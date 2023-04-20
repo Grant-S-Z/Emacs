@@ -1,0 +1,25 @@
+# -*- mode: org -*-
+# name: pandoc_to_dr
+# key:pandoc_to_dr
+# --
+#+PANDOC_OPTIONS: toc:nil
+#+PANDOC_OPTIONS: pdf-engine:xelatex
+#+LATEX_CLASS: \documentclass[11pt, a4paper]{ctexart}
+
+#+LaTeX_HEADER: \usepackage{fontspec}
+#+LaTeX_HEADER: \setmainfont{Times New Roman}
+#+LaTeX_HEADER: \setmonofont{Fantasque Sans Mono}
+#+LATEX_HEADER: \setCJKmainfont{华文楷体}
+
+#+LaTeX_HEADER: \usepackage{amsmath}
+#+LaTeX_HEADER: \usepackage{amsfonts}
+#+LaTeX_HEADER: \usepackage{amssymb}
+#+LaTeX_HEADER: \usepackage{mathtools}
+#+LaTeX_HEADER: \usepackage{siunitx}
+
+#+LaTeX_HEADER: \usepackage{array}
+#+LaTeX_HEADER: \usepackage{graphicx}
+#+LaTeX_HEADER: \usepackage{xcolor}
+
+#+TITLE:
+#+AUTHOR:

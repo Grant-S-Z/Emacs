@@ -1,0 +1,39 @@
+# -*- mode: snippet -*-
+# name: hw
+# key: hw
+# --
+\documentclass[a4paper]{ctexart}
+
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setmonofont{Fantasque Sans Mono}
+\setCJKmainfont{华文楷体}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{siunitx}
+\usepackage{array}
+
+\usepackage[subrefformat=parens]{subcaption}
+\usepackage{animate}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{xcolor}
+\usepackage{minted}
+
+\setminted{fontsize=\small, autogobble, breaklines, linenos}
+
+\definecolor{grey}{rgb}{0.95, 0.95, 0.95}
+
+\begin{document}
+
+\title{\fontsize{20pt}{0}\selectfont }
+\author{朱宇涛}
+\date{}
+
+\maketitle
+
+\end{document}
