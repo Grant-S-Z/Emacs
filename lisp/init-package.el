@@ -13,35 +13,20 @@
   :bind (("<M-up>" . drag-stuff-up)
 	 ("<M-down>" . drag-stuff-down)))
 
-(use-package ivy ;; 强化minibuffer
-  :defer 1
-  :demand
-  :hook (after-init . ivy-mode)
-  :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t
-	ivy-initial-inputs-alist nil
-	ivy-count-format "%d/%d "
-	enable-recursive-minibuffers t
-	ivy-re-builders-alist '((t . ivy--regex-ignore-order))))
-
-(use-package counsel ;; 文件搜索
-  :after ivy
-  :bind (("M-x" . counsel-M-x)
-	 ("C-x C-f" . counsel-find-file)
-	 ("C-c f" . counsel-recentf)
-	 ("C-c g" . counsel-git)))
-
 ;; (ivy-set-actions ;; 查找文件时删除文件
 ;;  'counsel-find-file
 ;;  '(("d" delete-file "delete")))
 
-(use-package swiper ;; 文件内容搜索
-  :after ivy
-  :bind (("C-s" .swiper)
-	 ("C-r" . swiper-isearch-backward))
-  :config (setq swiper-action-recenter t
-		swiper-include-line-number-in-search t))
+;; (use-package swiper ;; 文件内容搜索
+;;   :after vertico
+;;   :bind (("C-s" .swiper)
+;; 	 ("C-r" . swiper-isearch-backward)
+;; 	 ("C-x M-r" . query-replace-regexp))
+;;   :config (setq swiper-action-recenter t
+;; 		swiper-include-line-number-in-search t))
+
+(use-package consult
+  :bind (("C-s" . consult-line)))
 
 (use-package crux ;; 一些快捷键
   :bind (("C-a" . crux-move-beginning-of-line)
@@ -70,7 +55,7 @@
 
 ;; 语法
 (use-package company ;; 语法提示补全
-  :bind ("C-x c" . company-mode)
+  :init (global-company-mode t)
   :config
   (setq company-minimum-prefix-length 2
         company-show-quick-access 'left
@@ -97,7 +82,7 @@
 (use-package ace-window ;; 分屏切换
   :bind (("M-o" . 'ace-window)))
 
-(use-package dimmer ;; 确认分屏
+(use-package dimmer ;; 黯淡分屏
   :hook (prog-mode . dimmer-mode)
   :config
   (dimmer-configure-company-box)
@@ -110,14 +95,11 @@
   :config
   (dirvish-override-dired-mode) ;; 启用dirvish覆盖dired
   (setq dirvish-default-layout '(0 0.2 0.8)) ;; 去除父目录
-  (setq-default truncate-lines t) ;; 显示不自动换行
   (setq dirvish-attributes '(all-the-icons file-size) ;; 设置icons
 	insert-directory-program "gls"))
 
 (use-package shell-pop ;; 终端弹出
-  :bind (("C-c s" . shell-pop))
-  :config
-  (setq shell-pop-term-shell "/bin/zsh"))
+  :bind (("C-c s" . shell-pop)))
 
 (use-package ws-butler ;; 自动清除空格
   :hook (prog-mode . ws-butler-mode))

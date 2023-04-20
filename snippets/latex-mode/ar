@@ -2,38 +2,40 @@
 # name: ar
 # key: ar
 # --
-\documentclass[11pt, a4paper]{ctexart}
+\documentclass[UTF8]{ctexart}
 
+% fonts
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
 \setmonofont{Fantasque Sans Mono}
 
+% math
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-\usepackage{mathtools}
 \usepackage{bm}
 \usepackage{siunitx}
-\usepackage{array}
 
+% pictures and color
 \usepackage[subrefformat=parens]{subcaption}
 \usepackage{animate}
 \usepackage{graphicx}
-\usepackage{cite}
 \usepackage{xcolor}
 
+% references
+\usepackage{cite}
+
+% src
 \usepackage{minted}
-
 \setminted{fontsize=\small, autogobble, breaklines, linenos}
-
 \definecolor{grey}{rgb}{0.95, 0.95, 0.95}
 
 \renewcommand{\abstractname}{\Large 摘要}
 
 \begin{document}
 
-\title{\fontsize{20pt}{0}\selectfont }
-\author{朱宇涛}
+\title{}
+\author{}
 \date{}
 
 \maketitle

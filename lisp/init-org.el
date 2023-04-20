@@ -68,9 +68,43 @@
 ;; 图片
 (setq org-image-actual-width 300)
 
+;;; 笔记配置
+;; org-roam
+(use-package org-roam
+  :custom
+  (org-roam-directory "~/org/roam-notes/") ;; 默认笔记目录
+  (org-roam-dailies-directory "~/org/daily/") ;; 默认日记目录
+  (org-roam-db-gc-threshole most-positive-fixnum)
+
+  :bind
+  (("C-c n f" . org-roam-node-find)
+   ("C-c n i" . org-roam-node-insert)
+   ("C-c n c" . org-roam-capture)
+   ("C-c n l" . org-roam-buffer-toggle) ;; 显示后链窗口
+   ("C-c n u" . org-roam-ui-mode)) ;; 浏览器中可视化
+
+  :bind-keymap
+  ("C-c n d" . org-roam-dailies-map) ;; 日记菜单
+
+  :config
+  (require 'org-roam-dailies) ;; 启用日记功能
+  (org-roam-db-autosync-mode) ;; 启动时自动同步数据库
+  )
+
+(use-package org-roam-ui
+  :after org-roam
+  :custom
+  (org-roam-ui-sync-theme t) ;; 同步Emacs主题
+  (org-roam-ui-follow t) ;; 笔记节点跟随
+  (org-roam-ui-update-on-save t)
+  )
+
+;; org-noter
+(use-package org-noter)
+
 ;;; babel配置
 ;; python
-(setq python-shell-interpreter "~/code/python/venv3.11/bin/python")
+(setq python-shell-interpreter "~/usr/bin/python3")
 (setq org-babel-python-command "python3")
 (setq python-indent-offset 2)
 
