@@ -112,5 +112,13 @@
   (setq super-save-auto-save-when-idle t)
   (setq save-silently t))
 
+;; md-mode
+(use-package markdown-mode
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
+
 (provide 'init-package)
 ;;; init-package.el ends here

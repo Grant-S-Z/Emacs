@@ -11,6 +11,8 @@
 (global-auto-revert-mode t)
 (delete-selection-mode t)
 
+(mac-auto-operator-composition-mode) ;; fira code, you know
+
 (setq make-backup-files nil) ;; 不自动备份文件
 (setq inhibit-startup-message t) ;; 禁用初始欢迎界面
 

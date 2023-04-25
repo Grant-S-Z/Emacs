@@ -3,40 +3,45 @@
 ;;; Code:
 
 ;; 待办事项关键词
-(setq org-todo-keyword-faces '(("TODO" . "red") ("DOING" . "yellow") ("SHELVED" . "orange") ("DONE" . "blue") ("CANCELED" . "green")))
+(setq org-todo-keyword-faces '(("TODO" . "red") ("SHELVED" . "orange") ("DONE" . "blue") ("CANCELED" . "green")))
 
 ;; 日程文件位置
-(setq org-agenda-files (list "~/org/agenda/work.org"))
+(setq org-agenda-files (list "~/org/task.org"))
+
+;; org特性
+(add-hook 'org-mode-hook (lambda ()
+			   (setq truncate-lines nil)
+			   (org-cdlatex-mode);; 启用cdlatex
+			   ))
 
 ;; 任务capture-templetes
 (setq org-capture-templates nil)
-(add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
 
 (add-to-list 'org-capture-templates '("t" "Tasks")) ;; 任务模版集
 (add-to-list 'org-capture-templates
 	     '("tr" "Reading Task" entry
 	       (file+headline "~/org/task.org" "Reading")
-	       "* TODO %^{Contentsname}\n%u\n%a\n" :clock-in t :clock-resume t))
+	       "* TODO %^{Contentsname}\n%u\n"))
 (add-to-list 'org-capture-templates
 	     '("tw" "Work Task" entry
 	       (file+headline "~/org/task.org" "Work")
-	       "* TODO %^{Workname}\n%u\n%a\n" :clock-in t :clock-resume t))
+	       "* TODO %^{Workname}\n%u\n"))
 (add-to-list 'org-capture-templates
 	     '("th" "Homework Task" entry
 	       (file+headline "~/org/task.org" "Homework")
-	       "* TODO %^{Homeworkname}\n%u\n%a\n" :clock-in t :clock-resume t))
+	       "* TODO %^{Homeworkname}\n%u\n"))
 (add-to-list 'org-capture-templates
 	     '("tl" "Long Task" entry
 	       (file+headline "~/org/task.org" "Long Task")
-	       "* TODO %^{Longtaskname}\n%u\n%a\n" :clock-in t :clock-resume t))
+	       "* TODO %^{Longtaskname}\n%u\n"))
 (add-to-list 'org-capture-templates
 	     '("tq" "Questions" entry
 	       (file+headline "~/org/task.org" "Questions")
-	       "* TODO %^{Questionname}\n%u\n%a\n" :clock-in t :clock-resume t))
+	       "* TODO %^{Questionname}\n%u\n"))
 (add-to-list 'org-capture-templates
 	     '("tt" "Thesis Doubts" entry
 	       (file+headline "~/org/task.org" "Thesis Doubts")
-	       "* TODO %^{Doubtsname}\n%u\n%a\n" :clock-in t :clock-resume t))
+	       "* TODO %^{Doubtsname}\n%u\n"))
 
 (add-to-list 'org-capture-templates ;; 日志模版
              '("j" "Journal" entry (file "~/org/journal.org")
@@ -102,6 +107,14 @@
 ;; org-noter
 (use-package org-noter)
 
+;;; 图片预览
+;; xenops
+(use-package xenops
+  :after org
+  :hook (org-mode . xenops-mode)
+  :config
+  (setq xenops-xen-mode t))
+
 ;;; babel配置
 ;; python
 (setq python-shell-interpreter "~/usr/bin/python3")
@@ -113,9 +126,6 @@
   '((python . t)))
 
 (auto-image-file-mode t)
-
-;; prettify-symbols-mode配置
-;; (add-hook 'org-mode (lambda () (setq prettify-symbols-mode t)))
 
 ;; 快捷键
 (global-set-key (kbd "C-c a") #'org-agenda)

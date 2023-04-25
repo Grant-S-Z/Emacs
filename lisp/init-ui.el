@@ -53,6 +53,9 @@
   
   :config
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+  (setq dashboard-items '((recents  . 7)
+                          (bookmarks . 5)
+                          (agenda . 5)))
 
   :custom
   ;; Set the title
@@ -144,7 +147,20 @@
   :custom
   (default-input-method "rime")
   (rime-librime-root "~/.emacs.d/librime/dist")
-  (rime-emacs-module-header-root "~/.emacs.d/librime"))
+  (rime-emacs-module-header-root "~/.emacs.d/librime")
+  (rime-cursor "˰")
+  (rime-show-candidate 'posframe)
+  ;; 具体参考 mode-line-mule-info 默认值，其中可能有其它有用信息
+  (mode-line-mule-info '((:eval (rime-lighter))))
+  ;; 在 minibuffer 使用后自动关闭输入法
+  (rime-deactivate-when-exit-minibuffer t)
+
+  :config
+  ;(set-face-attribute 'rime-default-face nil :foreground "#839496" :background "#073642")
+  )
+
+(use-package fira-code-mode ;; font
+  :config (global-fira-code-mode))
 
 (use-package emacs
   :init
@@ -178,8 +194,22 @@
 
   (progn
     (set-face-attribute 'default nil ;; 英文字体
-			:font "Fantasque Sans Mono"
-			:height 150)
+					;:font "Fantasque Sans Mono"
+					;:font "LXGW WenKai Mono"
+					:font "Fira Code"
+					;:font "Georgia"
+					;:font "Helvetica"
+					;:font "Times New Roman"
+					;:font "DejaVu Sans Mono"
+					;:font "Inconsolata"
+					;:font "LXGW WenKai"
+					;:font "Futura"
+					;:font "Lucida Grande"
+					;:font "Menlo"
+					;:font "Courier New"
+					;:font "Andale Mono"
+					;:font "Monaco"
+			:height 140)
     (dolist (charset '(kana han symbol cjk-misc bopomofo)) ;; 中文字体
       (set-fontset-font (frame-parameter nil 'font)
 			charset (font-spec :family "LXGW WenKai Mono")))))

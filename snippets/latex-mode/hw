@@ -13,13 +13,18 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{bm}
 \usepackage{siunitx}
-\usepackage{array}
 
 \usepackage{graphicx}
-\usepackage{tikz}
 
-\newtheorem{theorem}{定理}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\pagenumbering{arabic}
+\fancyhead[C]{}
+\fancyfoot[C]{\thepage}
+
 
 \begin{document}
 
