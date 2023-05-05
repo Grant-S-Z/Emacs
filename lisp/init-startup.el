@@ -2,8 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 
-(set-frame-position (selected-frame) 720 0) ;; 设置启动位置
-(set-frame-width (selected-frame) 88) ;; 设置启动宽度
+;; (set-frame-position (selected-frame) 720 0) ;; 设置启动位置
+;; (set-frame-width (selected-frame) 88) ;; 设置启动宽度
 
 (tool-bar-mode -1) ;; 关闭任务栏
 (set-scroll-bar-mode nil) ;; 关闭滚动条
@@ -15,6 +15,7 @@
 
 (setq make-backup-files nil) ;; 不自动备份文件
 (setq inhibit-startup-message t) ;; 禁用初始欢迎界面
+(setq-default cursor-type 'bar) ;; 设置光标为竖线
 
 (add-hook 'prog-mode-hook #'show-paren-mode)
 (add-hook 'prog-mode-hook #'hs-minor-mode)
@@ -26,7 +27,7 @@
 
 (setq package-native-compile t)
 
-;; 将load-file的内容加载到custom.el中
+;; 将 load-file 的内容加载到 custom.el 中
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
   (load-file custom-file))

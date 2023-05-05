@@ -2,32 +2,27 @@
 ;;; Commentary:
 ;;; Code:
 
-;; (use-package night-owl-theme ;; theme
+;; themes
+;; (use-package night-owl-theme
 ;;   :init (load-theme 'night-owl t))
-
-;; (defun night-owl/ivy-format-function-line (cands)
-;;   (let ((str (ivy-format-function-line cands)))
-;;     (font-lock-append-text-property 0 (length str) 'face 'ivy-not-current str)
-;;     str))
-
-;; (setq ivy-format-function #'night-owl/ivy-format-function-line)
 
 (use-package solo-jazz-theme
   :init (load-theme 'solo-jazz t))
 
-;; (use-package modus-themes
-;;   ;; :init (load-theme 'modus-operandi)
-;;   :init (load-theme 'modus-operandi-deuteranopia t)
-;; )
-
-;; (load-theme 'leuven)
+;; (use-package mindre-theme
+;;   :init (load-theme 'mindre t)
+;;   :custom
+;;   (mindre-use-more-bold t)
+;;   (mindre-use-more-fading t)
+;;   (mindre-use-faded-lisp-parens t)
+;;   (mindre-faded-lisp-parens-modes '(emacs-lisp-mode lisp-mode scheme-mode racket-mode)))
 
 ;; 主题随时间变化
 ;; (add-to-list 'load-path "~/.emacs.d/repos/theme-changer")
 ;; (require 'theme-changer)
 ;; (change-theme 'solo-jazz 'night-owl)
 
-;; 尝试为org-mode单独配置主题
+;; 尝试为 org-mode 单独配置主题
 ;; (use-package leuven-theme
 ;;   :after org)
 
@@ -80,7 +75,7 @@
   (display-time-mode t))
 
 ;; (use-package visual-fill-column ;; 居中
-;;   :hook ((prog-mode) . (lambda () ;; tex-mode和org-mode不居中
+;;   :hook ((prog-mode) . (lambda () ;; tex-mode 和 org-mode 不居中
 ;; 		     (setq visual-fill-column-width 100) ;; 宽度
 ;; 		     (setq visual-fill-column-center-text t) ;; 居中
 ;; 		     (setq adaptive-fill-mode t)
@@ -90,10 +85,16 @@
   :init
   (setq sml/no-confirm-load-theme t
 	sml/theme 'respectful)
-  (sml/setup))
+  (sml/setup)
+  :config
+  (setq rm-blacklist
+	(format "^ \\(%s\\)$"
+		(mapconcat #'identity
+			   '("Projectile.*" "super-save" "P" "WK" "yas" "wb" "hs" "hl-p")
+			   "\\|"))))
 
 ;;; minibuffer
-;; (use-package ivy ;; 强化minibuffer
+;; (use-package ivy ;; 强化 minibuffer
 ;;   :defer 1
 ;;   :demand
 ;;   :hook (after-init . ivy-mode)
@@ -143,24 +144,22 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-(use-package rime ;; 输入法
-  :custom
-  (default-input-method "rime")
-  (rime-librime-root "~/.emacs.d/librime/dist")
-  (rime-emacs-module-header-root "~/.emacs.d/librime")
-  (rime-cursor "˰")
-  (rime-show-candidate 'posframe)
-  ;; 具体参考 mode-line-mule-info 默认值，其中可能有其它有用信息
-  (mode-line-mule-info '((:eval (rime-lighter))))
-  ;; 在 minibuffer 使用后自动关闭输入法
-  (rime-deactivate-when-exit-minibuffer t)
+;; (use-package rime ;; 输入法
+;;   :custom
+;;   (default-input-method "rime")
+;;   (rime-librime-root "~/.emacs.d/librime/dist")
+;;   (rime-emacs-module-header-root "~/.emacs.d/librime")
+;;   (rime-cursor "˰")
+;;   (rime-show-candidate 'posframe)
+;;   (rime-posframe-properties
+;;    (list :internal-border-width 5))
+;;   ;; 具体参考 mode-line-mule-info 默认值，其中可能有其它有用信息
+;;   (mode-line-mule-info '((:eval (rime-lighter))))
+;;   ;; 在 minibuffer 使用后自动关闭输入法
+;;   (rime-deactivate-when-exit-minibuffer t))
 
-  :config
-  ;(set-face-attribute 'rime-default-face nil :foreground "#839496" :background "#073642")
-  )
-
-(use-package fira-code-mode ;; font
-  :config (global-fira-code-mode))
+;; (use-package fira-code-mode ;; font
+;;   :config (global-fira-code-mode))
 
 (use-package emacs
   :init
@@ -189,30 +188,24 @@
   (setq enable-recursive-minibuffers t)
 
   :config
-  ;(setq display-line-numbers-type 'relative) ;; relative line numbers
-  ;(global-display-line-numbers-mode t)
+  ;; (setq display-line-numbers-type 'relative) ;; relative line numbers
+  ;; (global-display-line-numbers-mode t)
 
   (progn
     (set-face-attribute 'default nil ;; 英文字体
 					;:font "Fantasque Sans Mono"
 					;:font "LXGW WenKai Mono"
-					:font "Fira Code"
-					;:font "Georgia"
-					;:font "Helvetica"
-					;:font "Times New Roman"
+					;:font "Fira Code"
 					;:font "DejaVu Sans Mono"
-					;:font "Inconsolata"
+					:font "Inconsolata"
 					;:font "LXGW WenKai"
-					;:font "Futura"
-					;:font "Lucida Grande"
 					;:font "Menlo"
 					;:font "Courier New"
-					;:font "Andale Mono"
 					;:font "Monaco"
-			:height 140)
+					:height 180)
     (dolist (charset '(kana han symbol cjk-misc bopomofo)) ;; 中文字体
       (set-fontset-font (frame-parameter nil 'font)
-			charset (font-spec :family "LXGW WenKai Mono")))))
+			charset (font-spec :family "LXGW WenKai")))))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

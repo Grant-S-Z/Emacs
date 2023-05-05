@@ -15,7 +15,7 @@
   (setq-default TeX-master t) ;; 编译时不询问主文件名称
 
   (add-hook 'LaTeX-mode-hook (lambda ()
-	      (add-to-list 'TeX-command-list '("XeLaTeX" "%'xelatex%(mode) --synctax=1%' %t" TeX-run-TeX nil t)) ;; xelatex编译
+	      (add-to-list 'TeX-command-list '("XeLaTeX" "%'xelatex --synctex=1 --shell-escape%(mode)%' %t" TeX-run-TeX nil t)) ;; xelatex编译
 	      (setq prettify-symbols-mode t) ;; 加载prettify-symbols-mode
 	      (setq TeX-command-default "LatexMk") ;; 默认使用latexmk
 	      (setq TeX-show-compilation nil) ;; 不展示编译过程

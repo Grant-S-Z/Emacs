@@ -3,7 +3,7 @@
 ;;; Code:
 (setq package-check-signature nil) ; No checking signature
 
-;; 配置package源
+;; 配置 package 源
 (require 'package)
 
 ;; (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -29,16 +29,17 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-;; Use-package配置
+;; Use-package 配置
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
-(setq use-package-always-ensure t
-      use-package-always-defer t
+(eval-and-compile
+  (setq use-package-always-ensure t ;; 自动确保安装
+      use-package-always-defer t ;; 默认延迟加载
       use-package-always-demand nil
       use-package-expand-minimally t
-      use-package-verbose t)
+      use-package-verbose t))
 
 (require 'use-package)
 
