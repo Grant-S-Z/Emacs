@@ -1,0 +1,36 @@
+# -*- mode: snippet -*-
+# name: hwe
+# key: hwe
+# --
+\documentclass[UTF8]{article}
+
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setmonofont{Fantasque Sans Mono}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{siunitx}
+
+\usepackage{graphicx}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\pagenumbering{arabic}
+\fancyhead[C]{}
+\fancyfoot[C]{\thepage}
+
+
+\begin{document}
+
+\title{\fontsize{20pt}{0}\selectfont }
+\author{}
+\date{}
+
+\maketitle
+
+\end{document}

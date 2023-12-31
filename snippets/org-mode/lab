@@ -1,0 +1,23 @@
+# -*- mode: snippet -*-
+# name: lab
+# key: lab
+# --
+#+latex_header: \usepackage{cite}
+#+latex_header: \usepackage{booktabs}
+#+latex_header: \usepackage{graphicx}
+#+latex_header: \usepackage{subfigure}
+
+#+latex_header: \usepackage[margin=1in]{geometry}
+#+latex_header: \geometry{a4paper}
+#+latex_header: \usepackage{fancyhdr}
+#+latex_header: \pagestyle{fancy}
+#+latex_header: \fancyhf{}
+#+latex_header: \pagenumbering{arabic}
+#+latex_header: \fancyhead[C]{The name of the experiment}
+#+latex_header: \fancyfoot[C]{\thepage}
+
+#+options: toc:nil
+
+#+title:
+#+author:
+#+date:

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: hw
+# key: hw
+# --
+#+OPTIONS: H:2 toc:nil num:t \n:nil ::t |:t ^:t -:t f:t *:t <:t
+
+#+TITLE:
+#+AUTHOR:

@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: beamer
+# key: beamer
+# --
+#+TITLE:
+#+AUTHOR:
+#+DATE:
+#+LANGUAGE: cn
+#+OPTIONS: H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+startup: beamer
+#+LATEX_CLASS: beamer
+#+LATEX_HEADER: \usetheme{Madrid}
+#+LATEX_HEADER: \AtBeginSection[]{\begin{frame}\frametitle{目录}\tableofcontents[currentsection]\end{frame}}
+#+BEAMER_HEADER: \setbeamertemplate{footline}[frame number]

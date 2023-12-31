@@ -1,0 +1,66 @@
+# -*- mode: snippet -*-
+# name: lab
+# key: lab
+# --
+\documentclass[UTF8]{ctexart}
+
+% fonts
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setmonofont{Inconsolata}
+\setCJKmainfont{宋体-简}
+
+% math
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{siunitx}
+
+% references
+\usepackage{cite}
+\usepackage{hyperref}
+
+% pictures
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{subfigure}
+%\usepackage{array}
+\usepackage{booktabs}
+
+% pages
+\usepackage[margin=1in]{geometry}
+\geometry{a4paper}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\pagenumbering{arabic}
+\fancyhead[C]{The name of the experiment}
+\fancyfoot[C]{\thepage}
+
+% src
+\usepackage{minted}
+\setminted{fontsize=\small, autogobble, breaklines, linenos}
+\definecolor{grey}{rgb}{0.95, 0.95, 0.95}
+
+\begin{document}
+
+\title{实验报告}
+\author{朱宇涛}
+\date{\today}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+
+
+\newpage
+
+\bibliographystyle{plain}
+\bibliography{ref.bib}
+
+\end{document}

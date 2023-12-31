@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: latexe
+# key: latexe
+# --
+#+begin_latex export
+
+#+end_latex

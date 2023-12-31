@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: hugo
+# key: hugo
+# --
+#+TITLE:
+#+HUGO_TAGS:
+#+HUGO_CATEGORIES:
+#+HUGO_DRAFT: false
+#+HUGO_AUTO_SET_LASTMOD: t
