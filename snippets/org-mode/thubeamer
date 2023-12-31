@@ -1,0 +1,24 @@
+# -*- mode: snippet -*-
+# name: thubeamer
+# key: thubeamer
+# --
+#+LANGUAGE: cn
+#+OPTIONS: H:2 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+startup: beamer
+#+LATEX_CLASS: beamer
+#+LATEX_HEADER: \usetheme{thubeamer}
+#+LATEX_HEADER: \useoutertheme{default}
+#+LATEX_HEADER: \useinnertheme{default}
+#+LATEX_HEADER: \usecolortheme{default}
+#+LATEX_HEADER: \setbeamertemplate{blocks}[rounded][shadow=false]
+#+LATEX_HEADER: \setbeamertemplate{items}[ball]
+#+LATEX_HEADER: \setbeamertemplate{sections/subsections in toc}[ball]
+#+BEAMER_HEADER: \setbeamertemplate{footline}[frame number]
+#+BEAMER_HEADER: \setbeamertemplate{bibliography item}[text]
+#+LATEX_HEADER: \AtBeginSection[]{\begin{frame}\frametitle{目录}\tableofcontents[currentsection]\end{frame}}
+
+#+TITLE:
+#+SUBTITLE:
+#+AUTHOR:
+#+DATE: \small

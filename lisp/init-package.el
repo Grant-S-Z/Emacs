@@ -1,6 +1,9 @@
 ;;; init-package.el --- for packages
 ;;; Commentary:
 ;;; Code:
+(use-package benchmark-init ;; 统计 packages 耗时
+  :init (benchmark-init/activate))
+
 (use-package restart-emacs ;; 重启 emacs
   :bind (("C-c r" . restart-emacs)))
 
@@ -12,19 +15,14 @@
   :bind (("<M-up>" . drag-stuff-up)
 	 ("<M-down>" . drag-stuff-down)))
 
-(use-package keycast ;; 演示按键
-  :init (keycast-header-line-mode)
-  :config
-  (push '(org-self-insert-command nil nil) keycast-substitute-alist)
-  (push '(self-insert-command nil nil) keycast-substitute-alist)
-  (push '(mouse-drag-region nil nil) keycast-substitute-alist)
-  (push '(mouse-set-point nil nil) keycast-substitute-alist)
-  (push '(lsp-ui-doc--handle-mouse-movement nil nil) keycast-substitute-alist)
-  (push '(mac-mwheel-scroll nil nil) keycast-substitute-alist))
-
-(use-package smooth-scrolling
-  :init
-  :config (smooth-scrolling-mode t))
+;; (use-package keycast ;; 演示按键
+;;   :config
+;;   (push '(org-self-insert-command nil nil) keycast-substitute-alist)
+;;   (push '(self-insert-command nil nil) keycast-substitute-alist)
+;;   (push '(mouse-drag-region nil nil) keycast-substitute-alist)
+;;   (push '(mouse-set-point nil nil) keycast-substitute-alist)
+;;   (push '(lsp-ui-doc--handle-mouse-movement nil nil) keycast-substitute-alist)
+;;   (push '(mac-mwheel-scroll nil nil) keycast-substitute-alist))
 
 ;; (ivy-set-actions ;; 查找文件时删除文件
 ;;  'counsel-find-file
@@ -55,34 +53,9 @@
 (use-package yasnippet-snippets ;; 提供常用 snippets
   :after (yasnippet))
 
-;; (use-package auto-yasnippet
-;;   :bind
-;;   (("C-c w" . aya-create)
-;;    ("C-c y" . aya-expand))
-;;   :config
-;;   (setq aya-persist-snippets-dir (concat user-emacs-directory "~/.emacs.d/snippets")))
-
 (use-package which-key ;; 快捷键提示
   :defer nil
   :config (which-key-mode))
-
-;; 语法
-(use-package company ;; 语法提示补全
-  ;; :init (global-company-mode t)
-  :config
-  (setq company-minimum-prefix-length 1
-        company-show-quick-access 'left
- 	company-tooltip-align-annotations t
-	company-idle-delay 0.0 ;; default is 0.2
-	))
-
-;; (use-package auto-complete
-;;   :hook (prog-mode . auto-complete)
-;;   :config
-;;   (ac-config-default))
-
-(use-package flycheck ;; 语法检查
-  :hook (prog-mode . flycheck-mode))
 
 (use-package rainbow-delimiters ;; 括号颜色
   :init (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
@@ -105,14 +78,6 @@
   (dimmer-configure-posframe)
   (dimmer-configure-org))
 
-(use-package dirvish ;; 文件管理
-  :bind ("C-c C-x l" . dirvish)
-  :config
-  (dirvish-override-dired-mode) ;; 启用 dirvish 覆盖 dired
-  (setq dirvish-default-layout '(0 0.3 0.7)) ;; 去除父目录
-  (setq dirvish-attributes '(all-the-icons file-size) ;; 设置 icons
-	insert-directory-program "gls"))
-
 (use-package shell-pop ;; 终端弹出
   :bind (("C-c s" . shell-pop)))
 
@@ -127,7 +92,7 @@
   (setq super-save-auto-save-when-idle t)
   (setq save-silently t))
 
-(use-package pangu-spacing
+(use-package pangu-spacing ;; Comfortable space
   :init
   (global-pangu-spacing-mode 1)
   :config
@@ -157,6 +122,23 @@
   (setq org-hugo-section "post")
   :pin melpa
   :after ox)
+
+;; ein
+(use-package ein)
+
+;; bongo
+(use-package bongo
+  :commands bongo-playlist
+  :custom
+  (bongo-enabled-backends '(mplayer))
+  (bongo-default-directory "~/Music/MusicFree/Chinese")
+  (bongo-logo nil)
+  (bongo-insert-album-covers nil)
+  (bongo-album-cover-size 100)
+  (bongo-mode-line-indicator-mode nil))
+
+;; Calculator
+(use-package literate-calc-mode)
 
 (provide 'init-package)
 ;;; init-package.el ends here

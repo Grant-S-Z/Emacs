@@ -2,44 +2,16 @@
 ;;; Commentary:
 ;;; Code:
 
-;; themes
-;; (use-package night-owl-theme
-;;   :init (load-theme 'night-owl t))
-
-(use-package solo-jazz-theme
-  :init (load-theme 'solo-jazz t))
-
-;; (use-package mindre-theme
-;;   :init (load-theme 'mindre t)
-;;   :custom
-;;   (mindre-use-more-bold t)
-;;   (mindre-use-more-fading t)
-;;   (mindre-use-faded-lisp-parens t)
-;;   (mindre-faded-lisp-parens-modes '(emacs-lisp-mode lisp-mode scheme-mode racket-mode)))
+;;; themes
+;; (use-package doom-themes
+;;   :init (load-theme 'doom-one-light t))
 
 ;; 主题随时间变化
-;; (add-to-list 'load-path "~/.emacs.d/repos/theme-changer")
-;; (require 'theme-changer)
-;; (change-theme 'solo-jazz 'night-owl)
+(add-to-list 'load-path "~/.emacs.d/repos/theme-changer")
+(require 'theme-changer)
+(change-theme 'doom-one-light 'doom-one)
 
-;; 尝试为 org-mode 单独配置主题
-;; (use-package leuven-theme
-;;   :after org)
-
-;; (defvar saved-theme 'night-owl)
-
-;; (defun my-org-mode-hook ()
-;;   ;; 加载指定主题
-;;   (load-theme 'leuven-dark t))
-
-;; (defun my-change-major-mode-hook ()
-;;   ;; 恢复默认主题
-;;   (setq custom-enabled-themes saved-theme))
-
-;; (add-hook 'org-mode-hook 'my-org-mode-hook)
-;; (add-hook 'change-major-mode-hook 'my-change-major-mode-hook)
-
-(use-package all-the-icons ;; icons
+(use-package all-the-icons ;; all-the-icons
   :if (display-graphic-p))
 
 (use-package dashboard ;; 开始界面
@@ -60,7 +32,9 @@
   ;; Logo
   (dashboard-startup-banner "~/.emacs.d/img/madeline-strawberry.gif")
   ;; Footnote
-  (dashboard-footer-messages '("True mastery of any skill takes a lifetime."))
+  (dashboard-footer-messages '
+  ;("True mastery of any skill takes a lifetime.")
+  ("Schedule your tomorrow."))
   
   (dashboard-set-heading-icons t)
   (dashboard-set-file-icons t)
@@ -69,50 +43,19 @@
 
 (use-package time ;; 显示时间
   :init
-  (setq display-time-24hr-format t ;; hours
-	display-time-day-and-date t) ;; dates
+  (setq display-time-24hr-format t ;; 显示时间
+	display-time-day-and-date t) ;; 显示日期
   :config
   (display-time-mode t))
 
-;; (use-package visual-fill-column ;; 居中
-;;   :hook ((prog-mode) . (lambda () ;; tex-mode 和 org-mode 不居中
-;; 		     (setq visual-fill-column-width 100) ;; 宽度
-;; 		     (setq visual-fill-column-center-text t) ;; 居中
-;; 		     (setq adaptive-fill-mode t)
-;; 		     (global-visual-fill-column-mode 1))))
-
-(use-package smart-mode-line
-  :init
-  (setq sml/no-confirm-load-theme t
-	sml/theme 'respectful)
-  (sml/setup)
+;;; Modeline
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
   :config
-  (setq rm-blacklist
-	(format "^ \\(%s\\)$"
-		(mapconcat #'identity
-			   '("Projectile.*" "super-save" "P" "WK" "yas" "wb" "hs" "hl-p")
-			   "\\|"))))
+  (setq doom-modeline-buffer-file-name 'auto)
+  (setq doom-modeline-icon t))
 
 ;;; minibuffer
-;; (use-package ivy ;; 强化 minibuffer
-;;   :defer 1
-;;   :demand
-;;   :hook (after-init . ivy-mode)
-;;   :config
-;;   (ivy-mode 1)
-;;   (setq ivy-use-virtual-buffers t
-;; 	ivy-initial-inputs-alist nil
-;; 	ivy-count-format "%d/%d "
-;; 	enable-recursive-minibuffers t
-;; 	ivy-re-builders-alist '((t . ivy--regex-ignore-order))))
-
-;; (use-package counsel
-;;   :after ivy
-;;   :bind (("M-x" . counsel-M-x)
-;; 	 ("C-x C-f" . counsel-find-file)
-;; 	 ("C-c f" . counsel-recentf)
-;; 	 ("C-c g" . counsel-git)))
-
 (use-package vertico
   :init (vertico-mode))
 
@@ -144,26 +87,26 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-;; (use-package rime ;; 输入法
-;;   :custom
-;;   (default-input-method "rime")
-;;   (rime-librime-root "~/.emacs.d/librime/dist")
-;;   (rime-emacs-module-header-root "~/.emacs.d/librime")
-;;   (rime-cursor "˰")
-;;   (rime-show-candidate 'posframe)
-;;   (rime-posframe-properties
-;;    (list :internal-border-width 5))
-;;   ;; 具体参考 mode-line-mule-info 默认值，其中可能有其它有用信息
-;;   (mode-line-mule-info '((:eval (rime-lighter))))
-;;   ;; 在 minibuffer 使用后自动关闭输入法
-;;   (rime-deactivate-when-exit-minibuffer t))
-
-;; (use-package fira-code-mode ;; font
-;;   :config (global-fira-code-mode))
+(use-package rime ;; 输入法
+  :custom
+  (default-input-method "rime")
+  (rime-librime-root "~/.emacs.d/librime/dist") ;; librime 位置
+  (rime-emacs-module-header-root "/opt/homebrew/opt/emacs-mac/include/") ;; Emacs 头文件位置
+  (rime-share-data-dir "~/Library/Rime") ;; 共享目录
+  (rime-user-data-dir "~/.emacs.d/rime") ;; Emacs 目录，需要同步
+  (rime-cursor ".")
+  (rime-show-candidate 'posframe) ;; 使用 posframe 显示输入法
+  (rime-commit1-forall t) ;; 在输入位置显示首个备选项
+  (rime-posframe-properties
+   (list :internal-border-width 1 ;; 调整 posframe 边框
+	 :font "LXGW WenKai"
+	 :color 'rime-default-face))
+  (mode-line-mule-info '((:eval (rime-lighter)))) ;; 在 modeline 显示输入法标志
+  ;; 在 minibuffer 使用后自动关闭输入法
+  (rime-deactivate-when-exit-minibuffer t))
 
 (use-package emacs
   :init
-  ;; Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
   (defun crm-indicator (args)
     (cons (format "[CRM%s] %s"
@@ -187,25 +130,43 @@
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t)
 
-  :config
-  ;; (setq display-line-numbers-type 'relative) ;; relative line numbers
-  ;; (global-display-line-numbers-mode t)
-
   (progn
-    (set-face-attribute 'default nil ;; 英文字体
-					;:font "Fantasque Sans Mono"
-					;:font "LXGW WenKai Mono"
+    (set-face-attribute 'default nil    ;:font "Fantasque Sans Mono"
 					;:font "Fira Code"
 					;:font "DejaVu Sans Mono"
 					:font "Inconsolata"
-					;:font "LXGW WenKai"
-					;:font "Menlo"
-					;:font "Courier New"
-					;:font "Monaco"
-					:height 180)
-    (dolist (charset '(kana han symbol cjk-misc bopomofo)) ;; 中文字体
+					:height 130)
+    (dolist (charset '(kana han symbol cjk-misc bopomofo)) ;; Chinese fonts
       (set-fontset-font (frame-parameter nil 'font)
 			charset (font-spec :family "LXGW WenKai")))))
+
+;;; 文件管理
+;; dired
+(when (string= system-type "darwin")
+  (setq dired-use-ls-dired t
+        insert-directory-program "/opt/homebrew/bin/gls" ;; 因 ls 不能使用，设置为 gls
+        dired-listing-switches "-aBhl --group-directories-first"))
+;; dirvish
+(use-package dirvish
+  :bind
+  (("C-c l" . dirvish-side)
+   ("C-c f" . dirvish-fd))
+  :custom
+  (dirvish-quick-access-entries
+   '(("h" "~/" "Home")
+     ("d" "~/Downloads" "Downloads")
+     ("s" "~/Senior" "Senior")))
+  (dirvish-default-layout '(0 0.2 0.8))
+  (dirvish-attributes '(subtree-state
+		        nerd-icons
+		        collapse
+		        file-size)) ;; 设置显示
+  :config
+  (dirvish-override-dired-mode) ;; 启用 dirvish 覆盖 dired
+  (dirvish-side-follow-mode)
+)
+
+(use-package dired-subtree)
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

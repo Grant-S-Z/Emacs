@@ -2,14 +2,35 @@
 # name: beamer
 # key: beamer
 # --
-#+TITLE:
-#+AUTHOR:
-#+DATE:
 #+LANGUAGE: cn
-#+OPTIONS: H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS: H:2 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
 #+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
 #+startup: beamer
+
 #+LATEX_CLASS: beamer
-#+LATEX_HEADER: \usetheme{Madrid}
-#+LATEX_HEADER: \AtBeginSection[]{\begin{frame}\frametitle{目录}\tableofcontents[currentsection]\end{frame}}
-#+BEAMER_HEADER: \setbeamertemplate{footline}[frame number]
+
+#+LATEX_HEADER: \usepackage{etoolbox}
+#+LATEX_HEADER: \usepackage{pgfopts}
+#+LATEX_HEADER: \usepackage{booktabs}
+#+LATEX_HEADER: \usepackage[scale=2]{ccicons}
+
+#+LATEX_HEADER: \usetheme[block=fill, progressbar=frametitle]{metropolis}
+#+LATEX_HEADER: \useoutertheme{default}
+#+LATEX_HEADER: \useinnertheme{default}
+#+LATEX_HEADER: \usecolortheme{custom}
+
+#+LATEX_HEADER: \setbeamertemplate{blocks}[rounded][shadow=false]
+#+LATEX_HEADER: \setbeamertemplate{items}[circle]
+#+LATEX_HEADER: \setbeamertemplate{sections/subsections in toc}[ball]
+#+LATEX_HEADER: \setbeamertemplate{footline}[frame number]
+#+LATEX_HEADER: \setbeamertemplate{bibliography item}[text]
+#+LATEX_HEADER: %\setbeamerfont{footnote}{\tiny}
+
+#+TITLE:
+#+SUBTITLE:
+#+AUTHOR:
+#+DATE:
+** 目录
+#+begin_export latex
+\tableofcontents
+#+end_export

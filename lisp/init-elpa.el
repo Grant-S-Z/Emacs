@@ -30,10 +30,6 @@
   (package-refresh-contents))
 
 ;; Use-package 配置
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
 (eval-and-compile
   (setq use-package-always-ensure t ;; 自动确保安装
       use-package-always-defer t ;; 默认延迟加载
@@ -41,7 +37,7 @@
       use-package-expand-minimally t
       use-package-verbose t))
 
-(require 'use-package)
+(require 'use-package) ;; use-package 现已内置
 
 (provide 'init-elpa)
 ;;; init-elpa.el ends here

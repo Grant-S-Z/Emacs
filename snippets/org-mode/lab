@@ -13,11 +13,12 @@
 #+latex_header: \pagestyle{fancy}
 #+latex_header: \fancyhf{}
 #+latex_header: \pagenumbering{arabic}
-#+latex_header: \fancyhead[C]{The name of the experiment}
+#+latex_header: \fancyhead[C]{${1:name of the experiment}}
 #+latex_header: \fancyfoot[C]{\thepage}
 
 #+options: toc:nil
 
-#+title:
-#+author:
+#+title: $2
+#+author: $3
 #+date:
+-----

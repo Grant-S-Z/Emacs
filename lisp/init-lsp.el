@@ -2,44 +2,49 @@
 ;;; Commentary:
 ;;; Code:
 
-;; language server
-(use-package lsp-mode
-  :init
-  :hook
-  (python-mode . lsp-deferred)
-  (c++-mode . lsp-deferred)
-  (c-mode . lsp-deferred)
-  (json-mode . lsp-deferred)
-  (lsp-mode . lsp-enable-which-key-integration)
-  
-  :custom
-  (lsp-enable-snippet t)
-  (lsp-keep-workspace-alive t)
-  (lsp-enable-imenu t)
-  (lsp-enable-completion-at-point nil)
+;;; Language Server
+;; lsp-bridge
+(add-to-list 'load-path "~/.emacs.d/site-lisp/lsp-bridge")
+(require 'lsp-bridge)
+(global-lsp-bridge-mode)
+(add-hook 'find-file-hook #'lsp-bridge-restart-process)
 
-  :commands lsp)
+;; remote
+(setq lsp-bridge-remote-start-automatically t)
 
-(use-package lsp-ui
-  :after lsp-mode
-  :commands lsp-ui-mode)
+;;; Grammer
+(use-package flycheck
+  :init (global-flycheck-mode t))
+  ;:hook (prog-mode . flycheck-mode))
 
-;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+;;; Debug
+(use-package realgud)
+(use-package realgud-lldb)
 
-;; for debugger
-;; (use-package dapmode)
+;;; Org-babel
+(setq lsp-bridge-enable-org-babel t)
+(setq lsp-bridge-org-babel-lang-list '("python" "latex" "c" "c++"))
 
-;; (use-package dap-LANGUAGE)
-
-;; python
-;; (use-package lsp-pyright
-;;   :ensure t
-;;   :hook (python-mode . (lambda ()
-;;                           (require 'lsp-pyright)
-;;                           (lsp-deferred))))
-
-;; R
+;;; R
 (use-package ess)
+
+;;; Python
+(setq lsp-bridge-python-lsp-server "pyright")
+(setq lsp-bridge-python-multi-lsp-server "pyright_ruff")
+(setq python-indent-guess-indent-offset t)
+(setq python-indent-guess-indent-offset-verbose nil)
+;; Change mode for virtual environment
+(use-package direnv
+ :config
+ (direnv-mode))
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize)))
+
+;;; LaTeX
+(setq lsp-bridge-tex-lsp-server "texlab")
 
 (provide 'init-lsp)
 ;;; init-lsp.el ends here

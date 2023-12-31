@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: elatex
+# key: elatex
+# --
+#+begin_export latex
+$0
+#+end_export

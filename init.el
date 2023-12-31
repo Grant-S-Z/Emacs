@@ -9,9 +9,11 @@
 (require 'init-elpa)
 (require 'init-ui)
 (require 'init-package)
+(require 'init-mail)
 (require 'init-tex)
 (require 'init-org)
 (require 'init-lsp)
+
 
 (provide 'init)
 ;;; init.el ends here
