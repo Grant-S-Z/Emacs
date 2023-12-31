@@ -46,5 +46,16 @@
 ;;; LaTeX
 (setq lsp-bridge-tex-lsp-server "texlab")
 
+;;; Markdown
+(use-package markdown-mode
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
+
+;;; Jupyter notebook
+(use-package ein)
+
 (provide 'init-lsp)
 ;;; init-lsp.el ends here

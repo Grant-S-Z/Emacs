@@ -51,5 +51,8 @@
 (when (file-exists-p custom-file)
   (load-file custom-file))
 
+;; 快捷键
+
+
 (provide 'init-startup)
 ;;; init-startup.el ends here

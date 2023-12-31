@@ -1,8 +1,8 @@
 ;;; init-org.el --- for org
 ;;; Commentary:
 ;;; Code:
-
-;;; LaTeX 模板
+;;; org LaTeX 模板
+;; article and report
 (setq org-latex-classes
       '(("article" "\\documentclass{article}"
          ("\\section{%s}" . "\\section*{%s}")
@@ -80,13 +80,6 @@
 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
 ("\\paragraph{%s}" . "\\paragraph*{%s}")
 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-
-;; 获取密码
-(defun get-or-create-password ()
-  (setq password (read-string "Password: "))
-  (if (string= password "")
-      (create-password)
-    password))
 
 ;;; org
 (use-package org
@@ -216,7 +209,7 @@
                                       )))
   )
 
-;; org-appear, 方便编辑 latex 等
+;; org-appear, 方便编辑 latex 公式等
 (use-package org-appear
   :after org
   :hook (org-mode . org-appear-mode)
@@ -262,6 +255,7 @@
 ))
 
 ;;; 图片
+;; 复制
 (use-package org-download
   :after org
   :config
@@ -277,10 +271,6 @@
   :hook (org-mode . valign-mode)
   :custom
   (valign-fancy-bar nil)) ;; 确保性能
-
-;;; 快捷键
-(global-set-key (kbd "C-c a") #'org-agenda)
-(global-set-key (kbd "C-c c") #'org-capture)
 
 ;;; 笔记配置
 ;; Zotero 位置
@@ -381,6 +371,12 @@
 )
 (use-package djvu)
 (use-package nov)
+
+(use-package olivetti
+  :after org
+  :defer nil
+  :config
+  (olivetti-set-width 80))
 
 (provide 'init-org)
 ;;; init-org.el ends here
