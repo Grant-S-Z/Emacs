@@ -1,0 +1,38 @@
+# -*- mode: snippet -*-
+# name: book
+# key: book
+# --
+#+LANGUAGE: cn
+#+PROPERTY: header-args :eval never-export
+
+#+latex_complier: xelatex
+#+latex_class: book
+#+latex_header: \usepackage{cite}
+#+latex_header: \usepackage{booktabs}
+#+latex_header: \usepackage{graphicx}
+#+latex_header: \usepackage{subfigure}
+
+#+latex_header: \usepackage[margin=1in]{geometry}
+#+latex_header: \geometry{a4paper}
+
+#+latex_header: \usepackage{fancyhdr}
+#+latex_header: \pagestyle{fancy}
+#+latex_header: \fancyhf{}
+#+latex_header: \pagenumbering{arabic}
+#+latex_header: \fancyhead[C]{${1:bookname}}
+#+latex_header: \fancyfoot[C]{\thepage}
+
+#+latex_header: \theoremstyle{plain}
+#+latex_header: \newtheorem{theorem}{\indent 定理}[section]
+#+latex_header: \newtheorem{definition}{\indent 定义}[section]
+#+latex_header: \newtheorem{example}{\indent 例}[section]
+#+latex_header: \newtheorem{remark}{\indent 注}[section]
+#+latex_header: \newenvironment{solution}{\begin{proof}[\indent\bf 解]}{\end{proof}}
+#+latex_header: \renewcommand{\proofname}{\indent\bf 证明}
+
+#+options: toc:t H:2
+
+#+title: $2
+#+author: $3
+#+date: \today
+-----

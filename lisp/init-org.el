@@ -1,25 +1,46 @@
 ;;; init-org.el --- for org
 ;;; Commentary:
 ;;; Code:
-;;; org LaTeX 模板
-;; article and report
-(setq org-latex-classes
-      '(("article" "\\documentclass{article}"
-         ("\\section{%s}" . "\\section*{%s}")
-         ("\\subsection{%s}" . "\\subsection*{%s}")
-         ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-	 ("\\usepackage{fontspec}")
-	 ("\\setmainfont{Times New Roman}")
-	 ("\\setmonofont{Inconsolata}"))
-        ("report" "\\documentclass{report}"
-         ("\\chapter{%s}" . "\\chapter*{%s}")
-         ("\\section{%s}" . "\\section*{%s}")
-         ("\\subsection{%s}" . "\\subsection*{%s}")
-         ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
+;;; Org exports to LaTeX settings
+;; org-latex-hyperref-template
+(setq org-latex-hyperref-template "
+\\hypersetup{
+pdfauthor={%a},
+pdftitle={%t},
+pdfkeywords={%k},
+pdfsubject={%d},
+pdfcreator={%c},
+pdflang={%L},
+colorlinks=true,
+linkcolor=black
+}
+")
+
+;; babel output
+(setq org-latex-listings 'minted)
+(setq org-latex-pdf-process '("latexmk -f -pdf -shell-escape -%latex -interaction=nonstopmode -output-directory=%o %f")) ;; add "-shell-escape" for minted
 
 ;; ctexart
+(setq org-latex-classes '((("article" "
+\\documentclass[11pt]{article}"
+
+  ("\\section{%s}" . "\\section*{%s}")
+  ("\\subsection{%s}" . "\\subsection*{%s}")
+  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+  ("\\paragraph{%s}" . "\\paragraph*{%s}")
+  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+			    ("report" "
+\\documentclass[11pt]{report}"
+  ("\\part{%s}" . "\\part*{%s}")
+  ("\\chapter{%s}" . "\\chapter*{%s}")
+  ("\\section{%s}" . "\\section*{%s}")
+  ("\\subsection{%s}" . "\\subsection*{%s}")
+  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))))
+
+(add-to-list 'org-latex-classes '("chap" ""))
+
 (add-to-list 'org-latex-classes '("ctexart" "
-\\documentclass[UTF8, 11pt]{ctexart}
+\\documentclass[UTF8, a4paper, 11pt]{ctexart}
 
 \% fonts
 \\usepackage{fontspec}
@@ -27,26 +48,19 @@
 \\setmonofont{Inconsolata}
 \\setCJKmainfont{宋体-简}
 
-\\usepackage{amssymb}
 \\usepackage{amsfonts}
 \\usepackage{amsthm}
 \\usepackage{bm}
 \\usepackage{siunitx}
 \\usepackage{xcolor}
 
-\\usepackage{fancyvrb}
-\\RecustomVerbatimEnvironment{verbatim}{Verbatim}{}
+\\usepackage{cite}
+\\usepackage{booktabs}
+\\usepackage{graphicx}
+\\usepackage{subfigure}
 
-\% 设置全局的 Verbatim 样式
-\\fvset{
-  frame=lines,
-  fontsize=\\small,
-  numbers=left,
-  comment=\\color{grey}, % 注释颜色
-  keyword=\\color{red}, % 关键字颜色
-  % 设置背景色
-  fillcolor=\\color{gray}
-}
+\\usepackage[margin=1in]{geometry}
+\\geometry{a4paper}
 "
 
 ("\\section{%s}" . "\\section*{%s}")
@@ -81,27 +95,62 @@
 ("\\paragraph{%s}" . "\\paragraph*{%s}")
 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
+;; book
+(add-to-list 'org-latex-classes '("book" "
+\\documentclass[10pt, a4paper, pagesize=auto]{book}
+
+\% fonts
+\\usepackage{ctex}
+\\usepackage{fontspec}
+\\setmainfont{Times New Roman}
+\\setmonofont{Inconsolata}
+\\setsansfont{Times New Roman}
+\\setCJKmainfont{宋体-简}
+\\setCJKsansfont{楷体-简}
+\\setCJKmonofont{楷体-简}
+\\setcounter{secnumdepth}{3}
+
+\\usepackage{amsfonts}
+\\usepackage{amsthm}
+\\usepackage{bm}
+\\usepackage{siunitx}
+\\usepackage{xcolor}
+"
+
+("\\section{%s}" . "\\section*{%s}")
+("\\subsection{%s}" . "\\subsection*{%s}")
+("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+("\\paragraph{%s}" . "\\paragraph*{%s}")
+("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+;; elegantbook
+(add-to-list 'org-latex-classes '("elegantbook" "
+\\documentclass[lang=cn, newtx, 10pt, scheme=chinese]{elegantbook}
+
+\\setcounter{tocdepth}{3}
+\\logo{logo.png}
+\\cover{cover.jpg}
+
+\\addbibresource[location=local]{reference.bib}"))
+
 ;;; org
 (use-package org
   :defer nil
+  :bind ("C-x C-y" . org-insert-image)
   :config
-  ;;; 设置光标颜色
-  (set-cursor-color "#8A2BE2");; BlueViolet
+  ;;; 自动折叠
+  (setq org-startup-folded 'content) ;; 只显示标题
 
   ;;; 待办事项关键词
   (setq org-todo-keyword-faces '(("TODO" . "red") ("WAITING" . "orange") "|" ("DONE" . "blue") ("CANCELED" . "black")))
 
   ;;; 日程文件位置
-  (setq org-agenda-files '("~/org/task.org" "~/org/event.org" "~/org/plan.org"))
+  (setq org-agenda-files '("~/org/task.org" "~/org/event.org"))
 
   ;; 任务 capture-templetes
   (setq org-capture-templates nil)
 
   (add-to-list 'org-capture-templates '("t" "Tasks")) ;; 任务模版
-  (add-to-list 'org-capture-templates
-	       '("tr" "Reading Task" entry
-		 (file+headline "~/org/task.org" "Reading")
-		 "* TODO %^{Contentsname}\n%u\n"))
   (add-to-list 'org-capture-templates
 	       '("tw" "Work Task" entry
 		 (file+headline "~/org/task.org" "Work")
@@ -122,19 +171,9 @@
   (add-to-list 'org-capture-templates ;; 日志模版
                '("j" "Journal" entry (file "~/org/journal.org")
 		 "* %U - %^{heading}\n  %?"))
-
   (add-to-list 'org-capture-templates ;; 事例模版
                '("e" "Event" entry (file "~/org/event.org")
 		 "* %U - %^{heading}\n  %?"))
-
-  (add-to-list 'org-capture-templates ;; 备忘录模版
-               '("i" "Inbox" entry (file "~/org/inbox.org")
-		 "* %U - %^{heading} %^g\n %?\n"))
-
-  (add-to-list 'org-capture-templates ;; 计划模板
-	       '("p" "Plan tomorrow" entry (file "~/org/plan.org")
-		 "* TODO %U - %^{heading} %^g\n %?\n"))
-
   (add-to-list 'org-capture-templates ;; 密码模板
              '("k" "Passwords" entry (file "~/passwords.org")
                "* %U - %^{title} %^G\n\n  - 用户名: %^{用户名}\n  - 密码: %(get-or-create-password)"
@@ -144,12 +183,9 @@
   (auto-image-file-mode t)
   (setq org-image-actual-width 300)
 
-  ;; 导出 pdf 用 emacs 查看
-  (setq org-file-apps '("\\.pdf\\'" . emacs))
-
   ;; babel 配置
   (setq org-confirm-babel-evaluate nil)
-  (setq org-plantuml-jar-path "~/.emacs.d/repos/plantuml-1.2023.10.jar")
+  (setq org-plantuml-jar-path "~/Code/plantuml/plantuml-1.2024.3.jar")
 
   (require 'ob-C)
   (require 'ob-latex)
@@ -169,19 +205,25 @@
   ;;; python
   (setq python-shell-completion-native-enable t)
   (setq python-shell-interpreter "python3")
-  (setq org-babel-python-command "python3")
+  (setq org-babel-python-command "~/anaconda3/bin/python")
 
   ;;; latex
   (setq org-latex-default-class "ctexart") ;; 默认 latex class
   (setq org-latex-compiler "xelatex") ;; 默认 latex compiler
-
+  (turn-on-cdlatex)
   (add-hook 'org-mode-hook (lambda () ;; cdlatex
 			   (setq truncate-lines nil)
 			   (org-cdlatex-mode)))
 
+  ;;; pdf view
+  (setq org-file-apps
+	(quote
+	 ((auto-mode .emacs)
+	  ("\\.pdf\\'" . "/Applications/Skim.app/Contents/MacOS/Skim %s"))))
+
   :custom
-  (org-pretty-entities t) ;; pretty entities in org, which is not nice for writing latex
-  (org-startup-indented nil) ;; 大纲缩进，开启后代码块不美观
+  (org-pretty-entities t) ;; pretty entities in org
+  (org-startup-indented t) ;; 缩进
   (org-highlight-latex-and-related '(latex entities)) ;; latex 高亮设置
 
   ;;; Agenda styling
@@ -205,9 +247,7 @@
                                        2100
                                        2400)
                                       "......"
-                                      "-----------------------------------------------------"
-                                      )))
-  )
+                                      "-----------------------------------------------------"))))
 
 ;; org-appear, 方便编辑 latex 公式等
 (use-package org-appear
@@ -222,14 +262,16 @@
   (org-appear-autokeywords t))
 
 ;;; 主题
+;; org-modern
 (use-package org-modern
   :after org
   :hook (org-mode . org-modern-mode)
   :custom
-  (org-modern-todo nil) ;; 不太好看
-  (org-modern-table nil) ;; org-modern 表格十分难用
-  (org-modern-timestamp nil) ;; 和 TODO 一样不好看
-  (org-modern-tag nil) ;; 不想看见 org-modern 的 archive
+  (org-modern-hide-stars nil)
+  (org-modern-todo nil)
+  (org-modern-table nil)
+  (org-modern-timestamp nil)
+  (org-modern-tag nil)
   (org-modern-priority nil)
   :config
   ;; Add frame borders and window dividers
@@ -251,13 +293,18 @@
    org-insert-heading-respect-content t
    ;; Org styling, hide markup etc.
    org-hide-emphasis-markers t
-   org-ellipsis "…"
-))
+   org-ellipsis "…"))
+
+;; Fit org modern indent
+(setq org-startup-indented t)
+(use-package org-modern-indent
+  :load-path "~/.emacs.d/site-lisp/org-modern-indent"
+  :config
+  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 
 ;;; 图片
 ;; 复制
 (use-package org-download
-  :after org
   :config
   (add-hook 'dired-mode-hook 'org-download-enable)
   (setq-default org-download-image-dir "./img"))
@@ -274,7 +321,7 @@
 
 ;;; 笔记配置
 ;; Zotero 位置
-(setq zot_bib '("~/zotero/bibex/我的文库.bib") ;; Zotero 用 Better BibTeX 导出的 BibTeX 文件
+(setq zot_bib '("~/org/roam-notes/reference.bib") ;; Zotero 用 Better BibTeX 导出的 BibTeX 文件
       zot_pdf "~/library/CloudStorage/坚果云-zhuyt20@mails.tsinghua.edu.cn/zotero" ;; Zotero 的 ZotFile 同步文件夹
       org_refs "~/library/CloudStorage/坚果云-zhuyt20@mails.tsinghua.edu.cn/org/roam-notes/ref" ;; org-roam 文献笔记目录
       )
@@ -356,7 +403,7 @@
   :custom
   (org-noter-always-create-frame nil) ;; Please stop opening frames, which will change your fonts and make it hard to choose the window you want.
   (org-noter-highlight-selected-text t)
-  (org-noter-max-short-selected-text-length 15) ;; tab 高亮最小字符长度，大于该长度变为 quote
+  (org-noter-max-short-selected-text-length 50) ;; tab 高亮最小字符长度，大于该长度变为 quote
   (org-noter-auto-save-last-location t) ;; 自动保存上次位置
   (org-noter-notes-search-path '("~/org/roam-notes/"))
   :config
@@ -368,15 +415,17 @@
 	      "s" 'pdf-view-scroll-up-or-next-page) ;; 向下滑动
   (define-key pdf-view-mode-map
 	      "w" 'pdf-view-scroll-down-or-previous-page) ;; 向上滑动
-)
-(use-package djvu)
-(use-package nov)
+  )
 
-(use-package olivetti
-  :after org
+(use-package org-popup-posframe
+  :load-path "~/.emacs.d/site-lisp/org-popup-posframe"
   :defer nil
+  :init (org-popup-posframe-mode 1))
+
+;;; Org-reveal
+(use-package ox-reveal
   :config
-  (olivetti-set-width 80))
+  (setq org-reveal-root "file:///Users/grant/Code/js/reveal.js-5.0.5"))
 
 (provide 'init-org)
 ;;; init-org.el ends here

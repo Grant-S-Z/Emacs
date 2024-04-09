@@ -15,22 +15,32 @@
 #+LATEX_HEADER: \usepackage[scale=2]{ccicons}
 
 #+LATEX_HEADER: \usetheme[block=fill, progressbar=frametitle]{metropolis}
-#+LATEX_HEADER: \useoutertheme{default}
+#+LATEX_HEADER: \useoutertheme{infolines} % 采用 infoline
 #+LATEX_HEADER: \useinnertheme{default}
-#+LATEX_HEADER: \usecolortheme{custom}
+#+LATEX_HEADER: \usecolortheme{custom} % 使用 custom 颜色主题
 
 #+LATEX_HEADER: \setbeamertemplate{blocks}[rounded][shadow=false]
-#+LATEX_HEADER: \setbeamertemplate{items}[circle]
-#+LATEX_HEADER: \setbeamertemplate{sections/subsections in toc}[ball]
-#+LATEX_HEADER: \setbeamertemplate{footline}[frame number]
-#+LATEX_HEADER: \setbeamertemplate{bibliography item}[text]
-#+LATEX_HEADER: %\setbeamerfont{footnote}{\tiny}
+#+LATEX_HEADER: \setbeamertemplate{items}[circle] % circle item symbol
+#+LATEX_HEADER: \setbeamertemplate{sections/subsections in toc}[ball] % ball section symbol
+#+LATEX_HEADER: \setbeamertemplate{headline}[default] % 不使用 infoline 的 headline
+#+LATEX_HEADER: %\setbeamertemplate{footline}[default] % 使用 infoline 的 footline
+#+LATEX_HEADER: \setbeamertemplate{frame numbering}[none]
+#+LATEX_HEADER: \setbeamertemplate{bibliography item}[text] % 使用 text 的 references 形式
+#+LATEX_HEADER: %\setbeamerfont{footnote}{\tiny} % 可选择 tiny footnote
 
-#+TITLE:
-#+SUBTITLE:
-#+AUTHOR:
+#+TITLE: $1
+#+SUBTITLE: $2
+#+AUTHOR: $3
 #+DATE:
 ** 目录
 #+begin_export latex
 \tableofcontents
+#+end_export
+
+* 参考文献
+#+begin_export latex
+\begin{frame}[allowframebreaks]{参考文献}
+\bibliographystyle{abbrv} % tiny is not good
+\bibliography{reference.bib} % 参考文献存放在 "./reference.bib"
+\end{frame}
 #+end_export

@@ -2,6 +2,6 @@
 # name: r
 # key: r
 # --
-#+begin_src R :session
+#+begin_src R :session t
 $0
 #+end_src

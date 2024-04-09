@@ -2,6 +2,6 @@
 # name: sh
 # key: sh
 # --
-#+begin_src sh
+#+begin_src bash
 $0
 #+end_src

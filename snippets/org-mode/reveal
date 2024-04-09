@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: reveal
+# key: reveal
+# --
+#+REVEAL_THEME: serif
+#+OPTIONS: timestamp:nil toc:1 num:nil

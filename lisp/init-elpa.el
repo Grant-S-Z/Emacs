@@ -2,6 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 (setq package-check-signature nil) ; No checking signature
+(setq package-install-upgrade-built-in t) ; 内嵌 package 自动更新
 
 ;;; 配置 package 源
 (require 'package)
@@ -12,7 +13,6 @@
 ;; 			 ("melpa-stable" . "https://stable.melpa.org/packages/"))
 ;;       package-archive-priorities '(("melpa-stable" . 1)))
 
-;; thu
 (setq package-archives '(("gnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
                          ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
                          ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")))

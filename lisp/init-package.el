@@ -7,23 +7,9 @@
 (use-package restart-emacs ;; 重启 emacs
   :bind (("C-c r" . restart-emacs)))
 
-(use-package auto-package-update ;; package 更新
-  :config
-  (setq auto-package-update-delete-old-versions t
-	auto-package-update-hide-results t))
-
 (use-package drag-stuff ;; 范围移动
   :bind (("M-p" . drag-stuff-up)
 	 ("M-n" . drag-stuff-down)))
-
-(use-package keycast ;; 演示按键
-  :config
-  (push '(org-self-insert-command nil nil) keycast-substitute-alist)
-  (push '(self-insert-command nil nil) keycast-substitute-alist)
-  (push '(mouse-drag-region nil nil) keycast-substitute-alist)
-  (push '(mouse-set-point nil nil) keycast-substitute-alist)
-  (push '(lsp-ui-doc--handle-mouse-movement nil nil) keycast-substitute-alist)
-  (push '(mac-mwheel-scroll nil nil) keycast-substitute-alist))
 
 (use-package consult ;; 搜索
   :bind (("C-s" . consult-line)))
@@ -40,7 +26,7 @@
   :hook (prog-mode . yas-minor-mode))
 
 (use-package yasnippet-snippets ;; 提供常用 snippets
-  :after (yasnippet))
+  :after yasnippet)
 
 (use-package which-key ;; 快捷键提示
   :defer nil
@@ -67,9 +53,6 @@
   (dimmer-configure-posframe)
   (dimmer-configure-org))
 
-(use-package shell-pop ;; 终端弹出
-  :bind (("C-c s" . shell-pop)))
-
 (use-package ws-butler ;; 自动清除空格
   :hook (prog-mode . ws-butler-mode))
 
@@ -87,28 +70,56 @@
   :config
   (setq pangu-spacing-real-insert-separtor t))
 
+;; Key cast
+(use-package keycast
+  :config
+  (push '(org-self-insert-command nil nil) keycast-substitute-alist)
+  (push '(self-insert-command nil nil) keycast-substitute-alist)
+  (push '(mouse-drag-region nil nil) keycast-substitute-alist)
+  (push '(mouse-set-point nil nil) keycast-substitute-alist)
+  (push '(lsp-ui-doc--handle-mouse-movement nil nil) keycast-substitute-alist)
+  (push '(mac-mwheel-scroll nil nil) keycast-substitute-alist))
+
+;;; 终端
+(use-package vterm
+  :init
+  (setq vterm-shell "zsh"))
+
+(use-package vterm-toggle
+  :bind ("C-c s" . vterm-toggle)
+  :config
+  (setq vterm-toggle-fullscreen-p nil)
+  (add-to-list 'display-buffer-alist
+               '((lambda (buffer-or-name _)
+                   (let ((buffer (get-buffer buffer-or-name)))
+                     (with-current-buffer buffer
+                       (or (equal major-mode 'vterm-mode)
+                           (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
+                 (display-buffer-reuse-window display-buffer-at-bottom)
+                 (reusable-frames . visible)
+                 (window-height . 0.3))))
+
 ;;; hugo
 (use-package easy-hugo
-  :init
+  :bind ("C-c b" . easy-hugo)
+  :config
   (setq easy-hugo-basedir "~/Code/GrantSite/") ;; 网站本地文件根目录
   (setq easy-hugo-url "https://Grant-S-Z.github.io/GrantSite") ;; url 路径
   (setq easy-hugo-sshdomain "Grant-S-Z.github.io")
   (setq easy-hugo-previewtime "300")
-  (setq easy-hugo-default-ext ".org")
-  :bind ("C-c b" . easy-hugo))
+  (setq easy-hugo-default-ext ".org"))
 
 (use-package ox-hugo
-  :init
-  (setq org-hugo-base-dir "~/Site/GrantSite/")
-  (setq org-hugo-section "post")
-  :pin melpa
-  :after ox)
+  :config
+  (setq org-hugo-base-dir "~/Code/GrantSite/")
+  (setq org-hugo-section "post"))
 
 ;;; Bongo, a music player
 (use-package bongo
   :commands bongo-playlist
+  :bind ("C-c m" . bongo-playlist)
   :custom
-  (bongo-enabled-backends '(mplayer))
+  (bongo-enabled-backends '(mpv))
   (bongo-default-directory "~/Music/MusicFree/")
   (bongo-logo nil)
   (bongo-insert-album-covers nil)
@@ -118,8 +129,60 @@
 ;;; Calculator
 (use-package literate-calc-mode)
 
-;;; For writing
-(use-package darkroom-mode)
+;;; MPV
+(use-package mpv)
+
+;;; Calibre
+(use-package calibredb
+  :config
+  (setq calibredb-root-dir "~/Calibre Library")
+  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+  (setq calibredb-library-alist '(("~/Calibre"))))
+
+;;; EPUB reader
+(use-package nov
+  :config
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  (setq nov-text-width 100))
+(defun my-nov-font-setup ()
+  (face-remap-add-relative 'variable-pitch
+			   :family "Alegreya"
+			   :height 1.1))
+(add-hook 'nov-mode-hook 'my-nov-font-setup)
+
+;;; Translator
+(use-package fanyi
+  :bind ("C-c f" . fanyi-dwim)
+  :custom
+  (fanyi-providers '(;; 海词
+                     fanyi-haici-provider
+                     ;; 有道同义词词典
+                     fanyi-youdao-thesaurus-provider
+                     ;; Etymonline
+                     fanyi-etymon-provider
+                     ;; Longman
+                     fanyi-longman-provider))
+  (fanyi-verbose nil))
+
+(use-package go-translate
+  :config
+  (setq gts-translate-list '(("en" "zh")))
+  (setq gts-default-translator
+	(gts-translator
+	 :picker (gts-prompt-picker)
+	 :engines (list (gts-bing-engine))
+	 :render
+	 (gts-buffer-render))))
+
+;;; RSS
+(use-package elfeed
+  :config
+  (setq elfeed-feeds
+	'(("https://arxiv.org/rss/hep-ex" study physics)
+	  ("https://arxiv.org/rss/hep-ph" study physics)
+	  ("http://www.reddit.com/r/emacs/.rss" discussion emacs)
+	  ("https://planet.emacslife.com/atom.xml" discussion emacs)
+	  ("https://rss.nytimes.com/services/xml/rss/nyt/World.xml" news))))
 
 (provide 'init-package)
 ;;; init-package.el ends here

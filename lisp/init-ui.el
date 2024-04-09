@@ -3,26 +3,30 @@
 ;;; Code:
 
 ;;; themes
-;; (use-package doom-themes
-;;   :init (load-theme 'doom-one-light t))
+(use-package ef-themes
+  :init (load-theme 'ef-frost t))
 
-;; 主题随时间变化
-(add-to-list 'load-path "~/.emacs.d/repos/theme-changer")
-(require 'theme-changer)
-(change-theme 'doom-one-light 'doom-one)
+;;; Set transparency
+(set-frame-parameter (selected-frame) 'alpha '(100 100))
+(add-to-list 'default-frame-alist '(alpha 100 100))
 
 (use-package all-the-icons ;; all-the-icons
   :if (display-graphic-p))
 
-(use-package dashboard ;; 开始界面
+;;; 相对行号
+(setq display-line-numbers-type 'relative)
+(global-display-line-numbers-mode t)
+
+;;; 开始界面
+(use-package dashboard
   :init
   (add-hook 'after-init-hook 'dashboard-open)
-  
+
   :config
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-  (setq dashboard-items '((recents  . 7)
+  (setq dashboard-items '((recents  . 9)
                           (bookmarks . 5)
-                          (agenda . 5)))
+                          (agenda . 6)))
 
   :custom
   ;; Set the title
@@ -34,25 +38,18 @@
   ;; Footnote
   (dashboard-footer-messages '
   ;("True mastery of any skill takes a lifetime.")
-  ("Schedule your tomorrow."))
-  
+  ;("Schedule your tomorrow.")
+   ("Record yourself."))
+
   (dashboard-set-heading-icons t)
   (dashboard-set-file-icons t)
   (dashboard-set-init-info t)
   (dashboard-set-navigator t))
 
-(use-package time ;; 显示时间
-  :init
-  (setq display-time-24hr-format t ;; 显示时间
-	display-time-day-and-date t) ;; 显示日期
-  :config
-  (display-time-mode t))
-
 ;;; Modeline
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :config
-  (setq doom-modeline-buffer-file-name 'auto)
   (setq doom-modeline-icon t))
 
 ;;; minibuffer
@@ -87,7 +84,12 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
+;; Posframe
+(use-package posframe)
+
 (use-package rime ;; 输入法
+  :defer nil
+  :init
   :custom
   (default-input-method "rime")
   (rime-librime-root "~/.emacs.d/librime/dist") ;; librime 位置
@@ -103,7 +105,7 @@
 	 :color 'rime-default-face))
   (mode-line-mule-info '((:eval (rime-lighter)))) ;; 在 modeline 显示输入法标志
   ;; 在 minibuffer 使用后自动关闭输入法
-  (rime-deactivate-when-exit-minibuffer t))
+  (rime-d\eactivate-when-exit-minibuffer t))
 
 (use-package emacs
   :init
@@ -130,12 +132,27 @@
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t)
 
+  (defvar eh-space "  ")
+
+  ;; ** 设置 mode-line
+  ;; 在 mode-line 最后追加一个半角空格，一个全角空格，防止因为字体高度原
+  ;; 因，导致 mode-line 抖动。
+  (setq mode-line-end-spaces
+	'(:eval (if (display-graphic-p) eh-space "-%-")))
+
+  (defun eh-tab-line-format (orig_func)
+    "在 tab-line 的最后添加一个全角空格，防止 tab-line 抖动。"
+    (list (funcall orig_func) eh-space))
+
+  (advice-add 'tab-line-format :around #'eh-tab-line-format)
+
   (progn
     (set-face-attribute 'default nil    ;:font "Fantasque Sans Mono"
-					;:font "Fira Code"
 					;:font "DejaVu Sans Mono"
-					:font "Inconsolata"
-					:height 130)
+			                ;:font "IBM Plex Mono"
+					:font "Ligconsolata"
+			                ;:font Monaco
+					:height 140)
     (dolist (charset '(kana han symbol cjk-misc bopomofo)) ;; Chinese fonts
       (set-fontset-font (frame-parameter nil 'font)
 			charset (font-spec :family "LXGW WenKai")))))
@@ -148,9 +165,7 @@
         dired-listing-switches "-aBhl --group-directories-first"))
 ;; dirvish
 (use-package dirvish
-  :bind
-  (("C-c l" . dirvish-side)
-   ("C-c f" . dirvish-fd))
+  :bind ("C-c l" . dirvish-side)
   :custom
   (dirvish-quick-access-entries
    '(("h" "~/" "Home")
@@ -163,10 +178,7 @@
 		        file-size)) ;; 设置显示
   :config
   (dirvish-override-dired-mode) ;; 启用 dirvish 覆盖 dired
-  (dirvish-side-follow-mode)
-)
-
-(use-package dired-subtree)
+  (dirvish-side-follow-mode))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here
