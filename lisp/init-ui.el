@@ -3,19 +3,31 @@
 ;;; Code:
 
 ;;; themes
-(use-package ef-themes
-  :init (load-theme 'ef-frost t))
+;; 主题随时间变化
+(setq calendar-location-name "Beijing, CN")
+(setq calendar-latitude 39.9)
+(setq calendar-longitude 116.4)
+(require 'theme-changer)
+(change-theme 'ef-frost 'doom-shades-of-purple)
 
 ;;; Set transparency
 (set-frame-parameter (selected-frame) 'alpha '(100 100))
 (add-to-list 'default-frame-alist '(alpha 100 100))
 
-(use-package all-the-icons ;; all-the-icons
+;;; all-the-icons
+(use-package all-the-icons
   :if (display-graphic-p))
 
-;;; 相对行号
+;;; Line number
 (setq display-line-numbers-type 'relative)
-(global-display-line-numbers-mode t)
+(defun grant/enable-line-numbers ()
+  "Enable line numbers except in specific modes."
+  (unless (or (derived-mode-p 'org-mode)
+              (derived-mode-p 'latex-mode)
+              (derived-mode-p 'pdf-view-mode)
+              (derived-mode-p 'doc-view-mode))
+    (display-line-numbers-mode 1)))
+(add-hook 'prog-mode-hook 'grant/enable-line-numbers)
 
 ;;; 开始界面
 (use-package dashboard
@@ -34,12 +46,10 @@
   ;; Center contents
   (dashboard-center-content t)
   ;; Logo
-  (dashboard-startup-banner "~/.emacs.d/img/madeline-strawberry.gif")
+  (dashboard-startup-banner "~/.emacs.d/img/firefly.jpeg")
   ;; Footnote
   (dashboard-footer-messages '
-  ;("True mastery of any skill takes a lifetime.")
-  ;("Schedule your tomorrow.")
-   ("Record yourself."))
+  ("True mastery of any skill takes a lifetime."))
 
   (dashboard-set-heading-icons t)
   (dashboard-set-file-icons t)
@@ -50,6 +60,7 @@
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :config
+  (display-time)
   (setq doom-modeline-icon t))
 
 ;;; minibuffer
@@ -89,7 +100,6 @@
 
 (use-package rime ;; 输入法
   :defer nil
-  :init
   :custom
   (default-input-method "rime")
   (rime-librime-root "~/.emacs.d/librime/dist") ;; librime 位置
@@ -105,7 +115,7 @@
 	 :color 'rime-default-face))
   (mode-line-mule-info '((:eval (rime-lighter)))) ;; 在 modeline 显示输入法标志
   ;; 在 minibuffer 使用后自动关闭输入法
-  (rime-d\eactivate-when-exit-minibuffer t))
+  (rime-deactivate-when-exit-minibuffer t))
 
 (use-package emacs
   :init
@@ -134,9 +144,8 @@
 
   (defvar eh-space "  ")
 
-  ;; ** 设置 mode-line
-  ;; 在 mode-line 最后追加一个半角空格，一个全角空格，防止因为字体高度原
-  ;; 因，导致 mode-line 抖动。
+  ;; 设置 mode-line
+  ;; 在 mode-line 最后追加一个半角空格，一个全角空格，防止因为字体高度原因导致 mode-line 抖动。
   (setq mode-line-end-spaces
 	'(:eval (if (display-graphic-p) eh-space "-%-")))
 
@@ -151,11 +160,10 @@
 					;:font "DejaVu Sans Mono"
 			                ;:font "IBM Plex Mono"
 					:font "Ligconsolata"
-			                ;:font Monaco
-					:height 140)
+					:height 160)
     (dolist (charset '(kana han symbol cjk-misc bopomofo)) ;; Chinese fonts
       (set-fontset-font (frame-parameter nil 'font)
-			charset (font-spec :family "LXGW WenKai")))))
+			charset (font-spec :family "LXGW WenKai Mono")))))
 
 ;;; 文件管理
 ;; dired
@@ -165,6 +173,7 @@
         dired-listing-switches "-aBhl --group-directories-first"))
 ;; dirvish
 (use-package dirvish
+  :defer nil
   :bind ("C-c l" . dirvish-side)
   :custom
   (dirvish-quick-access-entries

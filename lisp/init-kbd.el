@@ -9,6 +9,7 @@
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c j") 'open-journal-at-today)
+(global-set-key (kbd "C-c w") 'open-words-recited)
 
 ;; lsp
 (global-set-key (kbd "C-x c") 'compile)

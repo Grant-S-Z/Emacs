@@ -21,21 +21,14 @@ linkcolor=black
 (setq org-latex-pdf-process '("latexmk -f -pdf -shell-escape -%latex -interaction=nonstopmode -output-directory=%o %f")) ;; add "-shell-escape" for minted
 
 ;; ctexart
-(setq org-latex-classes '((("article" "
+(setq org-latex-classes '(("art" "
 \\documentclass[11pt]{article}"
 
   ("\\section{%s}" . "\\section*{%s}")
   ("\\subsection{%s}" . "\\subsection*{%s}")
   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
   ("\\paragraph{%s}" . "\\paragraph*{%s}")
-  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-			    ("report" "
-\\documentclass[11pt]{report}"
-  ("\\part{%s}" . "\\part*{%s}")
-  ("\\chapter{%s}" . "\\chapter*{%s}")
-  ("\\section{%s}" . "\\section*{%s}")
-  ("\\subsection{%s}" . "\\subsection*{%s}")
-  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))))
+  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
 (add-to-list 'org-latex-classes '("chap" ""))
 
@@ -170,7 +163,7 @@ linkcolor=black
 
   (add-to-list 'org-capture-templates ;; 日志模版
                '("j" "Journal" entry (file "~/org/journal.org")
-		 "* %U - %^{heading}\n  %?"))
+		 "* %U - 日志\n  %?"))
   (add-to-list 'org-capture-templates ;; 事例模版
                '("e" "Event" entry (file "~/org/event.org")
 		 "* %U - %^{heading}\n  %?"))
@@ -181,7 +174,7 @@ linkcolor=black
 
   ;; 设置内联图片显示
   (auto-image-file-mode t)
-  (setq org-image-actual-width 300)
+  (setq org-image-actual-width 400)
 
   ;; babel 配置
   (setq org-confirm-babel-evaluate nil)
@@ -273,6 +266,7 @@ linkcolor=black
   (org-modern-timestamp nil)
   (org-modern-tag nil)
   (org-modern-priority nil)
+  (org-modern-star 'replace)
   :config
   ;; Add frame borders and window dividers
   (modify-all-frames-parameters
@@ -296,21 +290,11 @@ linkcolor=black
    org-ellipsis "…"))
 
 ;; Fit org modern indent
-(setq org-startup-indented t)
 (use-package org-modern-indent
   :load-path "~/.emacs.d/site-lisp/org-modern-indent"
+  :after org
   :config
   (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
-
-;;; 图片
-;; 复制
-(use-package org-download
-  :config
-  (add-hook 'dired-mode-hook 'org-download-enable)
-  (setq-default org-download-image-dir "./img"))
-
-;; graphviz
-(use-package graphviz-dot-mode)
 
 ;;; 表格
 (use-package valign
@@ -322,8 +306,8 @@ linkcolor=black
 ;;; 笔记配置
 ;; Zotero 位置
 (setq zot_bib '("~/org/roam-notes/reference.bib") ;; Zotero 用 Better BibTeX 导出的 BibTeX 文件
-      zot_pdf "~/library/CloudStorage/坚果云-zhuyt20@mails.tsinghua.edu.cn/zotero" ;; Zotero 的 ZotFile 同步文件夹
-      org_refs "~/library/CloudStorage/坚果云-zhuyt20@mails.tsinghua.edu.cn/org/roam-notes/ref" ;; org-roam 文献笔记目录
+      zot_pdf "~/Nutstore Files/zotero" ;; Zotero 的 ZotFile 同步文件夹
+      org_refs "~/org/roam-notes/ref" ;; org-roam 文献笔记目录
       )
 
 ;; org-roam
@@ -350,18 +334,18 @@ linkcolor=black
 		":Custom_ID: %^{citekey}\n"
 		":URL: %^{url}\n"
 		":AUTHOR: %^{author-or-editor}\n"
-		":NOTER_DOCUMENT: ~/library/CloudStorage/坚果云-zhuyt20@mails.tsinghua.edu.cn/zotero/%^{citekey}.pdf\n"
+		":NOTER_DOCUMENT: ~/Nutstore Files/zotero/%^{citekey}.pdf\n"
 		":END:"))
   (add-to-list 'org-roam-capture-templates
 	       `("r" "Zotero 文献模版" plain
 		 ,my/ref-template
 		 :target
-		 (file+head "~/library/CloudStorage/坚果云-zhuyt20@mails.tsinghua.edu.cn/org/roam-notes/ref/${citekey}.org" "#+title: ${title}\n"))))
+		 (file+head "~/org/roam-notes/ref/${citekey}.org" "#+title: ${title}\n"))))
 
 ;; 用 helm-bibtex 读取 Zotero 信息
 (use-package helm-bibtex
   :after org-roam
-  :defer nil
+  :defer t
   :custom
   (bibtex-completion-notes-path org_refs)
   (bibtex-completion-bibliography zot_bib)
@@ -370,6 +354,7 @@ linkcolor=black
 ;; org-roam-ui
 (use-package org-roam-ui
   :after org-roam
+  :defer t
   :custom
   (org-roam-ui-sync-theme t) ;; 同步 Emacs 主题
   (org-roam-ui-follow t) ;; 笔记节点跟随
@@ -378,7 +363,7 @@ linkcolor=black
 ;; org-roam-bibtex 绑定 helm-bibtex
 (use-package org-roam-bibtex
   :after org-roam
-  :defer nil
+  :defer t
   :hook (org-roam-mode . org-roam-bibtex-mode)
   :bind (("C-c n k" . orb-insert-link)
 	 ("C-c n a" . orb-note-action))
@@ -392,7 +377,7 @@ linkcolor=black
 
 ;; org-ref 引用设置
 (use-package org-ref
-  :defer nil
+  :defer t
   :after org-roam
   :bind (("C-c (" . org-ref-insert-link)))
 
@@ -417,15 +402,41 @@ linkcolor=black
 	      "w" 'pdf-view-scroll-down-or-previous-page) ;; 向上滑动
   )
 
-(use-package org-popup-posframe
-  :load-path "~/.emacs.d/site-lisp/org-popup-posframe"
-  :defer nil
-  :init (org-popup-posframe-mode 1))
-
-;;; Org-reveal
+;;; org-reveal
 (use-package ox-reveal
   :config
   (setq org-reveal-root "file:///Users/grant/Code/js/reveal.js-5.0.5"))
+
+;;; org-remark
+(use-package org-remark
+  :bind (("C-c n m" . org-remark-mark)
+	 ("C-c n ]" . org-remark-view-next)
+	 ("C-c n [" . org-remark-view-prev))
+  :hook (nov-mode . org-remark-nov-mode))
+
+;;; MPV
+(use-package mpv
+  :after org
+  :config
+  (defun org-mpv-complete-link (&optional arg)
+    (replace-regexp-in-string
+     "file:" "mpv:"
+     (org-link-complete-file arg)
+     t t))
+  (org-link-set-parameters "mpv"
+			   :follow #'mpv-play :complete #'org-mpv-complete-link)
+
+  (defun org-metareturn-insert-playback-position ()
+    (when-let ((item-beg (org-in-item-p)))
+      (when (and (not (bound-and-true-p org-timer-start-time))
+		 (mpv-live-p)
+		 (save-excursion
+                   (goto-char item-beg)
+                   (and (not (org-invisible-p)) (org-at-item-timer-p))))
+	(mpv-insert-playback-position t))))
+  (add-hook 'org-metareturn-hook #'org-metareturn-insert-playback-position)
+
+  (add-hook 'org-open-at-point-functions #'mpv-seek-to-position-at-point))
 
 (provide 'init-org)
 ;;; init-org.el ends here

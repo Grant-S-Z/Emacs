@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: ein
+# key: ein
+# --
+#+begin_src ein-python :session localhost $1
+  $0
+#+end_src

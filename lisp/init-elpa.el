@@ -27,5 +27,10 @@
 
 (require 'use-package) ;; use-package 现已内置
 
+(require 'async) ;; 异步
+(autoload 'dired-async-mode "dired-async.el" nil t)
+(dired-async-mode 1)
+(async-bytecomp-package-mode 1)
+
 (provide 'init-elpa)
 ;;; init-elpa.el ends here

@@ -8,9 +8,8 @@
 (delete-selection-mode t)
 (global-hl-line-mode t) ;; 高亮当前行
 
-(mouse-wheel-mode t) ;; 滚轮
-(pixel-scroll-mode -1) ;; 像素滚动，但在我这里不好用
-(pixel-scroll-precision-mode -1)
+(setq mac-mouse-wheel-smooth-scroll t) ;; 平滑滚动，对于 mac 只有这个起作用
+
 (mac-auto-operator-composition-mode t) ;; Ligature for mac port
 
 (setq make-backup-files nil) ;; 不自动备份文件
@@ -18,14 +17,11 @@
 (setq frame-title-format "Emacs") ;; frame 标题
 (setq-default cursor-type 'bar) ;; 设置光标为竖线
 
-(set-cursor-color "#8A2BE2") ;; 设置光标颜色 BlueViolet
+;;; 位置
+(setq calendar-location-name "Beijing, CN")
+(setq calendar-latitude 39.9042)
+(setq calendar-longitude 116.4074)
 
-;; 忽略某些 message
-(let ((inhibit-message t))
-  (message "Wrong type argument: number-or-marker-p, nil"))
-
-;;; 全屏启动，且可使用状态栏与程序坞
-;; (set-frame-parameter nil 'fullscreen 'fullboth)
 ;; Inhibit resizing Puremacs frame
 (setq frame-inhibit-implied-resize t)
 ;; To suppress flashing at startup
@@ -46,9 +42,6 @@
 (add-hook 'prog-mode-hook #'show-paren-mode)
 (add-hook 'prog-mode-hook #'hs-minor-mode)
 
-;; 垃圾回收
-(setq gc-cons-threshold most-positive-fixnum)
-(setq read-process-output-max (* 1024 1024))
 (setq package-native-compile t)
 
 ;; 将 load-file 的内容加载到 custom.el 中

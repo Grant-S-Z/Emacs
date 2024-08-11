@@ -1,6 +1,7 @@
 ;;; init-package.el --- for packages
 ;;; Commentary:
 ;;; Code:
+;;; Basic
 (use-package benchmark-init ;; 统计 packages 耗时
   :init (benchmark-init/activate))
 
@@ -19,7 +20,8 @@
 	 ("C-c ^" . crux-top-join-line)
 	 ("C-x ," . crux-find-user-init-file)
 	 ("C-S-d" . crux-duplicate-current-line-or-region)
-	 ("C-S-k" . crux-smart-kill-line)))
+	 ("C-S-k" . crux-smart-kill-line)
+	 ("C-c C-k" . crux-kill-other-buffers)))
 
 (use-package yasnippet ;; 设置 snippets
   :init (yas-global-mode t)
@@ -38,8 +40,12 @@
 (use-package highlight-parentheses ;; 括号高亮
   :init (add-hook 'prog-mode-hook 'highlight-parentheses-mode))
 
-;;; Git
+;; Git
 (use-package magit)
+
+;; Quickrun
+(use-package quickrun
+  :bind ("C-<return>" . quickrun))
 
 ;;; 界面
 (use-package ace-window ;; 分屏切换
@@ -72,6 +78,7 @@
 
 ;; Key cast
 (use-package keycast
+  :init (keycast-header-line-mode 1)
   :config
   (push '(org-self-insert-command nil nil) keycast-substitute-alist)
   (push '(self-insert-command nil nil) keycast-substitute-alist)
@@ -80,24 +87,11 @@
   (push '(lsp-ui-doc--handle-mouse-movement nil nil) keycast-substitute-alist)
   (push '(mac-mwheel-scroll nil nil) keycast-substitute-alist))
 
-;;; 终端
-(use-package vterm
-  :init
-  (setq vterm-shell "zsh"))
-
-(use-package vterm-toggle
-  :bind ("C-c s" . vterm-toggle)
-  :config
-  (setq vterm-toggle-fullscreen-p nil)
-  (add-to-list 'display-buffer-alist
-               '((lambda (buffer-or-name _)
-                   (let ((buffer (get-buffer buffer-or-name)))
-                     (with-current-buffer buffer
-                       (or (equal major-mode 'vterm-mode)
-                           (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
-                 (display-buffer-reuse-window display-buffer-at-bottom)
-                 (reusable-frames . visible)
-                 (window-height . 0.3))))
+;; Help
+(use-package helpful
+  :bind
+  ([remap describe-function] . #'helpful-callable)
+  ([remap describe-variable] . #'helpful-variable))
 
 ;;; hugo
 (use-package easy-hugo
@@ -117,9 +111,14 @@
 ;;; Bongo, a music player
 (use-package bongo
   :commands bongo-playlist
-  :bind ("C-c m" . bongo-playlist)
+  :bind (("C-c m m" . bongo-playlist)
+	 ("C-c m ," . bongo-pause/resume)
+	 ("C-c m ." . bongo-start/stop)
+	 ("C-c m n" . bongo-play-next)
+	 ("C-c m p" . bongo-play-previous))
   :custom
   (bongo-enabled-backends '(mpv))
+  (bongo-custom-backend-matchers '((mpv local-file "m4a")))
   (bongo-default-directory "~/Music/MusicFree/")
   (bongo-logo nil)
   (bongo-insert-album-covers nil)
@@ -129,9 +128,6 @@
 ;;; Calculator
 (use-package literate-calc-mode)
 
-;;; MPV
-(use-package mpv)
-
 ;;; Calibre
 (use-package calibredb
   :config
@@ -140,6 +136,7 @@
   (setq calibredb-library-alist '(("~/Calibre"))))
 
 ;;; EPUB reader
+(use-package djvu)
 (use-package nov
   :config
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
@@ -164,16 +161,6 @@
                      fanyi-longman-provider))
   (fanyi-verbose nil))
 
-(use-package go-translate
-  :config
-  (setq gts-translate-list '(("en" "zh")))
-  (setq gts-default-translator
-	(gts-translator
-	 :picker (gts-prompt-picker)
-	 :engines (list (gts-bing-engine))
-	 :render
-	 (gts-buffer-render))))
-
 ;;; RSS
 (use-package elfeed
   :config
@@ -181,8 +168,16 @@
 	'(("https://arxiv.org/rss/hep-ex" study physics)
 	  ("https://arxiv.org/rss/hep-ph" study physics)
 	  ("http://www.reddit.com/r/emacs/.rss" discussion emacs)
-	  ("https://planet.emacslife.com/atom.xml" discussion emacs)
-	  ("https://rss.nytimes.com/services/xml/rss/nyt/World.xml" news))))
+	  ("https://planet.emacslife.com/atom.xml" discussion emacs))))
+
+;;; LeetCode
+(use-package leetcode
+  :config
+  (setq leetcode-prefer-language "cpp")
+  (setq leetcode-save-solutions t)
+  (setq leetcode-directory "~/leetcode")
+  (add-hook 'leetcode-solution-mode-hook
+          (lambda() (flycheck-mode -1))))
 
 (provide 'init-package)
 ;;; init-package.el ends here
