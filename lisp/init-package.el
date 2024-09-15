@@ -43,10 +43,6 @@
 ;; Git
 (use-package magit)
 
-;; Quickrun
-(use-package quickrun
-  :bind ("C-<return>" . quickrun))
-
 ;;; 界面
 (use-package ace-window ;; 分屏切换
   :bind (("M-o" . 'ace-window)))
@@ -125,21 +121,36 @@
   (bongo-album-cover-size 100)
   (bongo-mode-line-indicator-mode nil))
 
+;;; MPV
+(use-package mpv
+  :config
+  (defun org-mpv-complete-link (&optional arg)
+    (replace-regexp-in-string
+     "file:" "mpv:"
+     (org-link-complete-file arg)
+     t t))
+  (org-link-set-parameters "mpv"
+			   :follow #'mpv-play :complete #'org-mpv-complete-link)
+
+  (defun org-metareturn-insert-playback-position ()
+    (when-let ((item-beg (org-in-item-p)))
+      (when (and (not (bound-and-true-p org-timer-start-time))
+		 (mpv-live-p)
+		 (save-excursion
+                   (goto-char item-beg)
+                   (and (not (org-invisible-p)) (org-at-item-timer-p))))
+	(mpv-insert-playback-position t))))
+  (add-hook 'org-metareturn-hook #'org-metareturn-insert-playback-position)
+
+  (add-hook 'org-open-at-point-functions #'mpv-seek-to-position-at-point))
+
 ;;; Calculator
 (use-package literate-calc-mode)
 
-;;; Calibre
-(use-package calibredb
-  :config
-  (setq calibredb-root-dir "~/Calibre Library")
-  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-  (setq calibredb-library-alist '(("~/Calibre"))))
-
 ;;; EPUB reader
-(use-package djvu)
 (use-package nov
+  ;:mode ("\\.epub\\" . nov-mode)
   :config
-  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
   (setq nov-text-width 100))
 (defun my-nov-font-setup ()
   (face-remap-add-relative 'variable-pitch
@@ -161,6 +172,8 @@
                      fanyi-longman-provider))
   (fanyi-verbose nil))
 
+(use-package sdcv)
+
 ;;; RSS
 (use-package elfeed
   :config
@@ -177,7 +190,7 @@
   (setq leetcode-save-solutions t)
   (setq leetcode-directory "~/leetcode")
   (add-hook 'leetcode-solution-mode-hook
-          (lambda() (flycheck-mode -1))))
+            (lambda() (flycheck-mode -1))))
 
 (provide 'init-package)
 ;;; init-package.el ends here

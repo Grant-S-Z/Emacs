@@ -14,6 +14,9 @@
 (setq python-indent-guess-indent-offset t)
 (setq python-indent-guess-indent-offset-verbose nil)
 
+(setq python-shell-completion-native-enable t)
+(setq org-babel-python-command "~/miniconda3/envs/pygeant4/bin/python")
+
 ;; Flycheck
 (setq flycheck-python-pycompile-executable "~/miniconda3/envs/pygeant4/bin/python")
 
@@ -21,6 +24,12 @@
 (setq doom-modeline-env-python-executable "~/miniconda3/envs/pygeant4/bin/python")
 
 ;; Quickrun
+(quickrun-add-command "python"
+  '((:command . "~/miniconda3/envs/pygeant4/bin/python")
+    (:exec . ("%c %s"))
+    (:template . nil)
+    (:description . "Run Python script..."))
+  :default "python")
 
 (provide 'init-python)
 ;;; init-python.el ends here

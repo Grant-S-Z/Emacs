@@ -1,130 +1,6 @@
 ;;; init-org.el --- for org
 ;;; Commentary:
 ;;; Code:
-;;; Org exports to LaTeX settings
-;; org-latex-hyperref-template
-(setq org-latex-hyperref-template "
-\\hypersetup{
-pdfauthor={%a},
-pdftitle={%t},
-pdfkeywords={%k},
-pdfsubject={%d},
-pdfcreator={%c},
-pdflang={%L},
-colorlinks=true,
-linkcolor=black
-}
-")
-
-;; babel output
-(setq org-latex-listings 'minted)
-(setq org-latex-pdf-process '("latexmk -f -pdf -shell-escape -%latex -interaction=nonstopmode -output-directory=%o %f")) ;; add "-shell-escape" for minted
-
-;; ctexart
-(setq org-latex-classes '(("art" "
-\\documentclass[11pt]{article}"
-
-  ("\\section{%s}" . "\\section*{%s}")
-  ("\\subsection{%s}" . "\\subsection*{%s}")
-  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-  ("\\paragraph{%s}" . "\\paragraph*{%s}")
-  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
-
-(add-to-list 'org-latex-classes '("chap" ""))
-
-(add-to-list 'org-latex-classes '("ctexart" "
-\\documentclass[UTF8, a4paper, 11pt]{ctexart}
-
-\% fonts
-\\usepackage{fontspec}
-\\setmainfont{Times New Roman}
-\\setmonofont{Inconsolata}
-\\setCJKmainfont{宋体-简}
-
-\\usepackage{amsfonts}
-\\usepackage{amsthm}
-\\usepackage{bm}
-\\usepackage{siunitx}
-\\usepackage{xcolor}
-
-\\usepackage{cite}
-\\usepackage{booktabs}
-\\usepackage{graphicx}
-\\usepackage{subfigure}
-
-\\usepackage[margin=1in]{geometry}
-\\geometry{a4paper}
-"
-
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-("\\paragraph{%s}" . "\\paragraph*{%s}")
-("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-
-;; beamer
-(add-to-list 'org-latex-classes '("beamer" "
-\\documentclass[10pt]{beamer}
-
-\% fonts
-\\usepackage{ctex}
-\\usepackage{fontspec}
-\\setmainfont{Times New Roman}
-\\setmonofont{Inconsolata}
-\\setsansfont{Times New Roman}
-\\setCJKmainfont{宋体-简}
-\\setCJKsansfont{宋体-简}
-
-\\usepackage{amsfonts}
-\\usepackage{amsthm}
-\\usepackage{bm}
-\\usepackage{siunitx}
-\\usepackage{xcolor}
-"
-
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-("\\paragraph{%s}" . "\\paragraph*{%s}")
-("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-
-;; book
-(add-to-list 'org-latex-classes '("book" "
-\\documentclass[10pt, a4paper, pagesize=auto]{book}
-
-\% fonts
-\\usepackage{ctex}
-\\usepackage{fontspec}
-\\setmainfont{Times New Roman}
-\\setmonofont{Inconsolata}
-\\setsansfont{Times New Roman}
-\\setCJKmainfont{宋体-简}
-\\setCJKsansfont{楷体-简}
-\\setCJKmonofont{楷体-简}
-\\setcounter{secnumdepth}{3}
-
-\\usepackage{amsfonts}
-\\usepackage{amsthm}
-\\usepackage{bm}
-\\usepackage{siunitx}
-\\usepackage{xcolor}
-"
-
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-("\\paragraph{%s}" . "\\paragraph*{%s}")
-("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-
-;; elegantbook
-(add-to-list 'org-latex-classes '("elegantbook" "
-\\documentclass[lang=cn, newtx, 10pt, scheme=chinese]{elegantbook}
-
-\\setcounter{tocdepth}{3}
-\\logo{logo.png}
-\\cover{cover.jpg}
-
-\\addbibresource[location=local]{reference.bib}"))
 
 ;;; org
 (use-package org
@@ -133,44 +9,6 @@ linkcolor=black
   :config
   ;;; 自动折叠
   (setq org-startup-folded 'content) ;; 只显示标题
-
-  ;;; 待办事项关键词
-  (setq org-todo-keyword-faces '(("TODO" . "red") ("WAITING" . "orange") "|" ("DONE" . "blue") ("CANCELED" . "black")))
-
-  ;;; 日程文件位置
-  (setq org-agenda-files '("~/org/task.org" "~/org/event.org"))
-
-  ;; 任务 capture-templetes
-  (setq org-capture-templates nil)
-
-  (add-to-list 'org-capture-templates '("t" "Tasks")) ;; 任务模版
-  (add-to-list 'org-capture-templates
-	       '("tw" "Work Task" entry
-		 (file+headline "~/org/task.org" "Work")
-		 "* TODO %^{Workname}\n%u\n"))
-  (add-to-list 'org-capture-templates
-	       '("th" "Homework Task" entry
-		 (file+headline "~/org/task.org" "Homework")
-		 "* TODO %^{Homeworkname}\n%u\n")) ;; 没必要放文件位置，实际很难对应
-  (add-to-list 'org-capture-templates
-	       '("tl" "Long Task" entry
-		 (file+headline "~/org/task.org" "Long Task")
-		 "* TODO %^{Longtaskname}\n%u\n"))
-  (add-to-list 'org-capture-templates
-	       '("tq" "Questions" entry
-		 (file+headline "~/org/task.org" "Questions")
-		 "* TODO %^{Questionname}\n%u\n"))
-
-  (add-to-list 'org-capture-templates ;; 日志模版
-               '("j" "Journal" entry (file "~/org/journal.org")
-		 "* %U - 日志\n  %?"))
-  (add-to-list 'org-capture-templates ;; 事例模版
-               '("e" "Event" entry (file "~/org/event.org")
-		 "* %U - %^{heading}\n  %?"))
-  (add-to-list 'org-capture-templates ;; 密码模板
-             '("k" "Passwords" entry (file "~/passwords.org")
-               "* %U - %^{title} %^G\n\n  - 用户名: %^{用户名}\n  - 密码: %(get-or-create-password)"
-               :empty-lines 1 :kill-buffer t))
 
   ;; 设置内联图片显示
   (auto-image-file-mode t)
@@ -194,11 +32,6 @@ linkcolor=black
      (shell . t)
      (org . t)
      (latex . t)))
-
-  ;;; python
-  (setq python-shell-completion-native-enable t)
-  (setq python-shell-interpreter "python3")
-  (setq org-babel-python-command "~/anaconda3/bin/python")
 
   ;;; latex
   (setq org-latex-default-class "ctexart") ;; 默认 latex class
@@ -413,30 +246,6 @@ linkcolor=black
 	 ("C-c n ]" . org-remark-view-next)
 	 ("C-c n [" . org-remark-view-prev))
   :hook (nov-mode . org-remark-nov-mode))
-
-;;; MPV
-(use-package mpv
-  :after org
-  :config
-  (defun org-mpv-complete-link (&optional arg)
-    (replace-regexp-in-string
-     "file:" "mpv:"
-     (org-link-complete-file arg)
-     t t))
-  (org-link-set-parameters "mpv"
-			   :follow #'mpv-play :complete #'org-mpv-complete-link)
-
-  (defun org-metareturn-insert-playback-position ()
-    (when-let ((item-beg (org-in-item-p)))
-      (when (and (not (bound-and-true-p org-timer-start-time))
-		 (mpv-live-p)
-		 (save-excursion
-                   (goto-char item-beg)
-                   (and (not (org-invisible-p)) (org-at-item-timer-p))))
-	(mpv-insert-playback-position t))))
-  (add-hook 'org-metareturn-hook #'org-metareturn-insert-playback-position)
-
-  (add-hook 'org-open-at-point-functions #'mpv-seek-to-position-at-point))
 
 (provide 'init-org)
 ;;; init-org.el ends here

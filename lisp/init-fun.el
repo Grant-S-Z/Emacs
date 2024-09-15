@@ -53,7 +53,7 @@ Show the heading too, if it is currently invisible."
   "Open words recited."
   (interactive)
   (find-file-other-window "~/org/words.org")
-  (goto-char (point-max))) ; 移动至最后
+  (goto-char (point-max)))
 
 (defun grant/open-in-finder ()
   "Show the current file in finder."

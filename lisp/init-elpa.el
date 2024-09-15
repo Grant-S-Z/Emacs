@@ -7,12 +7,6 @@
 ;;; 配置 package 源
 (require 'package)
 
-;; (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-;; 			 ("org" . "https://orgmode.org/elpa/")
-;; 			 ("melpa" . "https://melpa.org/packages/")
-;; 			 ("melpa-stable" . "https://stable.melpa.org/packages/"))
-;;       package-archive-priorities '(("melpa-stable" . 1)))
-
 (setq package-archives '(("gnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
                          ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
                          ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")))
@@ -24,8 +18,6 @@
 	use-package-always-demand nil
 	use-package-expand-minimally t
 	use-package-verbose t))
-
-(require 'use-package) ;; use-package 现已内置
 
 (require 'async) ;; 异步
 (autoload 'dired-async-mode "dired-async.el" nil t)

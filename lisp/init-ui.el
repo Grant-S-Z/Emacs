@@ -4,19 +4,8 @@
 
 ;;; themes
 ;; 主题随时间变化
-(setq calendar-location-name "Beijing, CN")
-(setq calendar-latitude 39.9)
-(setq calendar-longitude 116.4)
 (require 'theme-changer)
-(change-theme 'ef-frost 'doom-shades-of-purple)
-
-;;; Set transparency
-(set-frame-parameter (selected-frame) 'alpha '(100 100))
-(add-to-list 'default-frame-alist '(alpha 100 100))
-
-;;; all-the-icons
-(use-package all-the-icons
-  :if (display-graphic-p))
+(change-theme 'doom-one-light 'doom-shades-of-purple)
 
 ;;; Line number
 (setq display-line-numbers-type 'relative)
@@ -29,24 +18,44 @@
     (display-line-numbers-mode 1)))
 (add-hook 'prog-mode-hook 'grant/enable-line-numbers)
 
+;;; pixel smooth scroll
+(setq mac-mouse-wheel-smooth-scroll t) ;; 平滑滚动，只在 Mac 起作用
+(use-package ultra-scroll-mac
+  :if (eq window-system 'mac)
+  :load-path "~/.emacs.d/site-lisp/ultra-scroll-mac"
+  :init
+  (setq scroll-conservatively 101 ; important!
+        scroll-margin 0)
+  :config
+  (ultra-scroll-mac-mode 1))
+
 ;;; 开始界面
 (use-package dashboard
   :init
   (add-hook 'after-init-hook 'dashboard-open)
 
   :config
+  ;; Initial buffer
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-  (setq dashboard-items '((recents  . 9)
-                          (bookmarks . 5)
-                          (agenda . 6)))
+
+  ;; Items
+  (setq dashboard-items '((recents . 9)
+                          (agenda . 9)))
+  (setq dashboard-item-shortcuts '((recents . "r")
+				   (agenda . "a")))
+
+  ;; Icons
+  (setq dashboard-display-icons-p t)
+  (setq dashboard-icon-type 'nerd-icons)
 
   :custom
   ;; Set the title
-  (dashboard-banner-logo-title "Welcome, Grant!")
+  (dashboard-banner-logo-title "Welcome Grant. Have a good time!")
   ;; Center contents
   (dashboard-center-content t)
   ;; Logo
-  (dashboard-startup-banner "~/.emacs.d/img/firefly.jpeg")
+  ;; (dashboard-startup-banner "~/.emacs.d/img/firefly.jpg")
+  (dashboard-startup-banner "~/.emacs.d/img/Robin.jpg")
   ;; Footnote
   (dashboard-footer-messages '
   ("True mastery of any skill takes a lifetime."))
@@ -74,9 +83,6 @@
 (use-package orderless ;; Optionally use the orderless completion style.
   :after vertico
   :init
-  ;; Configure a custom style dispatcher (see the Consult wiki)
-  ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
-  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
         completion-category-overrides '((file (styles partial-completion)))))
@@ -94,28 +100,6 @@
 (use-package embark-consult
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
-
-;; Posframe
-(use-package posframe)
-
-(use-package rime ;; 输入法
-  :defer nil
-  :custom
-  (default-input-method "rime")
-  (rime-librime-root "~/.emacs.d/librime/dist") ;; librime 位置
-  (rime-emacs-module-header-root "/opt/homebrew/opt/emacs-mac/include/") ;; Emacs 头文件位置
-  (rime-share-data-dir "~/Library/Rime") ;; 共享目录
-  (rime-user-data-dir "~/.emacs.d/rime") ;; Emacs 目录，需要同步
-  (rime-cursor ".")
-  (rime-show-candidate 'posframe) ;; 使用 posframe 显示输入法
-  (rime-commit1-forall t) ;; 在输入位置显示首个备选项
-  (rime-posframe-properties
-   (list :internal-border-width 1 ;; 调整 posframe 边框
-	 :font "LXGW WenKai"
-	 :color 'rime-default-face))
-  (mode-line-mule-info '((:eval (rime-lighter)))) ;; 在 modeline 显示输入法标志
-  ;; 在 minibuffer 使用后自动关闭输入法
-  (rime-deactivate-when-exit-minibuffer t))
 
 (use-package emacs
   :init
@@ -173,7 +157,6 @@
         dired-listing-switches "-aBhl --group-directories-first"))
 ;; dirvish
 (use-package dirvish
-  :defer nil
   :bind ("C-c l" . dirvish-side)
   :custom
   (dirvish-quick-access-entries

@@ -11,7 +11,7 @@
 #+latex_header: \fancyhead[C]{${1:name of the experiment}}
 #+latex_header: \fancyfoot[C]{\thepage}
 
-#+options: toc:t
+#+options: toc:t \n:nil ::t |:t ^:t -:t f:t *:t <:t
 
 #+title: $1
 #+author: $2

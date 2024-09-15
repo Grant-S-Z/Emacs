@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: sol
+# key: s
+
+# --
+*Solution*.
+
+$0

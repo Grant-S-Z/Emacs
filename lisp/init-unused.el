@@ -195,4 +195,80 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
 
 (use-package sly)
 
+;;; Calibre
+(use-package calibredb
+  :config
+  (setq calibredb-root-dir "~/Calibre Library")
+  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+  (setq calibredb-library-alist '(("~/Calibre"))))
+
+;;; 默认 ssh
+;(setq tramp-default-method "ssh")
+
+;; (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+;; 			 ("org" . "https://orgmode.org/elpa/")
+;; 			 ("melpa" . "https://melpa.org/packages/")
+;; 			 ("melpa-stable" . "https://stable.melpa.org/packages/"))
+;;       package-archive-priorities '(("melpa-stable" . 1)))
+
+(require 'use-package) ;; use-package 现已内置
+
+;;; Set transparency
+(set-frame-parameter (selected-frame) 'alpha '(100 100))
+(add-to-list 'default-frame-alist '(alpha 100 100))
+
+(add-to-list 'org-capture-templates ;; 密码模板
+             '("k" "Passwords" entry (file "~/passwords.org")
+             "* %U - %^{title} %^G\n\n  - 用户名: %^{用户名}\n  - 密码: %(get-or-create-password)"
+               :empty-lines 1 :kill-buffer t))
+
+(use-package geiser-mit
+  :config
+  (setq geiser-active-implementations '(mit))
+  (setq geiser-default-implementation 'mit)
+  (add-hook 'scheme-mode-hook 'geiser-mode)
+  (add-to-list 'auto-mode-alist '("\\.scm\\'" . geiser-mode)))
+
+(use-package djvu)
+
+;;; all-the-icons
+(use-package all-the-icons
+  :if (display-graphic-p))
+
+(add-to-list 'load-path "~/.emacs.d/site-lisp/welcome-dashboard")
+(require 'welcome-dashboard)
+(setq welcome-dashboard-latitude calendar-latitude
+      welcome-dashboard-longitude calendar-longitude ;; latitude and longitude must be set to show weather information
+      welcome-dashboard-use-nerd-icons t ;; Use nerd icons instead of all-the-icons
+      welcome-dashboard-path-max-length 75
+      welcome-dashboard-use-fahrenheit nil ;; show in celcius or fahrenheit.
+      welcome-dashboard-min-left-padding 10
+      welcome-dashboard-image-file "~/.emacs.d/img/Robin.png"
+      welcome-dashboard-image-width 200
+      welcome-dashboard-max-number-of-todos 5
+      welcome-dashboard-image-height 169
+      welcome-dashboard-title "Welcome Grant. Have a great day!")
+(welcome-dashboard-create-welcome-hook)
+
+;; Posframe
+(use-package posframe)
+
+(use-package rime ;; 输入法
+  :custom
+  (default-input-method "rime")
+  (rime-librime-root "~/.emacs.d/librime/dist") ;; librime 位置
+  (rime-emacs-module-header-root "/opt/homebrew/opt/emacs-mac/include/") ;; Emacs 头文件位置
+  (rime-share-data-dir "~/Library/Rime") ;; 共享目录
+  (rime-user-data-dir "~/.emacs.d/rime") ;; Emacs 目录，需要同步
+  (rime-cursor ".")
+  (rime-show-candidate 'posframe) ;; 使用 posframe 显示输入法
+  (rime-commit1-forall t) ;; 在输入位置显示首个备选项
+  (rime-posframe-properties
+   (list :internal-border-width 1 ;; 调整 posframe 边框
+	 :font "LXGW WenKai"
+	 :color 'rime-default-face))
+  (mode-line-mule-info '((:eval (rime-lighter)))) ;; 在 modeline 显示输入法标志
+  ;; 在 minibuffer 使用后自动关闭输入法
+  (rime-deactivate-when-exit-minibuffer t))
+
 ;;; init-unused.el ends here

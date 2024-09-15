@@ -6,13 +6,14 @@
 ;; lsp-bridge
 (use-package lsp-bridge
   :load-path "~/.emacs.d/site-lisp/lsp-bridge"
-  ;:init (global-lsp-bridge-mode)
-  :bind ("C-x C-l" . lsp-bridge-mode)
+  :init (global-lsp-bridge-mode)
+  :bind (("C-x C-l" . lsp-bridge-mode)
+	 ("C-c <RET>" . lsp-bridge-code-format))
   :config
   (setq-default
    acm-enable-icon t
    acm-enable-doc t
-   acm-enable-yas t
+   acm-enable-yas nil
    acm-enable-tempel nil
    acm-enable-quick-access t
    acm-enable-search-file-words nil
@@ -64,6 +65,10 @@
 
 ;;; Csv
 (use-package csv-mode)
+
+;; Quickrun
+(use-package quickrun
+  :bind ("C-<return>" . quickrun))
 
 (provide 'init-lsp)
 ;;; init-lsp.el ends here
