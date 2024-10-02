@@ -1,7 +1,8 @@
 ;;; init-tex.el --- for tex
 ;;; Commentary:
 ;;; Code:
-
+;;; LSP
+(setq lsp-bridge-tex-lsp-server "texlab")
 ;;; TeX
 (use-package tex
   :ensure auctex

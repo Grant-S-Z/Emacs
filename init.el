@@ -13,12 +13,12 @@
 (require 'init-package)
 (require 'init-mail)
 (require 'init-lsp)
-(require 'init-tex)
-(require 'init-orgmodule)
-(require 'init-org)
 (require 'init-shell)
 (require 'init-cpp)
 (require 'init-python)
+(require 'init-tex)
+(require 'init-orgmodule)
+(require 'init-org)
 (require 'init-kbd)
 
 (setq gc-cons-threshold (* 1024 1024 10)) ; 10 M

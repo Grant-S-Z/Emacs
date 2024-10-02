@@ -37,11 +37,20 @@ Show the heading too, if it is currently invisible."
 		     "close access the_file"))
     ;; (shell-command (concat "pngpaste " image-file))
     (org-insert-link nil
-		     (concat "file:" image-file)
+		     (concat
+		      "file:" image-file)
 		     "")
     (message image-file))
   (org-display-inline-images))
 
+(defun pdf-open (pdf-path)
+  "Open a PDF file with Skim's displayline on macOS.
+Argument PDF-PATH The path to the PDF file."
+  (interactive "fPath to PDF: ") ;; Prompt user for PDF file path
+  (let ((skim-path "/opt/homebrew/bin/displayline"))
+    (if (file-exists-p pdf-path) ;; Check the path existence
+        (start-process "pdf-open" nil skim-path "1" pdf-path)
+      (message "PDF file does not exist: %s" pdf-path))))
 
 (defun open-journal-at-today ()
   "Open journal at today."

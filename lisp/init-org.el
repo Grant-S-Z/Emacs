@@ -2,6 +2,9 @@
 ;;; Commentary:
 ;;; Code:
 
+;;; LSP
+(setq lsp-bridge-enable-org-babel nil)
+
 ;;; org
 (use-package org
   :defer nil
@@ -12,7 +15,7 @@
 
   ;; 设置内联图片显示
   (auto-image-file-mode t)
-  (setq org-image-actual-width 400)
+  (setq org-image-actual-width 300)
 
   ;; babel 配置
   (setq org-confirm-babel-evaluate nil)
@@ -93,7 +96,7 @@
   :after org
   :hook (org-mode . org-modern-mode)
   :custom
-  (org-modern-hide-stars nil)
+  (org-modern-hide-stars t)
   (org-modern-todo nil)
   (org-modern-table nil)
   (org-modern-timestamp nil)
@@ -121,13 +124,6 @@
    ;; Org styling, hide markup etc.
    org-hide-emphasis-markers t
    org-ellipsis "…"))
-
-;; Fit org modern indent
-(use-package org-modern-indent
-  :load-path "~/.emacs.d/site-lisp/org-modern-indent"
-  :after org
-  :config
-  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 
 ;;; 表格
 (use-package valign
@@ -246,6 +242,15 @@
 	 ("C-c n ]" . org-remark-view-next)
 	 ("C-c n [" . org-remark-view-prev))
   :hook (nov-mode . org-remark-nov-mode))
+
+;;; org-zettel-ref
+(add-to-list 'load-path "~/.emacs.d/site-lisp/org-zettel-ref-mode")
+(require 'org-zettel-ref-mode)
+(setq org-zettel-ref-mode-type 'org-roam)
+(setq org-zettel-ref-python-file "~/.emacs.d/site-lisp/org-zettel-ref-mode/convert-to-org.py")
+(setq org-zettel-ref-temp-folder "~/org/zettel/tmp/")
+(setq org-zettel-ref-reference-folder "~/org/zettel/ref/")
+(setq org-zettel-ref-archive-folder "~/org/zettel/archive")
 
 (provide 'init-org)
 ;;; init-org.el ends here

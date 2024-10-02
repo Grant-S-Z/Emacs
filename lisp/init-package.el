@@ -114,7 +114,7 @@
 	 ("C-c m p" . bongo-play-previous))
   :custom
   (bongo-enabled-backends '(mpv))
-  (bongo-custom-backend-matchers '((mpv local-file "m4a")))
+  (bongo-custom-backend-matchers '((mpv local-file "m4a" "opus")))
   (bongo-default-directory "~/Music/MusicFree/")
   (bongo-logo nil)
   (bongo-insert-album-covers nil)
@@ -172,7 +172,22 @@
                      fanyi-longman-provider))
   (fanyi-verbose nil))
 
-(use-package sdcv)
+;; Translate variable name when coding
+(add-to-list 'load-path "~/.emacs.d/site-lisp/insert-translated-name/")
+(require 'insert-translated-name)
+(setq insert-translated-name-program "ollama")
+(setq insert-translated-name-ollama-model-name "zephyr")
+
+;;; Ollama client
+(use-package ellama
+  :init
+  (setopt ellama-language "English")
+  (require 'llm-ollama)
+  (setopt ellama-provider
+		  (make-llm-ollama
+		   :chat-model "zephyr" :embedding-model "zephyr"))
+  :bind (("C-c q" . ellama-chat)
+	 ("C-c t" . ellama-translate)))
 
 ;;; RSS
 (use-package elfeed
@@ -182,15 +197,6 @@
 	  ("https://arxiv.org/rss/hep-ph" study physics)
 	  ("http://www.reddit.com/r/emacs/.rss" discussion emacs)
 	  ("https://planet.emacslife.com/atom.xml" discussion emacs))))
-
-;;; LeetCode
-(use-package leetcode
-  :config
-  (setq leetcode-prefer-language "cpp")
-  (setq leetcode-save-solutions t)
-  (setq leetcode-directory "~/leetcode")
-  (add-hook 'leetcode-solution-mode-hook
-            (lambda() (flycheck-mode -1))))
 
 (provide 'init-package)
 ;;; init-package.el ends here

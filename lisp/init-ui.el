@@ -40,7 +40,7 @@
 
   ;; Items
   (setq dashboard-items '((recents . 9)
-                          (agenda . 9)))
+                          (agenda . 15)))
   (setq dashboard-item-shortcuts '((recents . "r")
 				   (agenda . "a")))
 
@@ -70,7 +70,8 @@
   :init (doom-modeline-mode 1)
   :config
   (display-time)
-  (setq doom-modeline-icon t))
+  (setq doom-modeline-icon t)
+  (setq doom-modeline-buffer-file-name-style 'auto))
 
 ;;; minibuffer
 (use-package vertico
@@ -100,6 +101,35 @@
 (use-package embark-consult
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
+
+;; avy
+(use-package avy
+  :bind
+  (("C-;" . avy-goto-char-timer)))
+
+;; multiple-cursors
+(use-package multiple-cursors
+  :bind
+  ("C-S-<mouse-1>" . mc/toggle-cursor-on-click))
+
+(use-package posframe)
+
+(use-package rime ;; 输入法
+  :custom
+  (default-input-method "rime")
+  (rime-librime-root "~/.emacs.d/librime/dist") ;; librime 位置
+  (rime-emacs-module-header-root "/opt/homebrew/opt/emacs-mac/include/") ;; Emacs 头文件位置
+  (rime-share-data-dir "~/Library/Rime") ;; 共享目录
+  (rime-user-data-dir "~/.emacs.d/rime") ;; Emacs 目录，需要同步
+  (rime-cursor ".")
+  (rime-show-candidate 'posframe) ;; 使用 posframe 显示输入法
+  (rime-commit1-forall t) ;; 在输入位置显示首个备选项
+  (rime-posframe-properties
+   (list :internal-border-width 4 ;; 调整 posframe 边框
+	 :font "Kai"))
+  (mode-line-mule-info '((:eval (rime-lighter)))) ;; 在 modeline 显示输入法标志
+  ;; 在 minibuffer 使用后自动关闭输入法
+  (rime-deactivate-when-exit-minibuffer t))
 
 (use-package emacs
   :init
@@ -157,6 +187,7 @@
         dired-listing-switches "-aBhl --group-directories-first"))
 ;; dirvish
 (use-package dirvish
+  :defer nil
   :bind ("C-c l" . dirvish-side)
   :custom
   (dirvish-quick-access-entries

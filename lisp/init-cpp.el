@@ -1,6 +1,10 @@
 ;;; init-cpp.el --- for c++
 ;;; Commentary:
 ;;; Code:
+
+;; LSP
+(setq lsp-bridge-c-lsp-server "clangd")
+
 ;; Quickrun
 (quickrun-add-command "c++/c1z"
   '((:command . "clang++")

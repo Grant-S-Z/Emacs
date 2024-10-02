@@ -250,25 +250,170 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
       welcome-dashboard-title "Welcome Grant. Have a great day!")
 (welcome-dashboard-create-welcome-hook)
 
-;; Posframe
-(use-package posframe)
+(use-package amx
+  :init (amx-mode))
 
-(use-package rime ;; 输入法
+;; lsp
+(add-hook 'find-file-hook #'lsp-bridge-restart-process) ;; 每进入一次其他文件，重启 lsp
+
+;;; LeetCode
+(use-package leetcode
+  :config
+  (setq leetcode-prefer-language "cpp")
+  (setq leetcode-save-solutions t)
+  (setq leetcode-directory "~/leetcode")
+  (add-hook 'leetcode-solution-mode-hook
+            (lambda() (flycheck-mode -1))))
+
+;; Fit org modern indent
+(use-package org-modern-indent
+  :load-path "~/.emacs.d/site-lisp/org-modern-indent"
+  :defer t
+  :after org
+  :hook (org-mode . org-modern-indent-mode)
+  :config
+  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
+
+;; highlight-symbol
+(use-package highlight-symbol
+  :init (highlight-symbol-mode))
+
+(use-package c++-mode
+  :functions 			; suppress warnings
+  c-toggle-hungry-state
+  :hook
+  (c-mode . lsp-deferred)
+  (c++-mode . lsp-deferred)
+  (c++-mode . c-toggle-hungry-state))
+
+;;; lsp-mode
+(use-package company
+  :init (global-company-mode)
+  :config
+  (setq company-minimum-prefix-length 1) ; 1 个字母开始进行自动补全
+  (setq company-tooltip-align-annotations t)
+  (setq company-idle-delay 0.0)
+  (setq company-show-numbers t) ;; 给选项编号 (按快捷键 M-1、M-2 等等来进行选择).
+  (setq company-selection-wrap-around t)
+  (setq company-transformers '(company-sort-by-occurrence))) ; 根据选择的频率进行排序
+
+(use-package company-box
+  :after company
+  :hook (company-mode . company-box-mode))
+
+(use-package lsp-mode
+  :ensure t
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-x C-l"
+	lsp-file-watch-threshold 500)
+  :hook
+  (lsp-mode . lsp-enable-which-key-integration) ; which-key integration
+  :commands (lsp lsp-deferred)
+  :config
+  (setq lsp-completion-provider :none) ;; 阻止 lsp 重新设置 company-backend 而覆盖我们 yasnippet 的设置
+  (setq lsp-headerline-breadcrumb-enable t)
+  :bind
+  ;("C-c l s" . lsp-ivy-workspace-symbol)
+  ) ;; 可快速搜索工作区内的符号（类名、函数名、变量名等）
+
+(use-package lsp-ui
+  :ensure t
+  :config
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+  (setq lsp-ui-doc-position 'top))
+
+;;; Dap
+(use-package dap-mode
+  :after hydra lsp-mode
+  :commands dap-debug
   :custom
-  (default-input-method "rime")
-  (rime-librime-root "~/.emacs.d/librime/dist") ;; librime 位置
-  (rime-emacs-module-header-root "/opt/homebrew/opt/emacs-mac/include/") ;; Emacs 头文件位置
-  (rime-share-data-dir "~/Library/Rime") ;; 共享目录
-  (rime-user-data-dir "~/.emacs.d/rime") ;; Emacs 目录，需要同步
-  (rime-cursor ".")
-  (rime-show-candidate 'posframe) ;; 使用 posframe 显示输入法
-  (rime-commit1-forall t) ;; 在输入位置显示首个备选项
-  (rime-posframe-properties
-   (list :internal-border-width 1 ;; 调整 posframe 边框
-	 :font "LXGW WenKai"
-	 :color 'rime-default-face))
-  (mode-line-mule-info '((:eval (rime-lighter)))) ;; 在 modeline 显示输入法标志
-  ;; 在 minibuffer 使用后自动关闭输入法
-  (rime-deactivate-when-exit-minibuffer t))
+  (dap-auto-configure-mode t)
+  :config
+  (dap-ui-mode 1)
+  :hydra
+  (hydra-dap-mode
+   (:color pink :hint nil :foreign-keys run)
+   "
+^Stepping^          ^Switch^                 ^Breakpoints^         ^Debug^                     ^Eval
+^^^^^^^^----------------------------------------------------------------------------------------------------------------
+_n_: Next           _ss_: Session            _bb_: Toggle          _dd_: Debug                 _ee_: Eval
+_i_: Step in        _st_: Thread             _bd_: Delete          _dr_: Debug recent          _er_: Eval region
+_o_: Step out       _sf_: Stack frame        _ba_: Add             _dl_: Debug last            _es_: Eval thing at point
+_c_: Continue       _su_: Up stack frame     _bc_: Set condition   _de_: Edit debug template   _ea_: Add expression.
+_r_: Restart frame  _sd_: Down stack frame   _bh_: Set hit count   _ds_: Debug restart
+_Q_: Disconnect     _sl_: List locals        _bl_: Set log message
+                  _sb_: List breakpoints
+                  _sS_: List sessions
+"
+   ("n" dap-next)
+   ("i" dap-step-in)
+   ("o" dap-step-out)
+   ("c" dap-continue)
+   ("r" dap-restart-frame)
+   ("ss" dap-switch-session)
+   ("st" dap-switch-thread)
+   ("sf" dap-switch-stack-frame)
+   ("su" dap-up-stack-frame)
+   ("sd" dap-down-stack-frame)
+   ("sl" dap-ui-locals)
+   ("sb" dap-ui-breakpoints)
+   ("sS" dap-ui-sessions)
+   ("bb" dap-breakpoint-toggle)
+   ("ba" dap-breakpoint-add)
+   ("bd" dap-breakpoint-delete)
+   ("bc" dap-breakpoint-condition)
+   ("bh" dap-breakpoint-hit-condition)
+   ("bl" dap-breakpoint-log-message)
+   ("dd" dap-debug)
+   ("dr" dap-debug-recent)
+   ("ds" dap-debug-restart)
+   ("dl" dap-debug-last)
+   ("de" dap-debug-edit-template)
+   ("ee" dap-eval)
+   ("ea" dap-ui-expressions-add)
+   ("er" dap-eval-region)
+   ("es" dap-eval-thing-at-point)
+   ("q" nil "quit" :color blue)
+   ("Q" dap-disconnect :color red)))
+(use-package dap-lldb
+  :after dap-mode
+  :custom
+  (dap-lldb-debug-program '("/usr/bin/lldb"))
+  ;; ask user for executable to debug if not specified explicitly (c++)
+  (dap-lldb-debugged-program-function
+   (lambda () (read-file-name "Select file to debug: "))))
 
+;; hydra
+(require 'hydra)
+(require 'use-package-hydra)
+
+;; undo-tree
+(use-package undo-tree
+  :ensure t
+  :init (global-undo-tree-mode)
+  :after hydra
+  :config
+  (bind-key* "C-x u" #'hydra-undo-tree/body)
+  :hydra (hydra-undo-tree (:hint nil)
+  "
+  _p_: undo  _n_: redo _s_: save _l_: load   "
+  ("p"   undo-tree-undo)
+  ("n"   undo-tree-redo)
+  ("s"   undo-tree-save-history)
+  ("l"   undo-tree-load-history)
+  ("u"   undo-tree-visualize "visualize" :color blue)
+  ("q"   nil "quit" :color blue)))
+
+;; org-modern-indent
+(add-to-list 'load-path "~/.emacs.d/lisp")
+(require 'org-modern-indent)
+(add-hook 'org-mode-hook #'org-modern-indent-mode 90)
+
+(use-package projectile
+  :bind (("C-c p" . projectile-command-map))
+  :config
+  (setq projectile-mode-line "Projectile")
+  (setq projectile-track-known-projects-automatically nil))
 ;;; init-unused.el ends here

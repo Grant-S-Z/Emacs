@@ -14,8 +14,8 @@
 ;;; Use-package 配置
 (eval-and-compile
   (setq use-package-always-ensure t ;; 自动确保安装
-	use-package-always-defer t ;; 默认延迟加载
-	use-package-always-demand nil
+	use-package-always-defer t ;; 延迟加载
+	use-package-always-demand nil ;; demand 可覆盖触发器，强制立即加载
 	use-package-expand-minimally t
 	use-package-verbose t))
 

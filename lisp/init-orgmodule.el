@@ -23,7 +23,9 @@ linkcolor=black
 
 ;; latex classes
 (setq org-latex-classes '(("art" "
-\\documentclass[11pt]{article}"
+\\documentclass[11pt]{article}
+
+"
 
   ("\\section{%s}" . "\\section*{%s}")
   ("\\subsection{%s}" . "\\subsection*{%s}")
@@ -40,7 +42,8 @@ linkcolor=black
 \\usepackage{fontspec}
 \\setmainfont{Times New Roman}
 \\setmonofont{Inconsolata}
-\\setCJKmainfont{宋体-简}
+\\setCJKmainfont{SimSong}
+\\setCJKmonofont{PingFang SC}
 
 \\usepackage{amsfonts}
 \\usepackage{amsthm}
@@ -56,6 +59,10 @@ linkcolor=black
 
 \\usepackage[margin=1in]{geometry}
 \\geometry{a4paper}
+
+\\usepackage{mathrsfs}
+\% commands
+\\newcommand{\\m}[1]{\\mathrm{#1}}
 "
 
 ("\\section{%s}" . "\\section*{%s}")
@@ -74,8 +81,8 @@ linkcolor=black
 \\setmainfont{Times New Roman}
 \\setmonofont{Inconsolata}
 \\setsansfont{Times New Roman}
-\\setCJKmainfont{宋体-简}
-\\setCJKsansfont{宋体-简}
+\\setCJKmainfont{SimSong}
+\\setCJKsansfont{SimSong}
 
 \\usepackage{amsfonts}
 \\usepackage{amsthm}
@@ -100,9 +107,9 @@ linkcolor=black
 \\setmainfont{Times New Roman}
 \\setmonofont{Inconsolata}
 \\setsansfont{Times New Roman}
-\\setCJKmainfont{宋体-简}
-\\setCJKsansfont{楷体-简}
-\\setCJKmonofont{楷体-简}
+\\setCJKmainfont{SimSong}
+\\setCJKsansfont{Kai}
+\\setCJKmonofont{Kai}
 \\setcounter{secnumdepth}{3}
 
 \\usepackage{amsfonts}
@@ -122,7 +129,7 @@ linkcolor=black
 (setq org-todo-keyword-faces '(("TODO" . "red") "|" ("DONE" . "blue") ("CANCELED" . "black")))
 
 ;;; 日程文件位置
-(setq org-agenda-files '("~/org/task.org" "~/org/event.org" "~/org/class.org"))
+(setq org-agenda-files '("~/org/class.org" "~/org/task.org" "~/org/event.org"))
 
 ;;; 任务 capture-templetes
 (setq org-capture-templates nil)
