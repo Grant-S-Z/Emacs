@@ -416,4 +416,68 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
   :config
   (setq projectile-mode-line "Projectile")
   (setq projectile-track-known-projects-automatically nil))
+
+;; for sdcv and fanyi
+;; (defun kimim/sdcv-translate-result-advice (word dictionary-list)
+;;   (let* ((arguments
+;;           (cons word
+;;                 (mapcan
+;;                  (lambda (d) (list "-u" d)) dictionary-list)))
+;;        (result (mapconcat
+;;                 (lambda (result)
+;;                   (let-alist result
+;;                     (format
+;;                      "## %s\n%s\n\n" .dict .definition)))
+;;                 (apply #'sdcv-call-process arguments)
+;;                 "")))
+;;   (if (string-empty-p result)
+;;       sdcv-fail-notify-string
+;;     result)))
+
+;; (advice-add 'sdcv-translate-result
+;;             :override
+;;             #'kimim/sdcv-translate-result-advice)
+
+;; (defun kimim/fanyi-dwim-add-sdcv (word)
+;;   (let ((buf (get-buffer fanyi-buffer-name)))
+;;   (with-current-buffer buf
+;;     (let ((inhibit-read-only t)
+;;           (inhibit-point-motion-hooks t))
+;;       ;; Clear the previous search result.
+;;       (point-max)
+;;       (insert "# SDCV\n\n")
+;;       (insert
+;;        (sdcv-search-with-dictionary-args
+;;         word sdcv-dictionary-complete-list))
+;;       (insert "\n\n")
+;;       (beginning-of-buffer)))))
+
+;; (advice-add 'fanyi-dwim :after
+;;             #'kimim/fanyi-dwim-add-sdcv)
+
+;; Translate variable name when coding
+(add-to-list 'load-path "~/.emacs.d/site-lisp/insert-translated-name/")
+(require 'insert-translated-name)
+(setq insert-translated-name-program "ollama")
+(setq insert-translated-name-ollama-model-name "zephyr")
+
+;;; Ollama client
+(use-package ellama
+  :init
+  (setopt ellama-language "English")
+  (require 'llm-ollama)
+  (setopt ellama-provider
+		  (make-llm-ollama
+		   :chat-model "zephyr" :embedding-model "zephyr"))
+  :bind (("C-c t" . ellama-translate)))
+
+(defun pdf-open (pdf-path)
+  "Open a PDF file with Skim's displayline on macOS.
+Argument PDF-PATH The path to the PDF file."
+  (interactive "fPath to PDF: ") ;; Prompt user for PDF file path
+  (let ((skim-path "/opt/homebrew/bin/displayline"))
+    (if (file-exists-p pdf-path) ;; Check the path existence
+        (start-process "pdf-open" nil skim-path "1" pdf-path)
+      (message "PDF file does not exist: %s" pdf-path))))
+
 ;;; init-unused.el ends here

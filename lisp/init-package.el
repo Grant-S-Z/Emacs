@@ -164,30 +164,36 @@
   :custom
   (fanyi-providers '(;; 海词
                      fanyi-haici-provider
-                     ;; 有道同义词词典
+                     ;; 有道同义词词典，支持中文
                      fanyi-youdao-thesaurus-provider
                      ;; Etymonline
-                     fanyi-etymon-provider
+                     ;fanyi-etymon-provider
                      ;; Longman
                      fanyi-longman-provider))
   (fanyi-verbose nil))
 
-;; Translate variable name when coding
-(add-to-list 'load-path "~/.emacs.d/site-lisp/insert-translated-name/")
-(require 'insert-translated-name)
-(setq insert-translated-name-program "ollama")
-(setq insert-translated-name-ollama-model-name "zephyr")
+(use-package sdcv)
 
-;;; Ollama client
-(use-package ellama
-  :init
-  (setopt ellama-language "English")
-  (require 'llm-ollama)
-  (setopt ellama-provider
-		  (make-llm-ollama
-		   :chat-model "zephyr" :embedding-model "zephyr"))
-  :bind (("C-c q" . ellama-chat)
-	 ("C-c t" . ellama-translate)))
+;;; Chatgpt
+(when *is-mac*
+  (defun osx-get-keychain-password (account-name)
+	"Gets ACCOUNT-NAME keychain password from OS X Keychain."
+	(let ((cmd (concat "security 2>&1 >/dev/null find-generic-password -ga '" account-name "'")))
+	  (let ((passwd (shell-command-to-string cmd)))
+		(when (string-match (rx "\"" (group (0+ (or (1+ (not (any "\"" "\\"))) (seq "\\" anything)))) "\"") passwd)
+		  (match-string 1 passwd))))))
+(when *is-mac*
+  (use-package chatgpt-shell
+    :bind
+    (("C-c q" . chatgpt-shell)
+     ("C-c d" . chatgpt-shell-explain-code)
+     ("C-c p" . chatgpt-shell-prompt))
+    :custom
+    ((chatgpt-shell-api-url-base "https://api.gptsapi.net")
+     (chatgpt-shell-openai-key
+      (lambda ()
+        ;; Here the openai-key should be the proxy service key.
+	(osx-get-keychain-password "openai key"))))))
 
 ;;; RSS
 (use-package elfeed
@@ -195,8 +201,23 @@
   (setq elfeed-feeds
 	'(("https://arxiv.org/rss/hep-ex" study physics)
 	  ("https://arxiv.org/rss/hep-ph" study physics)
-	  ("http://www.reddit.com/r/emacs/.rss" discussion emacs)
-	  ("https://planet.emacslife.com/atom.xml" discussion emacs))))
+	  ("https://arxiv.org/rss/hep-th" study physics)))
+  (setq elfeed-show-mode-hook
+      (lambda ()
+	(set-face-attribute 'variable-pitch (selected-frame) :font (font-spec :family "Fantasque Sans Mono" :size 16))
+	(setq fill-column 90))))
+
+;;; pomm
+(use-package pomm
+  :commands (pomm)
+  :config
+  (bind-key* "C-c C-p" #'pomm)
+  (setq pomm-audio-enabled nil)
+  (setq pomm-work-period 45)
+  (setq pomm-long-break-period 20)
+  (setq pomm-number-of-periods 2))
+(require 'pomm)
+(pomm-mode-line-mode)
 
 (provide 'init-package)
 ;;; init-package.el ends here

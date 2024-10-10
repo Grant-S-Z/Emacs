@@ -43,15 +43,6 @@ Show the heading too, if it is currently invisible."
     (message image-file))
   (org-display-inline-images))
 
-(defun pdf-open (pdf-path)
-  "Open a PDF file with Skim's displayline on macOS.
-Argument PDF-PATH The path to the PDF file."
-  (interactive "fPath to PDF: ") ;; Prompt user for PDF file path
-  (let ((skim-path "/opt/homebrew/bin/displayline"))
-    (if (file-exists-p pdf-path) ;; Check the path existence
-        (start-process "pdf-open" nil skim-path "1" pdf-path)
-      (message "PDF file does not exist: %s" pdf-path))))
-
 (defun open-journal-at-today ()
   "Open journal at today."
   (interactive)
@@ -126,52 +117,6 @@ Argument PDF-PATH The path to the PDF file."
   (interactive)
   (let ((default-directory (file-name-directory (directory-file-name (file-name-directory (or (buffer-file-name) ""))))))
     (compile "make")))
-
-;;; Some useful Elisp functions
-(defun random-num (max &optional min)
-  "Random number between MAX and MIN."
-  (let* ((num (random max)))
-    (if min (max min num) num)))
-
-(defun random-color-rgb ()
-  "Random color in rgb."
-  (list (random 255) (random 255) (random 255)))
-
-(defun random-color-html ()
-  "Random color in html."
-  (apply #'format "#%x%x%x" (random-color-rgb)))
-
-(defun random-color-face ()
-  "Generate a random valid color for a font face."
-  (let* ((colors (defined-colors))
-	 (n (length colors)))
-    (nth (random n) colors)))
-
-
-(defun my-denote--split-luhman-sig (signature)
-  "Split numbers and letters in Luhmann-style SIGNATURE string."
-  (replace-regexp-in-string
-   "\\([a-zA-Z]+?\\)\\([0-9]\\)" "\\1=\\2"
-   (replace-regexp-in-string
-    "\\([0-9]+?\\)\\([a-zA-Z]\\)" "\\1=\\2"
-    signature)))
-
-(defun my-denote--pad-sig (signature)
-  "Create a new signature with padded spaces for all components"
-  (combine-and-quote-strings
-   (mapcar
-    (lambda (x)
-      (string-pad x 5 32 t))
-    (split-string (my-denote--split-luhman-sig signature) "=" t))
-   "="))
-
-(defun my-denote-sort-for-signatures (sig1 sig2)
-  "Return non-nil if SIG1 is smaller that SIG2.
-Perform the comparison with `string<'."
-  (string< (my-denote--pad-sig sig1) (my-denote--pad-sig sig2)))
-
-;; Change the sorting function only when we sort by signature.
-(setq denote-sort-signature-comparison-function #'my-denote-sort-for-signatures)
 
 (provide 'init-fun)
 ;;; init-fun.el ends here

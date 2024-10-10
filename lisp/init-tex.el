@@ -13,7 +13,7 @@
   (setq-default TeX-engine 'xetex) ;; 使用 xelatex 作为 TeX-engine
   (add-hook 'LaTeX-mode-hook (lambda ()
 	      (add-to-list 'TeX-command-list '("XeLaTeX" "%'xelatex --synctex=1 --shell-escape%(mode)%' %t" TeX-run-TeX nil t)) ;; xelatex 编译
-	      ;;(setq prettify-symbols-mode t) ;; 加载 prettify-symbols-mode, 不适合 LaTeX 编辑
+	      ;(setq prettify-symbols-mode t) ;; 加载 prettify-symbols-mode, 不适合 LaTeX 编辑
 	      (setq TeX-command-default "LatexMk") ;; 默认使用 latexmk
 	      (setq TeX-show-compilation nil) ;; 不展示编译过程
 	      (turn-on-cdlatex) ;; 加载 cdlatex
@@ -42,7 +42,9 @@ n	      (outline-minor-mode) ;; 加载 outline-minor-mode
 (use-package cdlatex
   :after tex
   :hook ((org-mode . org-cdlatex-mode)
-	 (tex-mode . cdlatex-mode)))
+	 (tex-mode . cdlatex-mode))
+  :config
+  (add-to-list 'cdlatex-command-alist '("qt" "Insert \\qty{}{}" "\\qty{?}{}" cdlatex-position-cursor nil t nil)))
 
 ;;; PDF preview
 ;; pdf-tools

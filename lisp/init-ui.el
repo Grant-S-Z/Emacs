@@ -5,7 +5,7 @@
 ;;; themes
 ;; 主题随时间变化
 (require 'theme-changer)
-(change-theme 'doom-one-light 'doom-shades-of-purple)
+(change-theme 'doom-shades-of-purple 'doom-shades-of-purple)
 
 ;;; Line number
 (setq display-line-numbers-type 'relative)
@@ -40,7 +40,7 @@
 
   ;; Items
   (setq dashboard-items '((recents . 9)
-                          (agenda . 15)))
+                          (agenda . 9)))
   (setq dashboard-item-shortcuts '((recents . "r")
 				   (agenda . "a")))
 
@@ -126,7 +126,8 @@
   (rime-commit1-forall t) ;; 在输入位置显示首个备选项
   (rime-posframe-properties
    (list :internal-border-width 4 ;; 调整 posframe 边框
-	 :font "Kai"))
+	 :font "PingFang SC"))
+  (rime-posframe-style 'vertical)
   (mode-line-mule-info '((:eval (rime-lighter)))) ;; 在 modeline 显示输入法标志
   ;; 在 minibuffer 使用后自动关闭输入法
   (rime-deactivate-when-exit-minibuffer t))
@@ -169,15 +170,29 @@
 
   (advice-add 'tab-line-format :around #'eh-tab-line-format)
 
-  (progn
-    (set-face-attribute 'default nil    ;:font "Fantasque Sans Mono"
-					;:font "DejaVu Sans Mono"
-			                ;:font "IBM Plex Mono"
-					:font "Ligconsolata"
-					:height 160)
-    (dolist (charset '(kana han symbol cjk-misc bopomofo)) ;; Chinese fonts
-      (set-fontset-font (frame-parameter nil 'font)
-			charset (font-spec :family "LXGW WenKai Mono")))))
+  ;; Set line length
+  (setq shr-width 100)
+
+  ;; (progn
+  ;;   (set-face-attribute 'default nil    ;:font "Fantasque Sans Mono"
+  ;; 					;:font "DejaVu Sans Mono"
+  ;; 			                ;:font "IBM Plex Mono"
+  ;; 					:font "Ligconsolata"
+  ;; 					:height 160)
+  ;;   (dolist (charset '(kana han symbol cjk-misc bopomofo)) ;; Chinese fonts
+  ;;     (set-fontset-font (frame-parameter nil 'font)
+  ;; 			charset (font-spec :family "LXGW WenKai Mono"))))
+  )
+
+(use-package cnfonts
+  :init (cnfonts-mode 1)
+  :bind (("C--" . cnfonts-decrease-fontsize)
+  ("C-=" . cnfonts-increase-fontsize))
+  :custom
+  (cnfonts-personal-fontnames '(("Fira Code" "Ligconsolata" "Fantasque Sans Mono" "IBM Plex Mono")
+                                ("LXGW WenKai Mono")
+                                ("PragmataPro Mono Liga")
+                                ("PragmataPro Mono Liga"))))
 
 ;;; 文件管理
 ;; dired

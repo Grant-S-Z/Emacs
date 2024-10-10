@@ -25,12 +25,17 @@
   (require 'ob-latex)
   (require 'ob-shell)
   (require 'ob-org)
+  (require 'ob-chatgpt-shell)
+  (require 'ob-dall-e-shell)
+  (ob-chatgpt-shell-setup)
+  (ob-dall-e-shell-setup)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((python . t)
      (R . t)
      (emacs-lisp . t)
      (plantuml . t)
+     (dot . t)
      (C . t)
      (shell . t)
      (org . t)
@@ -67,13 +72,9 @@
   ;;org-agenda-time-grid
   ;;--------------------------------------------
   (org-agenda-time-grid (quote ((daily today require-timed)
-                                      (300
-                                       600
-                                       900
-                                       1200
-                                       1500
+                                      (700
+                                       1300
                                        1800
-                                       2100
                                        2400)
                                       "......"
                                       "-----------------------------------------------------"))))
@@ -131,6 +132,11 @@
   :hook (org-mode . valign-mode)
   :custom
   (valign-fancy-bar nil)) ;; 确保性能
+
+;;; View pdf images inline
+(use-package org-inline-pdf
+  :after org
+  :hook (org-mode . org-inline-pdf-mode))
 
 ;;; 笔记配置
 ;; Zotero 位置
@@ -251,6 +257,31 @@
 (setq org-zettel-ref-temp-folder "~/org/zettel/tmp/")
 (setq org-zettel-ref-reference-folder "~/org/zettel/ref/")
 (setq org-zettel-ref-archive-folder "~/org/zettel/archive")
+
+(defun my-denote--split-luhman-sig (signature)
+  "Split numbers and letters in Luhmann-style SIGNATURE string."
+  (replace-regexp-in-string
+   "\\([a-zA-Z]+?\\)\\([0-9]\\)" "\\1=\\2"
+   (replace-regexp-in-string
+    "\\([0-9]+?\\)\\([a-zA-Z]\\)" "\\1=\\2"
+    signature)))
+
+(defun my-denote--pad-sig (signature)
+  "Create a new signature with padded spaces for all components"
+  (combine-and-quote-strings
+   (mapcar
+    (lambda (x)
+      (string-pad x 5 32 t))
+    (split-string (my-denote--split-luhman-sig signature) "=" t))
+   "="))
+
+(defun my-denote-sort-for-signatures (sig1 sig2)
+  "Return non-nil if SIG1 is smaller that SIG2.
+Perform the comparison with `string<'."
+  (string< (my-denote--pad-sig sig1) (my-denote--pad-sig sig2)))
+
+;; Change the sorting function only when we sort by signature.
+(setq denote-sort-signature-comparison-function #'my-denote-sort-for-signatures)
 
 (provide 'init-org)
 ;;; init-org.el ends here

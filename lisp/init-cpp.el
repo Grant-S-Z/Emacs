@@ -13,5 +13,10 @@
     (:remove  . ("%e")))
   :default "c++")
 
+;; ROOT
+(use-package cern-root-mode
+  :config
+  (setq cern-root-filepath "~/miniconda3/envs/hep/bin/root"))
+
 (provide 'init-cpp)
 ;;; init-cpp.el ends here

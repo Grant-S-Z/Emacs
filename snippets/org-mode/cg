@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: chatgpt
+# key: cg
+# --
+#+begin_src chatgpt-shell
+$0
+#+end_src

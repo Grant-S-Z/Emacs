@@ -162,7 +162,7 @@ linkcolor=black
 	 "* %U - 日志\n  %?"))
 (add-to-list 'org-capture-templates ;; 事件
              '("e" "Event" entry (file "~/org/event.org")
-	 "* %U - %^{heading}\n  %?"))
+	 "* TODO %^{Eventname}\n  %?"))
 
 (provide 'init-orgmodule)
 ;;; init-orgmodule.el ends here
