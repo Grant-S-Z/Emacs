@@ -20,13 +20,15 @@ Show the heading too, if it is currently invisible."
 
 ;;; Org insert images
 (defun org-insert-image ()
-  "insert a image from clipboard"
+  "Insert a image from clipboard."
   (interactive)
   (let* ((path (concat default-directory "./img/"))
+	 ;; Remove the file extension from the buffer name
+	 (base-name (file-name-sans-extension (buffer-name)))
 	 (image-file (concat
 		      path
-		      (buffer-name)
-		      (format-time-string "_%Y%m%d_%H%M%S.png"))))
+		      base-name
+		      (format-time-string "_%Y%m%d%H%M%S.png"))))
     (if (not (file-exists-p path))
 	(mkdir path))
     (do-applescript (concat
@@ -35,7 +37,6 @@ Show the heading too, if it is currently invisible."
 		     "set the_file to open for access (POSIX file the_path as string) with write permission \n"
 		     "write png_data to the_file \n"
 		     "close access the_file"))
-    ;; (shell-command (concat "pngpaste " image-file))
     (org-insert-link nil
 		     (concat
 		      "file:" image-file)
@@ -43,17 +44,16 @@ Show the heading too, if it is currently invisible."
     (message image-file))
   (org-display-inline-images))
 
+(defun open-words ()
+  "Open words."
+  (interactive)
+  (find-file-other-window "~/org/words.org"))
+
 (defun open-journal-at-today ()
   "Open journal at today."
   (interactive)
   (find-file-other-window "~/org/journal.org")
   (goto-char (point-max))) ; 移动至最后
-
-(defun open-words-recited ()
-  "Open words recited."
-  (interactive)
-  (find-file-other-window "~/org/words.org")
-  (goto-char (point-max)))
 
 (defun grant/open-in-finder ()
   "Show the current file in finder."
@@ -73,15 +73,6 @@ Show the heading too, if it is currently invisible."
 	(rename-file filename new-name 1))
       (set-visited-file-name new-name)
       (rename-buffer new-name))))
-
-(defun grant/delete-file-and-buffer ()
-  "Kill current buffer and delete the file."
-  (interactive)
-  (let ((filename (buffer-file-name)))
-    (when (and filename (y-or-n-p (concat "Do you really want to delete " filename "?")))
-      (delete-file filename t)
-      (message "Deleted file %s." filename)
-      (kill-buffer))))
 
 (defun grant/clear-messages-buffer ()
   "Clear Message buffer."

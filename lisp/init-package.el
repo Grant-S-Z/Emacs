@@ -34,14 +34,38 @@
   :defer nil
   :config (which-key-mode))
 
-(use-package rainbow-delimiters ;; 括号颜色
-  :init (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+;; avy
+(use-package avy
+  :bind
+  (("C-;" . avy-goto-char-timer)))
 
-(use-package highlight-parentheses ;; 括号高亮
-  :init (add-hook 'prog-mode-hook 'highlight-parentheses-mode))
+;; multiple-cursors
+(use-package multiple-cursors
+  :bind
+  ("C-S-<mouse-1>" . mc/toggle-cursor-on-click))
+
+;; update changes automatically
+(use-package autorevert
+  :hook (after-init . global-auto-revert-mode))
 
 ;; Git
 (use-package magit)
+
+;; Chinese calendar
+(require 'cal-china-x)
+
+(setq calendar-chinese-all-holidays-flag t)
+(setq calendar-mark-holidays-flag t)
+(setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
+
+(setq holiday-local-holidays
+      '((holiday-lunar 1 10 "Father's birthday" 0)
+	(holiday-lunar 2 20 "Mother's birthday" 0)))
+
+(setq calendar-holidays
+    (append cal-china-x-important-holidays
+	    holiday-general-holidays
+	    holiday-local-holidays))
 
 ;;; 界面
 (use-package ace-window ;; 分屏切换
@@ -72,9 +96,21 @@
   :config
   (setq pangu-spacing-real-insert-separtor t))
 
+(use-package subword ;; camel
+  :hook (prog-mode . subword-mode))
+
+;;; 居中
+(use-package olivetti
+  :after org
+  :hook ((org-mode . olivetti-mode)
+	 (text-mode . olivetti-mode)
+	 (markdown-mode . olivetti-mode))
+  :custom
+  (olivetti-body-width 80))
+
 ;; Key cast
 (use-package keycast
-  :init (keycast-header-line-mode 1)
+  ;; :init (keycast-header-line-mode 1)
   :config
   (push '(org-self-insert-command nil nil) keycast-substitute-alist)
   (push '(self-insert-command nil nil) keycast-substitute-alist)
@@ -154,9 +190,11 @@
   (setq nov-text-width 100))
 (defun my-nov-font-setup ()
   (face-remap-add-relative 'variable-pitch
-			   :family "Alegreya"
-			   :height 1.1))
+			   :family "Bookerly"
+			   :height 1.0))
 (add-hook 'nov-mode-hook 'my-nov-font-setup)
+
+
 
 ;;; Translator
 (use-package fanyi
@@ -201,11 +239,40 @@
   (setq elfeed-feeds
 	'(("https://arxiv.org/rss/hep-ex" study physics)
 	  ("https://arxiv.org/rss/hep-ph" study physics)
-	  ("https://arxiv.org/rss/hep-th" study physics)))
+	  ("https://arxiv.org/rss/hep-th" study physics)
+	  ("https://sachachua.com/blog/category/emacs-news/feed/" emacs)
+	  ("https://emacs-china.org/posts.rss" emacs)
+	  ("https://www.reddit.com/r/emacs/.rss" emacs)
+	  ("https://emacs.stackexchange.com/feeds" emacs)
+	  ("https://news.ycombinator.com/rss" tech news)
+	  ;;("http://rss.slashdot.org/Slashdot/slashdotMain" tech news)
+	  ("https://www.economist.com/international/rss.xml" eco news)
+	  ))
   (setq elfeed-show-mode-hook
       (lambda ()
-	(set-face-attribute 'variable-pitch (selected-frame) :font (font-spec :family "Fantasque Sans Mono" :size 16))
-	(setq fill-column 90))))
+	(set-face-attribute 'variable-pitch (selected-frame) :font (font-spec :family "LXGW WenKai" :size 16))
+	(setq fill-column 100))))
+
+(use-package elfeed-summary
+  :bind ("C-c e" . elfeed-summary)
+  :config
+  (setq elfeed-summary-other-window t)
+  (setq elfeed-summary-settings
+	'((group (:title . "Physics")
+		 (:elements
+		  (query . (study physics))))
+	  (group (:title . "Emacs")
+		 (:elements
+		  (query . (emacs))))
+	  (group (:title . "News")
+		 (:elements
+		  (query . (and news (not '(tech eco))))
+		  (group (:title . "Tech News")
+			 (:elements
+			  (query . (and tech news))))
+		  (group (:title . "Eco News")
+			 (:elements
+			  (query . (and eco news)))))))))
 
 ;;; pomm
 (use-package pomm

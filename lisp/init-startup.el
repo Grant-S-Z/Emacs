@@ -1,12 +1,18 @@
 ;;; init-startup.el -- when starting
 ;;; Commentary:
 ;;; Code:
+;;; GC
+(require 'gcmh)
+(gcmh-mode 1)
+
 (tool-bar-mode -1) ;; 关闭任务栏
 (set-scroll-bar-mode nil) ;; 关闭滚动条
 (electric-pair-mode t) ;; 自动生成对应括号
 (global-auto-revert-mode t)
 (delete-selection-mode t)
 (global-hl-line-mode t) ;; 高亮当前行
+(winner-mode 1) ;; undo window operation
+(delete-selection-mode 1)
 
 (mac-auto-operator-composition-mode t) ;; Ligature for mac port
 
@@ -19,6 +25,9 @@
 (setq system-time-locale "C")         ; Make sure that the weekdays in the
                                       ; time stamps of your Org mode files and
                                       ; in the agenda appear in English.
+
+;; 全屏启动，且可使用状态栏与程序坞
+;(set-frame-parameter nil 'fullscreen 'fullboth)
 
 ;; Inhibit resizing Puremacs frame
 (setq frame-inhibit-implied-resize t)
@@ -35,8 +44,8 @@
 (define-advice startup--load-user-init-file (:after (&rest _) reset-inhibit-vars)
   (and init-file-had-error (reset-inhibit-vars)))
 
-(add-hook 'prog-mode-hook #'show-paren-mode)
-(add-hook 'prog-mode-hook #'hs-minor-mode)
+(add-hook 'prog-mode-hook #'show-paren-mode) ;; show paren
+(add-hook 'prog-mode-hook #'hs-minor-mode) ;; hideshow
 
 (setq package-native-compile t)
 

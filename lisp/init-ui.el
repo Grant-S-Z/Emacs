@@ -3,20 +3,8 @@
 ;;; Code:
 
 ;;; themes
-;; 主题随时间变化
-(require 'theme-changer)
-(change-theme 'doom-shades-of-purple 'doom-shades-of-purple)
-
-;;; Line number
-(setq display-line-numbers-type 'relative)
-(defun grant/enable-line-numbers ()
-  "Enable line numbers except in specific modes."
-  (unless (or (derived-mode-p 'org-mode)
-              (derived-mode-p 'latex-mode)
-              (derived-mode-p 'pdf-view-mode)
-              (derived-mode-p 'doc-view-mode))
-    (display-line-numbers-mode 1)))
-(add-hook 'prog-mode-hook 'grant/enable-line-numbers)
+(use-package flatui-theme
+  :init (load-theme 'flatui t))
 
 ;;; pixel smooth scroll
 (setq mac-mouse-wheel-smooth-scroll t) ;; 平滑滚动，只在 Mac 起作用
@@ -28,6 +16,22 @@
         scroll-margin 0)
   :config
   (ultra-scroll-mac-mode 1))
+
+;;; Line number
+;(setq display-line-numbers-type 'absolute) ;; 相对行号
+(defun grant/enable-line-numbers ()
+  "Enable line numbers except in specific modes."
+  (unless (or (derived-mode-p 'org-mode)
+              (derived-mode-p 'latex-mode)
+              (derived-mode-p 'pdf-view-mode)
+              (derived-mode-p 'doc-view-mode))
+    (display-line-numbers-mode 1)))
+(add-hook 'prog-mode-hook 'grant/enable-line-numbers)
+(custom-set-faces
+ '(line-number ((nil (:font "Inconsolata"
+		      :height 140))))
+ '(line-number-current-line ((nil (:font "Inconsolata"
+					 :height 140)))))
 
 ;;; 开始界面
 (use-package dashboard
@@ -102,19 +106,41 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-;; avy
-(use-package avy
-  :bind
-  (("C-;" . avy-goto-char-timer)))
+(use-package rainbow-delimiters ;; 括号颜色
+  :init (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
-;; multiple-cursors
-(use-package multiple-cursors
-  :bind
-  ("C-S-<mouse-1>" . mc/toggle-cursor-on-click))
+(use-package highlight-parentheses ;; 括号高亮
+  :init (add-hook 'prog-mode-hook 'highlight-parentheses-mode))
+
+(use-package highlight-indent-guides
+  :hook (prog-mode . highlight-indent-guides-mode)
+  :config
+  (setq highlight-indent-guides-method 'bitmap))
+
+(use-package cnfonts
+  :init (cnfonts-mode 1)
+  :defer nil
+  :bind (("C--" . cnfonts-decrease-fontsize)
+  ("C-=" . cnfonts-increase-fontsize))
+  :custom
+  (cnfonts-personal-fontnames '(("Fira Code" "Ligconsolata" "Fantasque Sans Mono" "IBM Plex Mono" "FantasqueSansM Nerd Font Mono" "Iosevka")
+                                ("LXGW WenKai Mono")
+                                ("PragmataPro Mono Liga")
+                                ("PragmataPro Mono Liga"))))
+
+(use-package mixed-pitch
+  :defer nil
+  :hook (org-mode . mixed-pitch-mode)
+  :config
+  (set-face-attribute 'variable-pitch nil
+                      :font "Iosevka")
+  (setq fixed-pitch "Fantasque Sans Mono")) ;; when cnfonts change, this should changes as the same.
 
 (use-package posframe)
 
 (use-package rime ;; 输入法
+  :init (toggle-input-method)
+  :defer nil
   :custom
   (default-input-method "rime")
   (rime-librime-root "~/.emacs.d/librime/dist") ;; librime 位置
@@ -126,73 +152,11 @@
   (rime-commit1-forall t) ;; 在输入位置显示首个备选项
   (rime-posframe-properties
    (list :internal-border-width 4 ;; 调整 posframe 边框
-	 :font "PingFang SC"))
+         :font "PingFang SC"))
   (rime-posframe-style 'vertical)
   (mode-line-mule-info '((:eval (rime-lighter)))) ;; 在 modeline 显示输入法标志
   ;; 在 minibuffer 使用后自动关闭输入法
   (rime-deactivate-when-exit-minibuffer t))
-
-(use-package emacs
-  :init
-  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-  ;; Vertico commands are hidden in normal buffers.
-  (setq read-extended-command-predicate
-        #'command-completion-default-include-p)
-
-  ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t)
-
-  (defvar eh-space "  ")
-
-  ;; 设置 mode-line
-  ;; 在 mode-line 最后追加一个半角空格，一个全角空格，防止因为字体高度原因导致 mode-line 抖动。
-  (setq mode-line-end-spaces
-	'(:eval (if (display-graphic-p) eh-space "-%-")))
-
-  (defun eh-tab-line-format (orig_func)
-    "在 tab-line 的最后添加一个全角空格，防止 tab-line 抖动。"
-    (list (funcall orig_func) eh-space))
-
-  (advice-add 'tab-line-format :around #'eh-tab-line-format)
-
-  ;; Set line length
-  (setq shr-width 100)
-
-  ;; (progn
-  ;;   (set-face-attribute 'default nil    ;:font "Fantasque Sans Mono"
-  ;; 					;:font "DejaVu Sans Mono"
-  ;; 			                ;:font "IBM Plex Mono"
-  ;; 					:font "Ligconsolata"
-  ;; 					:height 160)
-  ;;   (dolist (charset '(kana han symbol cjk-misc bopomofo)) ;; Chinese fonts
-  ;;     (set-fontset-font (frame-parameter nil 'font)
-  ;; 			charset (font-spec :family "LXGW WenKai Mono"))))
-  )
-
-(use-package cnfonts
-  :init (cnfonts-mode 1)
-  :bind (("C--" . cnfonts-decrease-fontsize)
-  ("C-=" . cnfonts-increase-fontsize))
-  :custom
-  (cnfonts-personal-fontnames '(("Fira Code" "Ligconsolata" "Fantasque Sans Mono" "IBM Plex Mono")
-                                ("LXGW WenKai Mono")
-                                ("PragmataPro Mono Liga")
-                                ("PragmataPro Mono Liga"))))
 
 ;;; 文件管理
 ;; dired

@@ -14,14 +14,12 @@
 (require 'init-mail)
 (require 'init-lsp)
 (require 'init-shell)
-(require 'init-cpp)
-(require 'init-python)
 (require 'init-tex)
-(require 'init-orgmodule)
 (require 'init-org)
+(require 'init-orgmodule)
 (require 'init-kbd)
 
-(setq gc-cons-threshold (* 1024 1024 10)) ; 10 M
+(setq gc-cons-threshold (* 1024 1024 20)) ; 20 M
 
 (provide 'init)
 ;;; init.el ends here

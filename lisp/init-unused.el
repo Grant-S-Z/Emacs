@@ -1,18 +1,6 @@
 ;;; init-unused.el --- Settings unused
 ;;; Commentary:
 ;;; Code:
-;; eglot
-(require 'eglot)
-
-(add-to-list 'eglot-server-programs
-	     '((c-mode c++-mode) . "clangd"))
-(add-to-list 'eglot-server-programs
-             '((python-mode python-ts-mode) . ("/Users/grant/anaconda3/bin/pyright-langserver" "--stdio")))
-
-(add-hook 'c-mode-hook 'eglot-ensure)
-(add-hook 'c++-mode-hook 'eglot-ensure)
-(add-hook 'python-mode-hook 'eglot-ensure)
-
 (use-package cape
   :ensure t
   :init
@@ -135,9 +123,6 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
 (setq scroll-step 1) ;; keyboard scroll one line at a time
 
 (set-cursor-color "#8A2BE2") ;; 设置光标颜色 BlueViolet
-
-;; 全屏启动，且可使用状态栏与程序坞
-(set-frame-parameter nil 'fullscreen 'fullboth)
 
 ;; 忽略某些 message
 (let ((inhibit-message t))
@@ -325,7 +310,7 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
   (setq lsp-ui-doc-position 'top))
 
 ;;; Dap
-(use-package dap-mode
+(use-package dap-mode ;; 还是用 vscode debug 吧...
   :after hydra lsp-mode
   :commands dap-debug
   :custom
@@ -390,7 +375,7 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
 (require 'use-package-hydra)
 
 ;; undo-tree
-(use-package undo-tree
+(use-package undo-tree ;; 重量级使用体验，强烈不推荐
   :ensure t
   :init (global-undo-tree-mode)
   :after hydra
@@ -479,5 +464,105 @@ Argument PDF-PATH The path to the PDF file."
     (if (file-exists-p pdf-path) ;; Check the path existence
         (start-process "pdf-open" nil skim-path "1" pdf-path)
       (message "PDF file does not exist: %s" pdf-path))))
+
+(require 'theme-changer)
+(change-theme 'doom-one-light 'doom-shades-of-purple)
+
+(defun grant/disable-keycast-header-line-mode-in-writeroom ()
+  "Disable keycast-header-line-mode when writeroom-mode is enabled."
+  (when (bound-and-true-p keycast-header-line-mode)
+    (keycast-header-line-mode -1)))
+
+(add-hook 'writeroom-mode-hook #'grant/disable-keycast-header-line-mode-in-writeroom)
+
+(add-to-list 'load-path "~/.emacs.d/site-lisp/holo-layer/")
+(require 'holo-layer)
+(setq holo-layer-python-command "~/miniconda3/envs/hep/bin/python")
+(setq holo-layer-enable-cursor-animation t)
+(setq holo-layer-enable-type-animation t)
+(setq holo-layer-enable-indent-rainbow t)
+(holo-layer-enable)
+
+;;; eglot
+;; (require 'eglot)
+
+;; (add-to-list 'eglot-server-programs
+;; 	     '((c-mode c++-mode) . ("clangd")))
+;; (add-to-list 'eglot-server-programs
+;;              '((python-mode python-ts-mode) . ("/Users/grant/miniconda3/envs/hep/bin/pyright")))
+
+;; (add-hook 'c-mode-hook 'eglot-ensure)
+;; (add-hook 'c++-mode-hook 'eglot-ensure)
+;; (add-hook 'python-mode-hook 'eglot-ensure)
+
+;;; company
+;; (use-package company
+;;   :init (global-company-mode)
+;;   :config
+;;   (setq company-minimum-prefix-length 1) ; 1 个字母开始进行自动补全
+;;   (setq company-tooltip-align-annotations t)
+;;   (setq company-idle-delay 0.0)
+;;   (setq company-show-numbers t) ;; 给选项编号 (按快捷键 M-1、M-2 等等来进行选择).
+;;   (setq company-selection-wrap-around t)
+;;   (setq company-transformers '(company-sort-by-occurrence))) ; 根据选择的频率进行排序
+
+;; (use-package company-box
+;;   :after company
+;;   :hook (company-mode . company-box-mode))
+
+(use-package emacs ;; 史前配置
+  :init
+  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+  ;; Vertico commands are hidden in normal buffers.
+  (setq read-extended-command-predicate
+        #'command-completion-default-include-p)
+
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t)
+
+  (defvar eh-space "  ")
+
+  ;; 设置 mode-line
+  ;; 在 mode-line 最后追加一个半角空格，一个全角空格，防止因为字体高度原因导致 mode-line 抖动。
+  (setq mode-line-end-spaces
+	'(:eval (if (display-graphic-p) eh-space "-%-")))
+
+  (defun eh-tab-line-format (orig_func)
+    "在 tab-line 的最后添加一个全角空格，防止 tab-line 抖动。"
+    (list (funcall orig_func) eh-space))
+
+  (advice-add 'tab-line-format :around #'eh-tab-line-format)
+
+  ;; Set line length
+  (setq shr-width 75)
+
+  ;; (progn
+  ;;   (set-face-attribute 'default nil    ;:font "Fantasque Sans Mono"
+  ;; 					;:font "DejaVu Sans Mono"
+  ;; 			                ;:font "IBM Plex Mono"
+  ;; 					:font "Ligconsolata"
+  ;; 					:height 160)
+  ;;   (dolist (charset '(kana han symbol cjk-misc bopomofo)) ;; Chinese fonts
+  ;;     (set-fontset-font (frame-parameter nil 'font)
+  ;; 			charset (font-spec :family "LXGW WenKai Mono"))))
+  )
+
+;; (use-package whitespace # 太繁复了
+;;   :hook (after-init . global-whitespace-mode))
 
 ;;; init-unused.el ends here

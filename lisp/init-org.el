@@ -2,9 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 
-;;; LSP
-(setq lsp-bridge-enable-org-babel nil)
-
 ;;; org
 (use-package org
   :defer nil
@@ -20,6 +17,7 @@
   ;; babel 配置
   (setq org-confirm-babel-evaluate nil)
   (setq org-plantuml-jar-path "~/Code/plantuml/plantuml-1.2024.3.jar")
+  (setq org-babel-python-command "~/miniconda3/envs/hep/bin/python")
 
   (require 'ob-C)
   (require 'ob-latex)
@@ -41,28 +39,25 @@
      (org . t)
      (latex . t)))
 
-  ;;; latex
+  ;; latex
+  (setq org-startup-with-latex-preview nil)
   (setq org-latex-default-class "ctexart") ;; 默认 latex class
   (setq org-latex-compiler "xelatex") ;; 默认 latex compiler
   (turn-on-cdlatex)
   (add-hook 'org-mode-hook (lambda () ;; cdlatex
-			   (setq truncate-lines nil)
-			   (org-cdlatex-mode)))
-
-  ;;; pdf view
-  (setq org-file-apps
-	(quote
-	 ((auto-mode .emacs)
-	  ("\\.pdf\\'" . "/Applications/Skim.app/Contents/MacOS/Skim %s"))))
+			     (setq truncate-lines nil)
+			     (org-cdlatex-mode)))
 
   :custom
   (org-pretty-entities t) ;; pretty entities in org
   (org-startup-indented t) ;; 缩进
   (org-highlight-latex-and-related '(latex entities)) ;; latex 高亮设置
 
-  ;;; Agenda styling
+  ;;; Agenda
+  (setq org-agenda-include-diary t)
+
+  ;; Agenda style
   (org-agenda-use-time-grid t)
-  (org-agenda-include-diary t)
 
   (org-agenda-tags-column 0)
   (org-agenda-block-separator ?─)
@@ -98,11 +93,11 @@
   :hook (org-mode . org-modern-mode)
   :custom
   (org-modern-hide-stars t)
-  (org-modern-todo nil)
+  (org-modern-todo t)
   (org-modern-table nil)
-  (org-modern-timestamp nil)
-  (org-modern-tag nil)
-  (org-modern-priority nil)
+  (org-modern-timestamp t)
+  (org-modern-tag t)
+  (org-modern-priority t)
   (org-modern-star 'replace)
   :config
   ;; Add frame borders and window dividers
@@ -257,6 +252,7 @@
 (setq org-zettel-ref-temp-folder "~/org/zettel/tmp/")
 (setq org-zettel-ref-reference-folder "~/org/zettel/ref/")
 (setq org-zettel-ref-archive-folder "~/org/zettel/archive")
+(setq org-zettel-ref-overview-directory "~/org/zettel/overview")
 
 (defun my-denote--split-luhman-sig (signature)
   "Split numbers and letters in Luhmann-style SIGNATURE string."

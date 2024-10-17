@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: root
+# key: root
+# --
+#+begin_src cern-root
+$0
+#+end_src

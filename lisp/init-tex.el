@@ -1,8 +1,7 @@
 ;;; init-tex.el --- for tex
 ;;; Commentary:
 ;;; Code:
-;;; LSP
-(setq lsp-bridge-tex-lsp-server "texlab")
+
 ;;; TeX
 (use-package tex
   :ensure auctex
@@ -28,7 +27,7 @@ n	      (outline-minor-mode) ;; 加载 outline-minor-mode
 	      (setq TeX-source-correlate-method 'syntax) ;; 搜索执行方式
 	      (setq TeX-view-program-list '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b") ;; Skim
 					    ("PDF Tools" "TeX-pdf-tools-sync-view"))) ;; pdf-tools
-	      (setq TeX-view-program-selection '((output-pdf "Skim")))
+	      (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
 	      (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer) ;; 完成编译后刷新 pdf
 	      (add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window))))
 
@@ -44,14 +43,22 @@ n	      (outline-minor-mode) ;; 加载 outline-minor-mode
   :hook ((org-mode . org-cdlatex-mode)
 	 (tex-mode . cdlatex-mode))
   :config
-  (add-to-list 'cdlatex-command-alist '("qt" "Insert \\qty{}{}" "\\qty{?}{}" cdlatex-position-cursor nil t nil)))
+  (add-to-list 'cdlatex-command-alist
+	       '(("qt" "Insert \\qty{}{}" "\\qty{?}{}" cdlatex-position-cursor nil t nil)
+		 ))
+  ;;; LaTeX environment
+  )
 
-;;; PDF preview
+;;; PDF view
 ;; pdf-tools
 (use-package pdf-tools
   :init (pdf-loader-install)
+  ;:hook (pdf-view-mode . pdf-view-midnight-minor-mode)
   :custom
-  (pdf-view-incompatible-modes '(linum-mode linum-relative-mode helm-linum-relative-mode nlinum-mode nlinum-hl-mode nlinum-relative-mode yalinum-mode)))
+  (pdf-view-incompatible-modes '(linum-mode linum-relative-mode helm-linum-relative-mode nlinum-mode nlinum-hl-mode nlinum-relative-mode yalinum-mode))
+  :config
+  (require 'saveplace-pdf-view)
+  (save-place-mode 1))
 
 (provide 'init-tex)
 ;;; init-tex.el ends here
