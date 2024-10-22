@@ -1,7 +1,6 @@
 ;;; init-orgmodule.el --- org latex modules and task templates
 ;;; Commentary:
 ;;; Code:
-
 ;;; Org exports to LaTeX settings
 ;; org-latex-hyperref-template
 (setq org-latex-hyperref-template "
@@ -109,6 +108,10 @@ linkcolor=black
 \\usepackage{bm}
 \\usepackage{siunitx}
 \\usepackage{xcolor}
+
+\\usepackage{mathrsfs}
+\% commands
+\\newcommand{\\m}[1]{\\mathrm{#1}}
 "
 
 ("\\section{%s}" . "\\section*{%s}")
@@ -145,23 +148,43 @@ linkcolor=black
 ("\\paragraph{%s}" . "\\paragraph*{%s}")
 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
-;;; org latex settings - preview
-;;; Commentary: We can only care about the equation environment, as the inline formula seldom uses preview.
-(setq org-format-latex-options
-      '(:foreground auto
-	:background auto
-	:scale 1.1))
+;;; Org latex preview settings
+;; Header
+(setq org-format-latex-header "\\documentclass{article}
+\\usepackage[usenames]{color}
+\\usepackage{siunitx}
+\\usepackage{mathrsfs}
+\\usepackage{amsfonts}
+\\usepackage{bm}
+\[DEFAULT-PACKAGES]
+\[PACKAGES]
+\\pagestyle{empty}             % do not remove
+% New commands
+\\newcommand{\\m}[1]{\\mathrm{#1}}
+% The settings below are copied from fullpage.sty
+\\setlength{\\textwidth}{\\paperwidth}
+\\addtolength{\\textwidth}{-3cm}
+\\setlength{\\oddsidemargin}{1.5cm}
+\\addtolength{\\oddsidemargin}{-2.54cm}
+\\setlength{\\evensidemargin}{\\oddsidemargin}
+\\setlength{\\textheight}{\\paperheight}
+\\addtolength{\\textheight}{-\\headheight}
+\\addtolength{\\textheight}{-\\headsep}
+\\addtolength{\\textheight}{-\\footskip}
+\\addtolength{\\textheight}{-3cm}
+\\setlength{\\topmargin}{1.5cm}
+\\addtolength{\\topmargin}{-2.54cm}")
 
-(plist-put org-format-latex-options :background "Transparent")
-
-;; Vertically align LaTeX preview in org mode
-(defun my-org-latex-preview-advice (beg end &rest _args)
-  (let* ((ov (car (overlays-at (/ (+ beg end) 2) t)))
-         (img (cdr (overlay-get ov 'display)))
-         (new-img (plist-put img :ascent 95)))
-    (overlay-put ov 'display (cons 'image new-img))))
-(advice-add 'org--make-preview-overlay
-            :after #'my-org-latex-preview-advice)
+;; Format, needed to restart when changing displayer according to this setting
+(let ((org-latex-preview-scale
+       (cond
+	((= (display-pixel-height) 900) 1.1) ;; Mac: 1440*900 Displayer: 1980*1080
+	((= (display-pixel-height) 1080) 1.6)
+	(t 1.1))))
+  (setq org-format-latex-options
+      `(:foreground "Black"
+		    :background "Transparent"
+		    :scale ,org-latex-preview-scale)))
 
 ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
 ;; Justifying-LaTeX-preview-fragments-in-org-mode/
@@ -239,7 +262,7 @@ linkcolor=black
   (apply orig-func args))
 (advice-add 'org-create-formula-image :around #'org-renumber-environment)
 
-(use-package org-fragtog
+(use-package org-fragtog ;; auto preview
   :hook (org-mode . org-fragtog-mode))
 
 ;; pdf view
@@ -251,15 +274,10 @@ linkcolor=black
 	;("\\.pdf\\'" . "/Applications/Skim.app/Contents/MacOS/Skim %s")
 	)))
 
-;;; 待办事项关键词
-(setq org-todo-keyword-faces '(("TODO" . "red") "|" ("DONE" . "blue") ("CANCELED" . "black")))
-
-;;; 日程文件位置
+;;; Org agenda and capture templates
 (setq org-agenda-files '("~/org/class.org" "~/org/task.org" "~/org/journal.org"))
 
-;;; 任务 capture-templetes
 (setq org-capture-templates nil)
-
 (add-to-list 'org-capture-templates '("t" "Tasks")) ;; 任务模版
 (add-to-list 'org-capture-templates
        '("tw" "Work" entry
@@ -277,12 +295,10 @@ linkcolor=black
        '("tq" "Questions" entry
 	 (file+headline "~/org/task.org" "Questions")
 	 "* TODO %^{Questionname}\n%u\n"))
-
 (add-to-list 'org-capture-templates ;; 课程
 	     '("c" "Class" entry
 	       (file "~/org/class.org")
 	       "* TODO %^{Coursename}\n%u\n"))
-
 (add-to-list 'org-capture-templates ;; 日志
              '("j" "Journal" entry (file "~/org/journal.org")
 	 "* %U - 日志\n  %?"))

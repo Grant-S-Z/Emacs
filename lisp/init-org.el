@@ -1,8 +1,7 @@
 ;;; init-org.el --- for org
 ;;; Commentary:
 ;;; Code:
-
-;;; org
+;;; Org
 (use-package org
   :defer nil
   :bind ("C-x C-y" . org-insert-image)
@@ -86,7 +85,7 @@
   (org-appear-inside-latex t) ;; latex 符号
   (org-appear-autokeywords t))
 
-;;; 主题
+;;; Org UI
 ;; org-modern
 (use-package org-modern
   :after org
@@ -100,6 +99,7 @@
   (org-modern-priority t)
   (org-modern-star 'replace)
   :config
+  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
   ;; Add frame borders and window dividers
   (modify-all-frames-parameters
    '((right-divider-width . 5)
@@ -119,21 +119,22 @@
    org-insert-heading-respect-content t
    ;; Org styling, hide markup etc.
    org-hide-emphasis-markers t
-   org-ellipsis "…"))
+   org-ellipsis "…")
+  ;; Org todo keywords
+  (setq org-todo-keywords '((sequence "TODO" "DONE" "CANCELED")))
+  (setq org-modern-todo-faces
+	(quote (("TODO" :background "pink" :foreground "black")
+		("DONE" :background "green" :foreground "black")
+		("CANCELED" :background "grey" :foreground "black")
+		)))
+  )
 
-;;; 表格
-(use-package valign
-  :after org
-  :hook (org-mode . valign-mode)
-  :custom
-  (valign-fancy-bar nil)) ;; 确保性能
-
-;;; View pdf images inline
+;; View pdf images inline
 (use-package org-inline-pdf
   :after org
   :hook (org-mode . org-inline-pdf-mode))
 
-;;; 笔记配置
+;;; Org notes
 ;; Zotero 位置
 (setq zot_bib '("~/org/roam-notes/reference.bib") ;; Zotero 用 Better BibTeX 导出的 BibTeX 文件
       zot_pdf "~/Nutstore Files/zotero" ;; Zotero 的 ZotFile 同步文件夹
@@ -216,35 +217,25 @@
   :defer t
   :bind (("C-c n n" . org-noter))
   :custom
-  (org-noter-always-create-frame nil) ;; Please stop opening frames, which will change your fonts and make it hard to choose the window you want.
+  (org-noter-always-create-frame nil) ;; Please stop opening frames
   (org-noter-highlight-selected-text t)
   (org-noter-max-short-selected-text-length 50) ;; tab 高亮最小字符长度，大于该长度变为 quote
   (org-noter-auto-save-last-location t) ;; 自动保存上次位置
-  (org-noter-notes-search-path '("~/org/roam-notes/"))
-  :config
-  (define-key pdf-view-mode-map
-	      "d" 'pdf-view-next-page-command) ;; 向后翻页
-  (define-key pdf-view-mode-map
-	      "a" 'pdf-view-previous-page-command) ;; 向前翻页
-  (define-key pdf-view-mode-map
-	      "s" 'pdf-view-scroll-up-or-next-page) ;; 向下滑动
-  (define-key pdf-view-mode-map
-	      "w" 'pdf-view-scroll-down-or-previous-page) ;; 向上滑动
-  )
+  (org-noter-notes-search-path '("~/org/roam-notes/")))
 
-;;; org-reveal
+;; ox reveal
 (use-package ox-reveal
   :config
   (setq org-reveal-root "file:///Users/grant/Code/js/reveal.js-5.0.5"))
 
-;;; org-remark
+;; org remark
 (use-package org-remark
   :bind (("C-c n m" . org-remark-mark)
 	 ("C-c n ]" . org-remark-view-next)
 	 ("C-c n [" . org-remark-view-prev))
   :hook (nov-mode . org-remark-nov-mode))
 
-;;; org-zettel-ref
+;; org-zettel-ref
 (add-to-list 'load-path "~/.emacs.d/site-lisp/org-zettel-ref-mode")
 (require 'org-zettel-ref-mode)
 (setq org-zettel-ref-mode-type 'org-roam)

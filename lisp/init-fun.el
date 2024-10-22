@@ -1,7 +1,6 @@
 ;;; init-fun.el --- for functions
 ;;; Commentary:
 ;;; Code:
-
 ;;; Quite useful to avoid the note insert position error
 (defun grant/outline-show-entry ()
   "Show the body directly following this heading.
@@ -18,7 +17,7 @@ Show the heading too, if it is currently invisible."
                          nil)))
 (advice-add 'outline-show-entry :override #'grant/outline-show-entry)
 
-;;; Org insert images
+;;; Org insert images in Macos
 (defun org-insert-image ()
   "Insert a image from clipboard."
   (interactive)
@@ -42,8 +41,10 @@ Show the heading too, if it is currently invisible."
 		      "file:" image-file)
 		     "")
     (message image-file))
-  (org-display-inline-images))
+  ;; (org-display-inline-images) ;; no need to display
+  )
 
+;;; Personal useful functions
 (defun open-words ()
   "Open words."
   (interactive)
@@ -74,40 +75,18 @@ Show the heading too, if it is currently invisible."
       (set-visited-file-name new-name)
       (rename-buffer new-name))))
 
-(defun grant/clear-messages-buffer ()
-  "Clear Message buffer."
-  (interactive)
-  (let ((inhibit-read-only t))
-    (with-current-buffer "*Messages*"
-      (erase-buffer))))
-
-(defun grant/kill-unused-buffers ()
-  "Kill unused buffers."
-  (interactive)
-  (ignore-errors
-    (save-excursion
-      (dolist (buf (buffer-list))
-	(set-buffer buf)
-	(when (and (string-prefix-p "*" (buffer-name)) (string-suffix-p "*" (buffer-name)))
-	  (kill-buffer buf))))))
-
-(defun grant/indent-all ()
-  "Indent for all code."
-  (interactive)
-  (indent-region (point-min) (point-max))
-  (message "format successfully"))
-
 (defun grant/make-in-current-directory ()
   "Run `make` in the directory of the current buffer's file."
   (interactive)
   (let ((default-directory (file-name-directory (or (buffer-file-name) ""))))
     (compile "make")))
 
-(defun grant/make-in-parent-directory ()
-  "Run `make` in the parent directory of the current buffer's file."
-  (interactive)
-  (let ((default-directory (file-name-directory (directory-file-name (file-name-directory (or (buffer-file-name) ""))))))
-    (compile "make")))
+(defadvice find-file (before make-directory-maybe (filename &optional wildcards) activate)
+  "Create parent directory if not exists while visiting file."
+  (unless (file-exists-p filename)
+    (let ((dir (file-name-directory filename)))
+      (unless (file-exists-p dir)
+        (make-directory dir t)))))
 
 (provide 'init-fun)
 ;;; init-fun.el ends here

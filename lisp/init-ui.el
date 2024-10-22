@@ -1,13 +1,14 @@
 ;;; init-ui.el -- themes of emacs
 ;;; Commentary:
 ;;; Code:
+;;; Themes
+(add-to-list 'load-path "~/.emacs.d/site-lisp/moe-theme.el")
+(require 'moe-theme)
+(load-theme 'moe-light t)
 
-;;; themes
-(use-package flatui-theme
-  :init (load-theme 'flatui t))
-
-;;; pixel smooth scroll
-(setq mac-mouse-wheel-smooth-scroll t) ;; 平滑滚动，只在 Mac 起作用
+;;; Pixel smooth scroll
+(setq mac-mouse-wheel-smooth-scroll t) ;; 平滑滚动, only in Mac and always return error
+(setq mac-mouse-wheel-mode t)
 (use-package ultra-scroll-mac
   :if (eq window-system 'mac)
   :load-path "~/.emacs.d/site-lisp/ultra-scroll-mac"
@@ -18,7 +19,6 @@
   (ultra-scroll-mac-mode 1))
 
 ;;; Line number
-;(setq display-line-numbers-type 'absolute) ;; 相对行号
 (defun grant/enable-line-numbers ()
   "Enable line numbers except in specific modes."
   (unless (or (derived-mode-p 'org-mode)
@@ -33,7 +33,7 @@
  '(line-number-current-line ((nil (:font "Inconsolata"
 					 :height 140)))))
 
-;;; 开始界面
+;;; Dashboard
 (use-package dashboard
   :init
   (add-hook 'after-init-hook 'dashboard-open)
@@ -58,12 +58,10 @@
   ;; Center contents
   (dashboard-center-content t)
   ;; Logo
-  ;; (dashboard-startup-banner "~/.emacs.d/img/firefly.jpg")
   (dashboard-startup-banner "~/.emacs.d/img/Robin.jpg")
   ;; Footnote
   (dashboard-footer-messages '
   ("True mastery of any skill takes a lifetime."))
-
   (dashboard-set-heading-icons t)
   (dashboard-set-file-icons t)
   (dashboard-set-init-info t)
@@ -77,7 +75,7 @@
   (setq doom-modeline-icon t)
   (setq doom-modeline-buffer-file-name-style 'auto))
 
-;;; minibuffer
+;;; Minibuffer
 (use-package vertico
   :init (vertico-mode))
 
@@ -117,6 +115,7 @@
   :config
   (setq highlight-indent-guides-method 'bitmap))
 
+;;; Fonts and input method
 (use-package cnfonts
   :init (cnfonts-mode 1)
   :defer nil
@@ -158,13 +157,13 @@
   ;; 在 minibuffer 使用后自动关闭输入法
   (rime-deactivate-when-exit-minibuffer t))
 
-;;; 文件管理
-;; dired
+;;; Dired and dirvish
+;; Dired
 (when (string= system-type "darwin")
   (setq dired-use-ls-dired t
         insert-directory-program "/opt/homebrew/bin/gls" ;; 因 ls 不能使用，设置为 gls
         dired-listing-switches "-aBhl --group-directories-first"))
-;; dirvish
+;; Dirvish
 (use-package dirvish
   :defer nil
   :bind ("C-c l" . dirvish-side)

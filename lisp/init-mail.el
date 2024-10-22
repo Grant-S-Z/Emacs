@@ -1,7 +1,7 @@
 ;;; Package -- summary
 ;;; Commentary:
 ;;; Code:
-
+;;; Basic settings
 ;; Send mails
 (require 'auth-source)
 (setq auth-source '("~/.authinfo" "~/.authinfo.gpg"))

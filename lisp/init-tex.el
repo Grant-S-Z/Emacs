@@ -1,8 +1,7 @@
 ;;; init-tex.el --- for tex
 ;;; Commentary:
 ;;; Code:
-
-;;; TeX
+;;; TeX settings
 (use-package tex
   :ensure auctex
   :config
@@ -57,6 +56,19 @@ n	      (outline-minor-mode) ;; 加载 outline-minor-mode
   :custom
   (pdf-view-incompatible-modes '(linum-mode linum-relative-mode helm-linum-relative-mode nlinum-mode nlinum-hl-mode nlinum-relative-mode yalinum-mode))
   :config
+  (define-key pdf-view-mode-map
+	      "d" 'pdf-view-next-page-command) ;; 向后翻页
+  (define-key pdf-view-mode-map
+	      "a" 'pdf-view-previous-page-command) ;; 向前翻页
+  (define-key pdf-view-mode-map
+	      "s" 'pdf-view-scroll-up-or-next-page) ;; 向下滑动
+  (define-key pdf-view-mode-map
+	      "w" 'pdf-view-scroll-down-or-previous-page) ;; 向上滑动
+  (require 'pdf-annot)
+  (define-key pdf-annot-minor-mode-map (kbd "C-a a") 'pdf-annot-add-highlight-markup-annotation)
+  (define-key pdf-annot-minor-mode-map (kbd "C-a s") 'pdf-annot-add-squiggly-markup-annotation)
+  (define-key pdf-annot-minor-mode-map (kbd "C-a f") 'pdf-annot-add-underline-markup-annotation)
+  (define-key pdf-annot-minor-mode-map (kbd "C-a d") 'pdf-annot-delete)
   (require 'saveplace-pdf-view)
   (save-place-mode 1))
 

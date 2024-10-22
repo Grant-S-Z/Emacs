@@ -565,4 +565,120 @@ Argument PDF-PATH The path to the PDF file."
 ;; (use-package whitespace # 太繁复了
 ;;   :hook (after-init . global-whitespace-mode))
 
+;; (use-package olivetti
+;;   :after org
+;;   :hook ((org-mode . olivetti-mode)
+;; 	 (text-mode . olivetti-mode)
+;; 	 (markdown-mode . olivetti-mode))
+;;   :custom
+;;   (olivetti-body-width 100))
+;; (defun grant/toggle-olivetti-according-window ()
+;;     "Toggle olivetti mode according to window width."
+;;     (if (and (eq (buffer-local-value 'major-mode (current-buffer)) 'org-mode)
+;; 	     (or (eq (length (window-list nil nil nil)) 1)
+;; 		 (window-at-side-p (frame-first-window) 'right))) ;; frame-first-window 的 mode 是 org-mode 并且没有右边 window
+;; 	(olivetti-mode 1)
+;;       (olivetti-mode 0)
+;;       (when (eq (buffer-local-value 'major-mode (current-buffer)) 'org-mode)
+;; 	(visual-line-mode 1))))
+;;   (add-hook 'org-mode-hook #'grant/toggle-olivetti-according-window)
+;;   (add-hook 'window-configuration-change-hook #'grant/toggle-olivetti-according-window)
+
+;; unsuccessful
+;; (setq org-format-latex-options '(:foreground "Black"
+;; 					     :background "Transparent"
+;; 					     :scale 1.1))
+;;
+;; (defun grant/update-org-latex-preview-scale ()
+;;   (let ((org-latex-preview-scale
+;; 	   (cond
+;; 	    ((= (display-pixel-height) 900) 1.1)
+;; 	    ((= (display-pixel-height) 1080) 1.7)
+;; 	    (t, 1.1)))
+;;     (plist-put org-format-latex-options :scale org-latex-preview-scale))))
+;; (advice-add 'org--make-preview-overlay
+;; 	    :after #'grant/update-org-latex-preview-scale)
+
+;; Vertically align LaTeX preview in org mode
+;; (defun grant/org-latex-preview-advice (beg end &rest _args)
+;;   (let* ((ov (car (overlays-at (/ (+ beg end) 2) t)))
+;;          (img (cdr (overlay-get ov 'display)))
+;;          (new-img (plist-put img :ascent 95)))
+;;     (overlay-put ov 'display (cons 'image new-img))))
+;; (advice-add 'org--make-preview-overlay
+;;             :after #'grant/org-latex-preview-advice)
+
+;; 全屏启动，且可使用状态栏与程序坞
+;(set-frame-parameter nil 'fullscreen 'fullboth)
+
+(global-hl-line-mode nil) ;; no highlight current line
+
+;; Inhibit resizing Puremacs frame
+(setq frame-inhibit-implied-resize t)
+
+;; To suppress flashing at startup
+(setq-default inhibit-redisplay t
+              inhibit-message t)
+(defun reset-inhibit-vars ()
+  "Reset inhibit vars."
+  (setq-default inhibit-redisplay nil
+                inhibit-message nil)
+  (redraw-frame))
+(add-hook 'window-setup-hook #'reset-inhibit-vars)
+(define-advice startup--load-user-init-file (:after (&rest _) reset-inhibit-vars)
+  (and init-file-had-error (reset-inhibit-vars)))
+
+;;; 位置
+(setq calendar-location-name "Beijing, CN")
+(setq calendar-latitude 39.9042)
+(setq calendar-longitude 116.4074)
+
+;;; Functions
+(defun grant/make-in-parent-directory ()
+  "Run `make` in the parent directory of the current buffer's file."
+  (interactive)
+  (let ((default-directory (file-name-directory (directory-file-name (file-name-directory (or (buffer-file-name) ""))))))
+    (compile "make")))
+
+(defun grant/indent-all ()
+  "Indent for all code."
+  (interactive)
+  (indent-region (point-min) (point-max))
+  (message "format successfully"))
+
+(defun grant/clear-messages-buffer ()
+  "Clear Message buffer."
+  (interactive)
+  (let ((inhibit-read-only t))
+    (with-current-buffer "*Messages*"
+      (erase-buffer))))
+
+(defun grant/kill-unused-buffers () ;; use crux-kill-other-buffers
+  "Kill unused buffers."
+  (interactive)
+  (ignore-errors
+    (save-excursion
+      (dolist (buf (buffer-list))
+	(set-buffer buf)
+	(when (and (string-prefix-p "*" (buffer-name)) (string-suffix-p "*" (buffer-name)))
+	  (kill-buffer buf))))))
+
+;;; 待办事项关键词
+;; (setq org-todo-keywords '((sequence "TODO" "DONE" "CANCELED")))
+;; (setq org-todo-keyword-faces '(("TODO" . "red") ("DONE" . "green") ("CANCELED" . "blue")))
+
+;;; 表格
+(use-package valign
+  :after org
+  :hook (org-mode . valign-mode)
+  :custom
+  (valign-fancy-bar nil)) ;; 确保性能
+
+(setq package-native-compile t)
+
+;; (add-to-list 'exec-path "~/miniconda3/bin")
+;; (setenv "PATH" "~/miniconda3/bin:$PATH" '("PATH"))
+
+;; (setq python-shell-exec-path "python")
+
 ;;; init-unused.el ends here

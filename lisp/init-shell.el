@@ -1,16 +1,12 @@
 ;;; init-shell.el --- for shell
 ;;; Commentary:
 ;;; Code:
-
 ;;; Get commands work in shell
 (use-package exec-path-from-shell
   :defer nil
   :config
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)))
-
-(add-to-list 'exec-path "~/miniconda3/bin")
-(setenv "PATH" "~/miniconda3/bin:$PATH" '("PATH"))
 
 ;;; Shell vterm
 (use-package vterm

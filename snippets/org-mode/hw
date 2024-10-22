@@ -3,19 +3,10 @@
 # key: hw
 # --
 #+PROPERTY: header-args :eval never-export
-
-#+latex_header: \usepackage{fancyhdr}
-#+latex_header: \pagestyle{fancy}
-#+latex_header: \fancyhf{}
-#+latex_header: \pagenumbering{arabic}
-#+latex_header: \fancyhead[C]{${1:name}}
-#+latex_header: \fancyfoot[C]{\thepage}
-#+latex_header: \setlength{\headheight}{13.59999pt}
-#+latex_header: \addtolength{\topmargin}{-1.59999pt}
-
 #+options: H:2 toc:nil num:t \n:nil ::t |:t ^:t -:t f:t *:t <:t
 #+title: $1
 #+author: $2
 #+date:
 -----
+
 $3

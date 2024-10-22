@@ -44,10 +44,6 @@
   :bind
   ("C-S-<mouse-1>" . mc/toggle-cursor-on-click))
 
-;; update changes automatically
-(use-package autorevert
-  :hook (after-init . global-auto-revert-mode))
-
 ;; Git
 (use-package magit)
 
@@ -67,7 +63,7 @@
 	    holiday-general-holidays
 	    holiday-local-holidays))
 
-;;; 界面
+;;; UI helpful packages
 (use-package ace-window ;; 分屏切换
   :bind (("M-o" . 'ace-window)))
 
@@ -90,26 +86,23 @@
   (setq super-save-auto-save-when-idle t)
   (setq save-silently t))
 
-(use-package pangu-spacing ;; Comfortable space
+(use-package pangu-spacing ;; comfortable space
   :init
   (global-pangu-spacing-mode 1)
   :config
   (setq pangu-spacing-real-insert-separtor t))
 
-(use-package subword ;; camel
-  :hook (prog-mode . subword-mode))
-
-;;; 居中
-(use-package olivetti
-  :after org
-  :hook ((org-mode . olivetti-mode)
-	 (text-mode . olivetti-mode)
-	 (markdown-mode . olivetti-mode))
+(use-package writeroom-mode ;;; center texts
+  :hook (org-mode . writeroom-mode)
   :custom
-  (olivetti-body-width 80))
+  (writeroom-maximize-window nil)
+  (writeroom-global-effects '(writeroom-set-alpha
+			      writeroom-set-menu-bar-lines
+			      writeroom-set-tool-bar-lines
+			      writeroom-set-vertical-scroll-bars
+			      writeroom-set-bottom-divider-width)))
 
-;; Key cast
-(use-package keycast
+(use-package keycast ;; key cast
   ;; :init (keycast-header-line-mode 1)
   :config
   (push '(org-self-insert-command nil nil) keycast-substitute-alist)
@@ -119,13 +112,18 @@
   (push '(lsp-ui-doc--handle-mouse-movement nil nil) keycast-substitute-alist)
   (push '(mac-mwheel-scroll nil nil) keycast-substitute-alist))
 
-;; Help
-(use-package helpful
+(use-package helpful ;; help
   :bind
   ([remap describe-function] . #'helpful-callable)
   ([remap describe-variable] . #'helpful-variable))
 
-;;; hugo
+;; Outli, unfold as org
+(add-to-list 'load-path "~/.emacs.d/site-lisp/outli/")
+(require 'outli)
+(add-hook 'prog-mode-hook 'outli-mode-hook)
+
+;;; Diary else
+;; Hugo
 (use-package easy-hugo
   :bind ("C-c b" . easy-hugo)
   :config
@@ -140,7 +138,7 @@
   (setq org-hugo-base-dir "~/Code/GrantSite/")
   (setq org-hugo-section "post"))
 
-;;; Bongo, a music player
+;; Bongo, a music player
 (use-package bongo
   :commands bongo-playlist
   :bind (("C-c m m" . bongo-playlist)
@@ -157,7 +155,7 @@
   (bongo-album-cover-size 100)
   (bongo-mode-line-indicator-mode nil))
 
-;;; MPV
+;; Mpv
 (use-package mpv
   :config
   (defun org-mpv-complete-link (&optional arg)
@@ -180,12 +178,13 @@
 
   (add-hook 'org-open-at-point-functions #'mpv-seek-to-position-at-point))
 
-;;; Calculator
-(use-package literate-calc-mode)
+;; Calculator
+(use-package literate-calc-mode
+  :mode ("calc" . literate-calc-mode))
 
-;;; EPUB reader
+;; Reader
 (use-package nov
-  ;:mode ("\\.epub\\" . nov-mode)
+  :mode ("\\.epub\\'" . nov-mode)
   :config
   (setq nov-text-width 100))
 (defun my-nov-font-setup ()
@@ -194,9 +193,7 @@
 			   :height 1.0))
 (add-hook 'nov-mode-hook 'my-nov-font-setup)
 
-
-
-;;; Translator
+;; Translator
 (use-package fanyi
   :bind ("C-c f" . fanyi-dwim)
   :custom
@@ -209,8 +206,76 @@
                      ;; Longman
                      fanyi-longman-provider))
   (fanyi-verbose nil))
-
 (use-package sdcv)
+
+;; Rss
+(use-package elfeed
+  :config
+  (setq elfeed-feeds
+	'(("https://arxiv.org/rss/hep-ex" study physics)
+	  ("https://arxiv.org/rss/hep-ph" study physics)
+	  ("https://arxiv.org/rss/hep-th" study physics)
+	  ("https://sachachua.com/blog/category/emacs-news/feed/" news emacs)
+	  ("https://emacs-china.org/posts.rss" emacs)
+	  ("https://emacs.stackexchange.com/feeds" emacs)
+	  ("https://www.reddit.com/r/emacs/.rss" emacs)
+	  ("https://www.reddit.com/r/orgmode/.rss" org emacs)
+	  ("https://news.ycombinator.com/rss" tech news)
+	  ;;("http://rss.slashdot.org/Slashdot/slashdotMain" tech news)
+	  ("https://www.economist.com/international/rss.xml" eco news)
+	  ("https://www.reddit.com/r/leagueoflegends/.rss" lol games)
+	  ))
+  (setq elfeed-show-mode-hook
+      (lambda ()
+	(set-face-attribute 'variable-pitch (selected-frame) :font (font-spec :family "Iosevka" :size 18))
+	(setq fill-column 100)))
+  )
+
+(use-package elfeed-summary
+  :bind ("C-c e" . elfeed-summary)
+  :config
+  (setq elfeed-summary-other-window t)
+  (setq elfeed-summary-settings
+	'((group (:title . "Physics")
+		 (:elements
+		  (query . (study physics))))
+	  (group (:title . "Emacs")
+		 (:elements
+		  (query . (and emacs (not '(news org))))
+		  (group (:title . "News")
+			 (:elements
+			  (query . (and news emacs))))
+		  (group (:title . "Org")
+			 (:elements
+			  (query . (and org emacs))))))
+	  (group (:title . "News")
+		 (:elements
+		  (query . (and news (not '(tech eco emacs))))
+		  (group (:title . "Tech")
+			 (:elements
+			  (query . (and tech news))))
+		  (group (:title . "Eco")
+			 (:elements
+			  (query . (and eco news))))))
+	  (group (:title . "Games")
+		 (:elements
+		  (query . (and Games (not '(lol))))
+		  (group (:title . "LOL")
+			 (:elements
+			  (query . (and lol games))))))
+	  )))
+
+;; Pomm
+(use-package pomm
+  :commands (pomm)
+  :config
+  (bind-key* "C-c C-p" #'pomm)
+  (setq pomm-audio-enabled nil)
+  (setq pomm-work-period 45)
+  (setq pomm-long-break-period 20)
+  (setq pomm-number-of-periods 2))
+(require 'pomm)
+(pomm-mode-line-mode)
 
 ;;; Chatgpt
 (when *is-mac*
@@ -233,58 +298,7 @@
         ;; Here the openai-key should be the proxy service key.
 	(osx-get-keychain-password "openai key"))))))
 
-;;; RSS
-(use-package elfeed
-  :config
-  (setq elfeed-feeds
-	'(("https://arxiv.org/rss/hep-ex" study physics)
-	  ("https://arxiv.org/rss/hep-ph" study physics)
-	  ("https://arxiv.org/rss/hep-th" study physics)
-	  ("https://sachachua.com/blog/category/emacs-news/feed/" emacs)
-	  ("https://emacs-china.org/posts.rss" emacs)
-	  ("https://www.reddit.com/r/emacs/.rss" emacs)
-	  ("https://emacs.stackexchange.com/feeds" emacs)
-	  ("https://news.ycombinator.com/rss" tech news)
-	  ;;("http://rss.slashdot.org/Slashdot/slashdotMain" tech news)
-	  ("https://www.economist.com/international/rss.xml" eco news)
-	  ))
-  (setq elfeed-show-mode-hook
-      (lambda ()
-	(set-face-attribute 'variable-pitch (selected-frame) :font (font-spec :family "LXGW WenKai" :size 16))
-	(setq fill-column 100))))
 
-(use-package elfeed-summary
-  :bind ("C-c e" . elfeed-summary)
-  :config
-  (setq elfeed-summary-other-window t)
-  (setq elfeed-summary-settings
-	'((group (:title . "Physics")
-		 (:elements
-		  (query . (study physics))))
-	  (group (:title . "Emacs")
-		 (:elements
-		  (query . (emacs))))
-	  (group (:title . "News")
-		 (:elements
-		  (query . (and news (not '(tech eco))))
-		  (group (:title . "Tech News")
-			 (:elements
-			  (query . (and tech news))))
-		  (group (:title . "Eco News")
-			 (:elements
-			  (query . (and eco news)))))))))
-
-;;; pomm
-(use-package pomm
-  :commands (pomm)
-  :config
-  (bind-key* "C-c C-p" #'pomm)
-  (setq pomm-audio-enabled nil)
-  (setq pomm-work-period 45)
-  (setq pomm-long-break-period 20)
-  (setq pomm-number-of-periods 2))
-(require 'pomm)
-(pomm-mode-line-mode)
 
 (provide 'init-package)
 ;;; init-package.el ends here
