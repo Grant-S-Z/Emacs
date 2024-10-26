@@ -45,7 +45,10 @@ linkcolor=black
 
 \\usepackage{mathrsfs}
 \% commands
-\\newcommand{\\m}[1]{\\mathrm{#1}}
+\\newcommand{\\mr}[1]{\\mathrm{#1}}
+\\newcommand{\\mb}[1]{\\mathbf{#1}}
+\\newcommand{\\mc}[1]{\\mathcal{#1}}
+\\newcommand{\\ms}[1]{\\mathscr{#1}}
 "
 
   ("\\section{%s}" . "\\section*{%s}")
@@ -81,7 +84,10 @@ linkcolor=black
 
 \\usepackage{mathrsfs}
 \% commands
-\\newcommand{\\m}[1]{\\mathrm{#1}}
+\\newcommand{\\mr}[1]{\\mathrm{#1}}
+\\newcommand{\\mb}[1]{\\mathbf{#1}}
+\\newcommand{\\mc}[1]{\\mathcal{#1}}
+\\newcommand{\\ms}[1]{\\mathscr{#1}}
 "
 
 ("\\section{%s}" . "\\section*{%s}")
@@ -111,7 +117,10 @@ linkcolor=black
 
 \\usepackage{mathrsfs}
 \% commands
-\\newcommand{\\m}[1]{\\mathrm{#1}}
+\\newcommand{\\mr}[1]{\\mathrm{#1}}
+\\newcommand{\\mb}[1]{\\mathbf{#1}}
+\\newcommand{\\mc}[1]{\\mathcal{#1}}
+\\newcommand{\\ms}[1]{\\mathscr{#1}}
 "
 
 ("\\section{%s}" . "\\section*{%s}")
@@ -160,7 +169,10 @@ linkcolor=black
 \[PACKAGES]
 \\pagestyle{empty}             % do not remove
 % New commands
-\\newcommand{\\m}[1]{\\mathrm{#1}}
+\\newcommand{\\mr}[1]{\\mathrm{#1}}
+\\newcommand{\\mb}[1]{\\mathbf{#1}}
+\\newcommand{\\mc}[1]{\\mathcal{#1}}
+\\newcommand{\\ms}[1]{\\mathscr{#1}}
 % The settings below are copied from fullpage.sty
 \\setlength{\\textwidth}{\\paperwidth}
 \\addtolength{\\textwidth}{-3cm}
@@ -178,9 +190,9 @@ linkcolor=black
 ;; Format, needed to restart when changing displayer according to this setting
 (let ((org-latex-preview-scale
        (cond
-	((= (display-pixel-height) 900) 1.1) ;; Mac: 1440*900 Displayer: 1980*1080
-	((= (display-pixel-height) 1080) 1.6)
-	(t 1.1))))
+	((= (display-pixel-height) 900) 1.2) ;; Mac: 1440*900 Displayer: 1980*1080
+	((= (display-pixel-height) 1080) 1.7)
+	(t 1.2))))
   (setq org-format-latex-options
       `(:foreground "Black"
 		    :background "Transparent"

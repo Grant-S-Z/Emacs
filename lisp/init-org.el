@@ -228,13 +228,6 @@
   :config
   (setq org-reveal-root "file:///Users/grant/Code/js/reveal.js-5.0.5"))
 
-;; org remark
-(use-package org-remark
-  :bind (("C-c n m" . org-remark-mark)
-	 ("C-c n ]" . org-remark-view-next)
-	 ("C-c n [" . org-remark-view-prev))
-  :hook (nov-mode . org-remark-nov-mode))
-
 ;; org-zettel-ref
 (add-to-list 'load-path "~/.emacs.d/site-lisp/org-zettel-ref-mode")
 (require 'org-zettel-ref-mode)

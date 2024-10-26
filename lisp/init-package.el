@@ -39,11 +39,6 @@
   :bind
   (("C-;" . avy-goto-char-timer)))
 
-;; multiple-cursors
-(use-package multiple-cursors
-  :bind
-  ("C-S-<mouse-1>" . mc/toggle-cursor-on-click))
-
 ;; Git
 (use-package magit)
 
@@ -63,7 +58,7 @@
 	    holiday-general-holidays
 	    holiday-local-holidays))
 
-;;; UI helpful packages
+;;; UI operation
 (use-package ace-window ;; 分屏切换
   :bind (("M-o" . 'ace-window)))
 
@@ -93,7 +88,9 @@
   (setq pangu-spacing-real-insert-separtor t))
 
 (use-package writeroom-mode ;;; center texts
-  :hook (org-mode . writeroom-mode)
+  :defer nil
+  :hook ((org-mode . writeroom-mode)
+	 (nov-mode . writeroom-mode))
   :custom
   (writeroom-maximize-window nil)
   (writeroom-global-effects '(writeroom-set-alpha
@@ -117,12 +114,7 @@
   ([remap describe-function] . #'helpful-callable)
   ([remap describe-variable] . #'helpful-variable))
 
-;; Outli, unfold as org
-(add-to-list 'load-path "~/.emacs.d/site-lisp/outli/")
-(require 'outli)
-(add-hook 'prog-mode-hook 'outli-mode-hook)
-
-;;; Diary else
+;;; Daily packages
 ;; Hugo
 (use-package easy-hugo
   :bind ("C-c b" . easy-hugo)
@@ -186,12 +178,25 @@
 (use-package nov
   :mode ("\\.epub\\'" . nov-mode)
   :config
-  (setq nov-text-width 100))
+  (setq nov-text-width 80))
 (defun my-nov-font-setup ()
   (face-remap-add-relative 'variable-pitch
-			   :family "Bookerly"
-			   :height 1.0))
+			   :family "Alegreya"
+			   :height 1.5))
 (add-hook 'nov-mode-hook 'my-nov-font-setup)
+
+;; Nov notes, combined with org-noter in place of pdf-tools to take notes
+(use-package org-remark
+  :bind (("C-c n m" . org-remark-mark)
+	 ("C-c n ]" . org-remark-view-next)
+	 ("C-c n [" . org-remark-view-prev))
+  :hook (nov-mode . org-remark-nov-mode))
+
+;; Calibre
+(use-package calibredb
+  :config
+  (setq calibredb-root-dir "~/org/books/")
+  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir)))
 
 ;; Translator
 (use-package fanyi
@@ -215,13 +220,13 @@
 	'(("https://arxiv.org/rss/hep-ex" study physics)
 	  ("https://arxiv.org/rss/hep-ph" study physics)
 	  ("https://arxiv.org/rss/hep-th" study physics)
+	  ("https://root-forum.cern.ch/posts.rss" root)
 	  ("https://sachachua.com/blog/category/emacs-news/feed/" news emacs)
 	  ("https://emacs-china.org/posts.rss" emacs)
-	  ("https://emacs.stackexchange.com/feeds" emacs)
-	  ("https://www.reddit.com/r/emacs/.rss" emacs)
-	  ("https://www.reddit.com/r/orgmode/.rss" org emacs)
+	  ;("https://emacs.stackexchange.com/feeds" emacs)
+	  ;("https://www.reddit.com/r/emacs/.rss" emacs)
+	  ;("https://www.reddit.com/r/orgmode/.rss" org emacs)
 	  ("https://news.ycombinator.com/rss" tech news)
-	  ;;("http://rss.slashdot.org/Slashdot/slashdotMain" tech news)
 	  ("https://www.economist.com/international/rss.xml" eco news)
 	  ("https://www.reddit.com/r/leagueoflegends/.rss" lol games)
 	  ))
@@ -239,15 +244,19 @@
 	'((group (:title . "Physics")
 		 (:elements
 		  (query . (study physics))))
+	  (group (:title . "ROOT")
+		 (:elements
+		  (query . (root))))
 	  (group (:title . "Emacs")
 		 (:elements
 		  (query . (and emacs (not '(news org))))
 		  (group (:title . "News")
 			 (:elements
 			  (query . (and news emacs))))
-		  (group (:title . "Org")
-			 (:elements
-			  (query . (and org emacs))))))
+		  ;; (group (:title . "Org")
+		  ;; 	 (:elements
+		  ;; 	  (query . (and org emacs))))
+		  ))
 	  (group (:title . "News")
 		 (:elements
 		  (query . (and news (not '(tech eco emacs))))
@@ -297,8 +306,6 @@
       (lambda ()
         ;; Here the openai-key should be the proxy service key.
 	(osx-get-keychain-password "openai key"))))))
-
-
 
 (provide 'init-package)
 ;;; init-package.el ends here

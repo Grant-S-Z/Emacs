@@ -180,12 +180,7 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
 
 (use-package sly)
 
-;;; Calibre
-(use-package calibredb
-  :config
-  (setq calibredb-root-dir "~/Calibre Library")
-  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-  (setq calibredb-library-alist '(("~/Calibre"))))
+
 
 ;;; 默认 ssh
 ;(setq tramp-default-method "ssh")
@@ -548,9 +543,6 @@ Argument PDF-PATH The path to the PDF file."
 
   (advice-add 'tab-line-format :around #'eh-tab-line-format)
 
-  ;; Set line length
-  (setq shr-width 75)
-
   ;; (progn
   ;;   (set-face-attribute 'default nil    ;:font "Fantasque Sans Mono"
   ;; 					;:font "DejaVu Sans Mono"
@@ -680,5 +672,83 @@ Argument PDF-PATH The path to the PDF file."
 ;; (setenv "PATH" "~/miniconda3/bin:$PATH" '("PATH"))
 
 ;; (setq python-shell-exec-path "python")
+
+;; (use-package highlight-parentheses ;; highlight parentheses
+;;   :init (add-hook 'prog-mode-hook 'highlight-parentheses-mode))
+
+;; (use-package color-identifiers-mode
+;;   :init (add-hook 'prog-mode-hook 'color-identifiers-mode))
+
+;; multiple-cursors
+(use-package multiple-cursors
+  :bind
+  ("C-S-<mouse-1>" . mc/toggle-cursor-on-click))
+
+;; Lsp bridge
+;; (use-package lsp-bridge
+;;   :defer nil
+;;   :load-path "~/.emacs.d/site-lisp/lsp-bridge"
+;;   :bind (("C-x C-l" . lsp-bridge-mode)
+;; 	 ("C-x C-p" . lsp-bridge-peek) ;; 8 -> lsp-bridge-peek-jump
+;; 	 ("C-x C-8" . lsp-bridge-peek-jump-back)
+;; 	 ("C-c <return>" . lsp-bridge-code-format))
+;;   :config
+;;   (setq lsp-bridge-peek-file-content-height 14)
+;;   (setq lsp-bridge-peek-file-content-scroll-margin 2)
+;;   (setq-default
+;;    acm-enable-icon t
+;;    acm-enable-doc t
+;;    acm-enable-yas nil
+;;    acm-enable-tempel nil
+;;    acm-enable-quick-access t
+;;    acm-enable-search-file-words nil
+;;    acm-enable-telega nil
+;;    acm-enable-tabnine nil
+;;    acm-enable-doc-markdown-render 'async
+;;    acm-candidate-match-function 'orderless-flex
+;;    lsp-bridge-enable-log nil
+;;    lsp-bridge-enable-signature-help nil
+;;    lsp-bridge-enable-diagnostics nil
+;;    lsp-bridge-complete-manually nil
+;;    lsp-bridge-enable-search-words nil
+;;    lsp-bridge-enable-auto-format-code nil)
+;;   ;; languages
+;;   (setq lsp-bridge-default-mode-hooks '(c-mode-hook c++-mode-hook python-mode-hook bash-mode-hook sh-mode-hook emacs-lisp-mode-hook lisp-interaction-mode-hook LaTeX-mode-hook bibtex-mode-hook))
+;;   (setq lsp-bridge-c-lsp-server "clangd")
+;;   (setq lsp-bridge-python-command "~/miniconda3/envs/hep/bin/python")
+;;   (setq lsp-bridge-python-lsp-server "~/miniconda3/envs/hep/bin/pyright")
+;;   (setq lsp-bridge-python-multi-lsp-server "pyright_ruff")
+;;   (setq lsp-bridge-enable-org-babel t)
+;;   ;; start
+;;   (add-hook 'find-file-hook #'lsp-bridge-restart-process) ;; restart lsp-bridge when entering a new file
+;;   (global-lsp-bridge-mode))
+
+;; Debug
+;; (use-package realgud)
+
+(setq blink-cursor-mode t) ;; no blinking cursor, which is very distracting
+
+;; (use-package ultra-scroll-mac
+;;   :if (eq window-system 'mac)
+;;   :load-path "~/.emacs.d/site-lisp/ultra-scroll-mac"
+;;   :init
+;;   (setq scroll-conservatively 101 ; important!
+;;         scroll-margin 0)
+;;   :config
+;;   (ultra-scroll-mac-mode 1))
+
+;; Eglot
+;; (use-package eglot
+;;   :bind (("C-x C-l" . eglot)
+;; 	 ("C-c <RET>" . eglot-format)
+;; 	 ("C-x C-p" . eglot-find-declaration))
+;;   :hook ((c-mode-hook . eglot-ensure)
+;; 	 (c++-mode-hook .eglot-ensure)
+;; 	 (python-mode . eglot-ensure))
+;;   :config
+;;   (add-to-list 'eglot-server-programs
+;; 	     '((c-mode c++-mode) . ("clangd")))
+;;   (add-to-list 'eglot-server-programs
+;; 		 '((python-mode) . ("~/.local/bin/pyright-langserver" "--stdio")))) ;; use langserver
 
 ;;; init-unused.el ends here

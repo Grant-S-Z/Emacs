@@ -6,18 +6,6 @@
 (require 'moe-theme)
 (load-theme 'moe-light t)
 
-;;; Pixel smooth scroll
-(setq mac-mouse-wheel-smooth-scroll t) ;; 平滑滚动, only in Mac and always return error
-(setq mac-mouse-wheel-mode t)
-(use-package ultra-scroll-mac
-  :if (eq window-system 'mac)
-  :load-path "~/.emacs.d/site-lisp/ultra-scroll-mac"
-  :init
-  (setq scroll-conservatively 101 ; important!
-        scroll-margin 0)
-  :config
-  (ultra-scroll-mac-mode 1))
-
 ;;; Line number
 (defun grant/enable-line-numbers ()
   "Enable line numbers except in specific modes."
@@ -43,8 +31,8 @@
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
   ;; Items
-  (setq dashboard-items '((recents . 9)
-                          (agenda . 9)))
+  (setq dashboard-items '((recents . 8)
+                          (agenda . 7)))
   (setq dashboard-item-shortcuts '((recents . "r")
 				   (agenda . "a")))
 
@@ -104,16 +92,21 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-(use-package rainbow-delimiters ;; 括号颜色
-  :init (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+;;; Useful highlights and colors
+(use-package rainbow-delimiters ;; color of delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
 
-(use-package highlight-parentheses ;; 括号高亮
-  :init (add-hook 'prog-mode-hook 'highlight-parentheses-mode))
-
-(use-package highlight-indent-guides
+(use-package highlight-indent-guides ;; highlight indents (draw lines here)
   :hook (prog-mode . highlight-indent-guides-mode)
-  :config
-  (setq highlight-indent-guides-method 'bitmap))
+  :custom (highlight-indent-guides-method 'fill))
+
+(use-package symbol-overlay ;; highlight the variable at the point
+  :hook (prog-mode . symbol-overlay-mode))
+
+;; Outli, unfold as org
+(add-to-list 'load-path "~/.emacs.d/site-lisp/outli/")
+(require 'outli)
+(add-hook 'prog-mode-hook 'outli-mode)
 
 ;;; Fonts and input method
 (use-package cnfonts

@@ -2,54 +2,81 @@
 ;;; Commentary:
 ;;; Code:
 ;;; LSP
-;; Lsp bridge
-(use-package lsp-bridge
-  :defer nil
-  :load-path "~/.emacs.d/site-lisp/lsp-bridge"
-  :bind (("C-x C-l" . lsp-bridge-mode)
-	 ("C-x C-p" . lsp-bridge-peek) ;; 8 -> lsp-bridge-peek-jump
-	 ("C-x C-8" . lsp-bridge-peek-jump-back)
-	 ("C-c <return>" . lsp-bridge-code-format))
+(use-package lsp-mode
+  :init
+  (defun grant/lsp-mode-setup-completion ()
+     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+	   '(orderless)))
+  :commands (lsp lsp-deferred)
+  :hook
+  ((c++-mode . lsp-deferred)
+   (c-mode . lsp-deferred)
+   (lsp-mode . lsp-enable-which-key-integration)
+   (lsp-completion-mode . grant/lsp-mode-setup-completion))
+  :custom
+  (lsp-keymap-prefix "C-x C-l")
+  (lsp-file-watch-threshold 500)
+  ;; Completion provider
+  (lsp-completion-provider :none)
+  ;; Python ruff
+  (lsp-ruff-python-path "~/miniconda3/bin/python3")
+  (lsp-ruff-server-command '("~/.local/bin/ruff" "server"))
+  )
+
+(use-package lsp-pyright
+  :custom (lsp-pyright-langserver-command "~/.local/bin/pyright")
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp-deferred))))
+
+(use-package lsp-ui)
+(use-package lsp-treemacs)
+(use-package dap-mode
   :config
-  (setq lsp-bridge-peek-file-content-height 14)
-  (setq lsp-bridge-peek-file-content-scroll-margin 2)
-  (setq-default
-   acm-enable-icon t
-   acm-enable-doc t
-   acm-enable-yas nil
-   acm-enable-tempel nil
-   acm-enable-quick-access t
-   acm-enable-search-file-words nil
-   acm-enable-telega nil
-   acm-enable-tabnine nil
-   acm-enable-doc-markdown-render 'async
-   acm-candidate-match-function 'orderless-flex
-   lsp-bridge-enable-log nil
-   lsp-bridge-enable-signature-help nil
-   lsp-bridge-enable-diagnostics nil
-   lsp-bridge-complete-manually nil
-   lsp-bridge-enable-search-words nil
-   lsp-bridge-enable-auto-format-code nil)
-  ;; languages
-  (setq lsp-bridge-default-mode-hooks '(c-mode-hook c++-mode-hook python-mode-hook bash-mode-hook sh-mode-hook emacs-lisp-mode-hook lisp-interaction-mode-hook LaTeX-mode-hook bibtex-mode-hook))
-  (setq lsp-bridge-c-lsp-server "clangd")
-  (setq lsp-bridge-python-command "~/miniconda3/envs/hep/bin/python")
-  (setq lsp-bridge-python-lsp-server "~/miniconda3/envs/hep/bin/pyright")
-  (setq lsp-bridge-python-multi-lsp-server "pyright_ruff")
-  (setq lsp-bridge-enable-org-babel t)
-  ;; start
-  (add-hook 'find-file-hook #'lsp-bridge-restart-process) ;; 每进入一次其他文件，重启 lsp
-  (global-lsp-bridge-mode))
+  (require 'dap-python)
+  (setq dap-python-debugger 'debugpy)
+  (require 'dap-lldb))
+
+;; Corfu
+(use-package corfu
+  :hook ((emacs-lisp-mode . corfu-mode)
+	 (lisp-interaction-mode . corfu-mode)
+	 (c-mode . corfu-mode)
+	 (c++-mode . corfu-mode)
+	 (python-mode . corfu-mode))
+  :bind (:map corfu-map
+              ("M-n" . corfu-next)
+              ("M-p" . corfu-previous))
+  :config
+  (setq corfu-auto t
+        corfu-auto-prefix 1
+        corfu-auto-delay 0.1
+        corfu-quit-no-match t
+        corfu-quit-at-boundary t
+	)
+  (corfu-popupinfo-mode) ;; show doc
+  (corfu-indexed-mode) ;; show index
+  (dotimes (i 10) ;; use M-num to select index
+    (define-key corfu-mode-map
+                (kbd (format "M-%s" i))
+                (kbd (format "C-%s <tab>" i))))
+  )
+
+(use-package nerd-icons-corfu
+  :after corfu
+  :init (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 ;; Grammer
+(setq flymake-start-on-save-buffer nil)
+(setq flymake-start-on-flymake-mode nil)
 (use-package flycheck
   :config
   (setq truncate-lines nil) ; 如果单行信息很长会自动换行
+  (setq flycheck-python-pycompile-executable "~/miniconda3/bin/python3")
+  (setq flycheck-python-ruff-executable "~/.local/bin/ruff")
+
   :hook
   (prog-mode . flycheck-mode))
-
-;; Debug
-(use-package realgud)
 
 ;; Tree-sitter
 (setq treesit-extra-load-path '("~/.emacs.d/tree-sitter/"))
@@ -61,17 +88,16 @@
   (setq quickrun-timeout-seconds 600))
 
 ;;; Languages
+;; Emacs lisp
+;; (use-package elisp-autofmt)
+
 ;; Python basic settings
-(setq python-interpreter "~/miniconda3/envs/hep/bin/python")
-(setq python-shell-interpreter "~/miniconda3/envs/hep/bin/python")
+(setq python-interpreter "~/miniconda3/bin/python3")
+(setq python-shell-interpreter "~/miniconda3/bin/python3")
 (setq python-indent-guess-indent-offset t)
 (setq python-indent-guess-indent-offset-verbose nil)
-
 (setq python-shell-completion-native-enable t)
-
-(setq flycheck-python-pycompile-executable "~/miniconda3/envs/hep/bin/python") ;; flycheck
-
-(setq doom-modeline-env-python-executable "~/miniconda3/envs/hep/bin/python") ;; doom-modeline
+(setq doom-modeline-env-python-executable "~/miniconda3/bin/python3") ;; doom-modeline
 
 (use-package numpydoc ;; Numpydoc
   :bind ("C-x C-n" . numpydoc-generate)
@@ -80,7 +106,7 @@
   (setq numpydoc-insert-return-without-typehint t))
 
 (quickrun-add-command "python" ;; Quickrun
-  '((:command . "~/miniconda3/envs/hep/bin/python")
+  '((:command . "~/miniconda3/bin/python3")
     (:exec . ("%c %s"))
     (:template . nil)
     (:description . "Run Python script..."))
@@ -96,7 +122,7 @@
 
 (use-package cern-root-mode ;; ROOT
   :config
-  (setq cern-root-filepath "~/miniconda3/envs/hep/bin/root"))
+  (setq cern-root-filepath "/opt/homebrew/bin/root"))
 
 ;; R
 (use-package ess)

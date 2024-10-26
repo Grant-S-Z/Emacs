@@ -5,16 +5,15 @@
 (setq inhibit-startup-message t) ;; no startup message
 (setq frame-title-format "Emacs") ;; frame title
 (setq-default cursor-type 'bar) ;; set cursor type to hollow box
-(setq blink-cursor-mode nil) ;; no blinking cursor, which is very distracting
 
 (scroll-bar-mode -1) ;; no scroll bar
 (tool-bar-mode -1) ;; no tool bar
 (winner-mode 1) ;; undo window operation
 (delete-selection-mode 1) ;; replace the contents in selected region
 (global-auto-revert-mode 1) ;; auto refresh changed windows
-(global-subword-mode 1) ;; go through camel words
 (mac-auto-operator-composition-mode 1) ;; Ligature for mac port
 
+(add-hook 'prog-mode-hook #'subword-mode) ;; operation on camel words
 (electric-pair-mode 1) ;; generate parens automatically
 (add-hook 'prog-mode-hook #'show-paren-mode) ;; show paren
 (setq show-paren-style 'expression) ;; show expression between parens
@@ -24,6 +23,13 @@
 (setq system-time-locale "C") ;; in English
 
 (setq load-prefer-newer t) ;; avoid byte-compiled files that are older than their source files
+
+;; Pixel smooth scroll
+(setq mac-mouse-wheel-smooth-scroll t) ;; smooth scroll, only in Mac and always return error when scrolling up
+(setq mac-mouse-wheel-mode t)
+
+;; Scratch
+(setq initial-scratch-message nil)
 
 ;; Load the contents of load-file into custom.el
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
