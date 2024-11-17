@@ -1,6 +1,7 @@
 ;;; init-startup.el -- when starting
 ;;; Commentary:
 ;;; Code:
+;;; Basic
 (setq make-backup-files nil) ;; no backup files
 (setq inhibit-startup-message t) ;; no startup message
 (setq frame-title-format "Emacs") ;; frame title
@@ -16,22 +17,27 @@
 (add-hook 'prog-mode-hook #'subword-mode) ;; operation on camel words
 (electric-pair-mode 1) ;; generate parens automatically
 (add-hook 'prog-mode-hook #'show-paren-mode) ;; show paren
-(setq show-paren-style 'expression) ;; show expression between parens
 (add-hook 'prog-mode-hook #'hs-minor-mode) ;; hideshow
+(global-hl-line-mode -1)
+(add-hook 'nov-mode-hook 'hl-line-mode)
 
 ;; System locale to use for formatting time values.
 (setq system-time-locale "C") ;; in English
 
 (setq load-prefer-newer t) ;; avoid byte-compiled files that are older than their source files
+(global-hl-line-mode nil) ;; no highlight current line
 
-;; Pixel smooth scroll
+;; Scratch
+(setq initial-scratch-message "Elisp:")
+
+;;; Scroll
+;; Parameters
+(setq scroll-margin 2)
+;; Mac pixel scroll
 (setq mac-mouse-wheel-smooth-scroll t) ;; smooth scroll, only in Mac and always return error when scrolling up
 (setq mac-mouse-wheel-mode t)
 
-;; Scratch
-(setq initial-scratch-message nil)
-
-;; Load the contents of load-file into custom.el
+;;; Load the contents of load-file into custom.el
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
   (load-file custom-file))

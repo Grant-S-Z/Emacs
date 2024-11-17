@@ -6,6 +6,8 @@
 (global-set-key (kbd "C-M-<return>") 'toggle-frame-fullscreen)
 
 ;; Org
+(global-set-key (kbd "M-[") 'backward-paragraph)
+(global-set-key (kbd "M-]") 'forward-paragraph)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c w") 'open-words)

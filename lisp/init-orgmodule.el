@@ -106,8 +106,9 @@ linkcolor=black
 \\setmainfont{Times New Roman}
 \\setmonofont{Inconsolata}
 \\setsansfont{Times New Roman}
-\\setCJKmainfont{SimSong}
+\\setCJKmainfont{SimSong} % much more beautiful than STSong, which is sans serif
 \\setCJKsansfont{SimSong}
+\\setCJKmonofont{LXGW WenKai Mono}
 
 \\usepackage{amsfonts}
 \\usepackage{amsthm}
@@ -139,9 +140,9 @@ linkcolor=black
 \\setmainfont{Times New Roman}
 \\setmonofont{Inconsolata}
 \\setsansfont{Times New Roman}
-\\setCJKmainfont{SimSong}
-\\setCJKsansfont{Kai}
-\\setCJKmonofont{Kai}
+\%\setCJKmainfont{SimSong}
+\%\setCJKsansfont{Kai}
+\%\setCJKmonofont{Kai}
 \\setcounter{secnumdepth}{3}
 
 \\usepackage{amsfonts}
@@ -158,6 +159,16 @@ linkcolor=black
 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 ;;; Org latex preview settings
+;; Process
+(setq org-preview-latex-default-process 'dvisvgm)
+
+;; Format
+(setq org-format-latex-options
+        (list :foreground 'default
+              :background 'default
+              :scale 0.9
+              :matchers '("begin" "$1" "$" "$$" "\\(" "\\[")))
+
 ;; Header
 (setq org-format-latex-header "\\documentclass{article}
 \\usepackage[usenames]{color}
@@ -187,20 +198,20 @@ linkcolor=black
 \\setlength{\\topmargin}{1.5cm}
 \\addtolength{\\topmargin}{-2.54cm}")
 
-;; Format, needed to restart when changing displayer according to this setting
-(let ((org-latex-preview-scale
-       (cond
-	((= (display-pixel-height) 900) 1.2) ;; Mac: 1440*900 Displayer: 1980*1080
-	((= (display-pixel-height) 1080) 1.7)
-	(t 1.2))))
-  (setq org-format-latex-options
-      `(:foreground "Black"
-		    :background "Transparent"
-		    :scale ,org-latex-preview-scale)))
+(use-package org-fragtog ;; auto preview
+  :hook (org-mode . org-fragtog-mode))
+
+;; Center vertically
+(defun grant/org-latex-preview-advice (beg end &rest _args)
+  (let* ((ov (car (overlays-in beg end)))
+         (img (cdr (overlay-get ov 'display)))
+         (new-img (plist-put img :ascent 90)))
+    (overlay-put ov 'display (cons 'image new-img))))
+(advice-add 'org--make-preview-overlay
+            :after #'grant/org-latex-preview-advice)
 
 ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
-;; Justifying-LaTeX-preview-fragments-in-org-mode/
-;; specify the justification you want
+;; Justifying LaTeX preview fragments in org
 (plist-put org-format-latex-options :justify 'center)
 
 (defun eli/org-justify-fragment-overlay (beg end image imagetype)
@@ -273,18 +284,6 @@ linkcolor=black
              (car args)))))
   (apply orig-func args))
 (advice-add 'org-create-formula-image :around #'org-renumber-environment)
-
-(use-package org-fragtog ;; auto preview
-  :hook (org-mode . org-fragtog-mode))
-
-;; pdf view
-(setq org-file-apps
-      (quote
-       ((auto-mode . emacs)
-	(directory . emacs)
-	("\\.pdf\\'" . emacs)
-	;("\\.pdf\\'" . "/Applications/Skim.app/Contents/MacOS/Skim %s")
-	)))
 
 ;;; Org agenda and capture templates
 (setq org-agenda-files '("~/org/class.org" "~/org/task.org" "~/org/journal.org"))

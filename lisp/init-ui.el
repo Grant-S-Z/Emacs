@@ -25,7 +25,6 @@
 (use-package dashboard
   :init
   (add-hook 'after-init-hook 'dashboard-open)
-
   :config
   ;; Initial buffer
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
@@ -39,7 +38,6 @@
   ;; Icons
   (setq dashboard-display-icons-p t)
   (setq dashboard-icon-type 'nerd-icons)
-
   :custom
   ;; Set the title
   (dashboard-banner-logo-title "Welcome Grant. Have a good time!")
@@ -82,26 +80,14 @@
   :after vertico
   :init (marginalia-mode t))
 
-(use-package embark
-  :bind (("C-." . embark-act))
-  :config
-  (setq prefix-help-command 'embark-prefix-help-command))
-
-;; Consult users will also want the embark-consult package.
-(use-package embark-consult
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
-
 ;;; Useful highlights and colors
 (use-package rainbow-delimiters ;; color of delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
-(use-package highlight-indent-guides ;; highlight indents (draw lines here)
-  :hook (prog-mode . highlight-indent-guides-mode)
-  :custom (highlight-indent-guides-method 'fill))
-
-(use-package symbol-overlay ;; highlight the variable at the point
-  :hook (prog-mode . symbol-overlay-mode))
+(use-package indent-bars
+  :hook (prog-mode . indent-bars-mode)
+  :custom
+  (indent-bars-no-descend-lists t))
 
 ;; Outli, unfold as org
 (add-to-list 'load-path "~/.emacs.d/site-lisp/outli/")
@@ -111,68 +97,43 @@
 ;;; Fonts and input method
 (use-package cnfonts
   :init (cnfonts-mode 1)
-  :defer nil
   :bind (("C--" . cnfonts-decrease-fontsize)
   ("C-=" . cnfonts-increase-fontsize))
   :custom
-  (cnfonts-personal-fontnames '(("Fira Code" "Ligconsolata" "Fantasque Sans Mono" "IBM Plex Mono" "FantasqueSansM Nerd Font Mono" "Iosevka")
-                                ("LXGW WenKai Mono")
+  (cnfonts-personal-fontnames '(("Fira Code" "Ligconsolata" "Fantasque Sans Mono" "FantasqueSansM Nerd Font Mono" "Iosevka")
+                                ("LXGW WenKai Mono" "TsangerJinKai05")
                                 ("PragmataPro Mono Liga")
                                 ("PragmataPro Mono Liga"))))
 
 (use-package mixed-pitch
-  :defer nil
   :hook (org-mode . mixed-pitch-mode)
   :config
   (set-face-attribute 'variable-pitch nil
                       :font "Iosevka")
-  (setq fixed-pitch "Fantasque Sans Mono")) ;; when cnfonts change, this should changes as the same.
+  (setq fixed-pitch "Fantasque Sans Mono") ;; when cnfonts change, this should change as the same.
+  )
 
-(use-package posframe)
+(use-package posframe) ;; frame
 
-(use-package rime ;; 输入法
-  :init (toggle-input-method)
-  :defer nil
+;; Input method
+(use-package rime
   :custom
   (default-input-method "rime")
-  (rime-librime-root "~/.emacs.d/librime/dist") ;; librime 位置
-  (rime-emacs-module-header-root "/opt/homebrew/opt/emacs-mac/include/") ;; Emacs 头文件位置
-  (rime-share-data-dir "~/Library/Rime") ;; 共享目录
-  (rime-user-data-dir "~/.emacs.d/rime") ;; Emacs 目录，需要同步
+  (rime-librime-root "~/.emacs.d/librime/dist") ;; librime path
+  (rime-emacs-module-header-root "/opt/homebrew/cellar/emacs/29.4_1/include") ;; emacs include path
+  (rime-share-data-dir "~/Library/Rime") ;; share path
+  (rime-user-data-dir "~/.emacs.d/rime") ;; real path used in Emacs rime
   (rime-cursor ".")
-  (rime-show-candidate 'posframe) ;; 使用 posframe 显示输入法
-  (rime-commit1-forall t) ;; 在输入位置显示首个备选项
+  (rime-show-candidate 'posframe) ;; use posframe
+  (rime-commit1-forall t) ;; show the first choice
   (rime-posframe-properties
-   (list :internal-border-width 4 ;; 调整 posframe 边框
-         :font "PingFang SC"))
+   (list :internal-border-width 4 ;; posframe internal border width
+         ;; :font "TsangerJinKai05"
+   ))
   (rime-posframe-style 'vertical)
-  (mode-line-mule-info '((:eval (rime-lighter)))) ;; 在 modeline 显示输入法标志
-  ;; 在 minibuffer 使用后自动关闭输入法
-  (rime-deactivate-when-exit-minibuffer t))
-
-;;; Dired and dirvish
-;; Dired
-(when (string= system-type "darwin")
-  (setq dired-use-ls-dired t
-        insert-directory-program "/opt/homebrew/bin/gls" ;; 因 ls 不能使用，设置为 gls
-        dired-listing-switches "-aBhl --group-directories-first"))
-;; Dirvish
-(use-package dirvish
-  :defer nil
-  :bind ("C-c l" . dirvish-side)
-  :custom
-  (dirvish-quick-access-entries
-   '(("h" "~/" "Home")
-     ("d" "~/Downloads" "Downloads")
-     ("s" "~/Senior" "Senior")))
-  (dirvish-default-layout '(0 0.2 0.8))
-  (dirvish-attributes '(subtree-state
-		        nerd-icons
-		        collapse
-		        file-size)) ;; 设置显示
-  :config
-  (dirvish-override-dired-mode) ;; 启用 dirvish 覆盖 dired
-  (dirvish-side-follow-mode))
+  (mode-line-mule-info '((:eval (rime-lighter)))) ;; show rime symbol on modeline
+  (rime-deactivate-when-exit-minibuffer t) ;; deactivate rime in minibuffer automatically
+  )
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

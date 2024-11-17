@@ -2,20 +2,20 @@
 ;;; Commentary:
 ;;; Code:
 ;;; Basic
-(use-package benchmark-init ;; 统计 packages 耗时
+(use-package benchmark-init ;; packages init time
   :init (benchmark-init/activate))
 
-(use-package restart-emacs ;; 重启 emacs
+(use-package restart-emacs ;; restart emacs
   :bind (("C-c r" . restart-emacs)))
 
-(use-package drag-stuff ;; 范围移动
+(use-package drag-stuff ;; move selected region
   :bind (("M-p" . drag-stuff-up)
 	 ("M-n" . drag-stuff-down)))
 
-(use-package consult ;; 搜索
+(use-package consult ;; search
   :bind (("C-s" . consult-line)))
 
-(use-package crux ;; 一些快捷键
+(use-package crux ;; crux bindings
   :bind (("C-a" . crux-move-beginning-of-line)
 	 ("C-c ^" . crux-top-join-line)
 	 ("C-x ," . crux-find-user-init-file)
@@ -23,19 +23,18 @@
 	 ("C-S-k" . crux-smart-kill-line)
 	 ("C-c C-k" . crux-kill-other-buffers)))
 
-(use-package yasnippet ;; 设置 snippets
+(use-package yasnippet ;; snippets
   :init (yas-global-mode t)
   :hook (prog-mode . yas-minor-mode))
 
-(use-package yasnippet-snippets ;; 提供常用 snippets
+(use-package yasnippet-snippets ;; regular snippets
   :after yasnippet)
 
-(use-package which-key ;; 快捷键提示
+(use-package which-key ;; key binding tips
   :defer nil
   :config (which-key-mode))
 
-;; avy
-(use-package avy
+(use-package avy ;; goto directly
   :bind
   (("C-;" . avy-goto-char-timer)))
 
@@ -59,10 +58,10 @@
 	    holiday-local-holidays))
 
 ;;; UI operation
-(use-package ace-window ;; 分屏切换
+(use-package ace-window ;; change window
   :bind (("M-o" . 'ace-window)))
 
-(use-package dimmer ;; 黯淡分屏
+(use-package dimmer ;; dimmer window unfocused
   :hook (prog-mode . dimmer-mode)
   :config
   (dimmer-configure-company-box)
@@ -70,10 +69,10 @@
   (dimmer-configure-posframe)
   (dimmer-configure-org))
 
-(use-package ws-butler ;; 自动清除空格
+(use-package ws-butler ;; remove space automatically
   :hook (prog-mode . ws-butler-mode))
 
-(use-package super-save ;; 自动保存
+(use-package super-save ;; save automatically
   :diminish
   :defer 0.5
   :config
@@ -81,14 +80,18 @@
   (setq super-save-auto-save-when-idle t)
   (setq save-silently t))
 
-(use-package pangu-spacing ;; comfortable space
+(use-package pangu-spacing ;; comfortable space between English and Chinese
   :init
   (global-pangu-spacing-mode 1)
   :config
   (setq pangu-spacing-real-insert-separtor t))
 
+(use-package helpful ;; help
+  :bind
+  ([remap describe-function] . #'helpful-callable)
+  ([remap describe-variable] . #'helpful-variable))
+
 (use-package writeroom-mode ;;; center texts
-  :defer nil
   :hook ((org-mode . writeroom-mode)
 	 (nov-mode . writeroom-mode))
   :custom
@@ -99,28 +102,13 @@
 			      writeroom-set-vertical-scroll-bars
 			      writeroom-set-bottom-divider-width)))
 
-(use-package keycast ;; key cast
-  ;; :init (keycast-header-line-mode 1)
-  :config
-  (push '(org-self-insert-command nil nil) keycast-substitute-alist)
-  (push '(self-insert-command nil nil) keycast-substitute-alist)
-  (push '(mouse-drag-region nil nil) keycast-substitute-alist)
-  (push '(mouse-set-point nil nil) keycast-substitute-alist)
-  (push '(lsp-ui-doc--handle-mouse-movement nil nil) keycast-substitute-alist)
-  (push '(mac-mwheel-scroll nil nil) keycast-substitute-alist))
-
-(use-package helpful ;; help
-  :bind
-  ([remap describe-function] . #'helpful-callable)
-  ([remap describe-variable] . #'helpful-variable))
-
 ;;; Daily packages
 ;; Hugo
 (use-package easy-hugo
   :bind ("C-c b" . easy-hugo)
   :config
-  (setq easy-hugo-basedir "~/Code/GrantSite/") ;; 网站本地文件根目录
-  (setq easy-hugo-url "https://Grant-S-Z.github.io/GrantSite") ;; url 路径
+  (setq easy-hugo-basedir "~/Code/GrantSite/") ;; website root
+  (setq easy-hugo-url "https://Grant-S-Z.github.io/GrantSite") ;; url
   (setq easy-hugo-sshdomain "Grant-S-Z.github.io")
   (setq easy-hugo-previewtime "300")
   (setq easy-hugo-default-ext ".org"))
@@ -145,47 +133,28 @@
   (bongo-logo nil)
   (bongo-insert-album-covers nil)
   (bongo-album-cover-size 100)
-  (bongo-mode-line-indicator-mode nil))
-
-;; Mpv
-(use-package mpv
-  :config
-  (defun org-mpv-complete-link (&optional arg)
-    (replace-regexp-in-string
-     "file:" "mpv:"
-     (org-link-complete-file arg)
-     t t))
-  (org-link-set-parameters "mpv"
-			   :follow #'mpv-play :complete #'org-mpv-complete-link)
-
-  (defun org-metareturn-insert-playback-position ()
-    (when-let ((item-beg (org-in-item-p)))
-      (when (and (not (bound-and-true-p org-timer-start-time))
-		 (mpv-live-p)
-		 (save-excursion
-                   (goto-char item-beg)
-                   (and (not (org-invisible-p)) (org-at-item-timer-p))))
-	(mpv-insert-playback-position t))))
-  (add-hook 'org-metareturn-hook #'org-metareturn-insert-playback-position)
-
-  (add-hook 'org-open-at-point-functions #'mpv-seek-to-position-at-point))
+  (bongo-mode-line-indicator-mode nil)
+  (bongo-header-line-mode nil)
+  )
 
 ;; Calculator
 (use-package literate-calc-mode
-  :mode ("calc" . literate-calc-mode))
+  :mode ("\\.cl\\'" . literate-calc-mode))
 
 ;; Reader
 (use-package nov
   :mode ("\\.epub\\'" . nov-mode)
   :config
-  (setq nov-text-width 80))
+  (setq nov-text-width (- writeroom-width 10))
+  )
 (defun my-nov-font-setup ()
   (face-remap-add-relative 'variable-pitch
 			   :family "Alegreya"
-			   :height 1.5))
+			   :height 1.5
+			   ))
 (add-hook 'nov-mode-hook 'my-nov-font-setup)
 
-;; Nov notes, combined with org-noter in place of pdf-tools to take notes
+;; Nov notes
 (use-package org-remark
   :bind (("C-c n m" . org-remark-mark)
 	 ("C-c n ]" . org-remark-view-next)
@@ -202,16 +171,11 @@
 (use-package fanyi
   :bind ("C-c f" . fanyi-dwim)
   :custom
-  (fanyi-providers '(;; 海词
-                     fanyi-haici-provider
-                     ;; 有道同义词词典，支持中文
-                     fanyi-youdao-thesaurus-provider
-                     ;; Etymonline
-                     ;fanyi-etymon-provider
-                     ;; Longman
-                     fanyi-longman-provider))
+  (fanyi-providers '(fanyi-haici-provider ;; haici
+                     fanyi-youdao-thesaurus-provider ;; youdao
+                     fanyi-longman-provider ;; longman
+		     ))
   (fanyi-verbose nil))
-(use-package sdcv)
 
 ;; Rss
 (use-package elfeed
@@ -223,12 +187,8 @@
 	  ("https://root-forum.cern.ch/posts.rss" root)
 	  ("https://sachachua.com/blog/category/emacs-news/feed/" news emacs)
 	  ("https://emacs-china.org/posts.rss" emacs)
-	  ;("https://emacs.stackexchange.com/feeds" emacs)
-	  ;("https://www.reddit.com/r/emacs/.rss" emacs)
-	  ;("https://www.reddit.com/r/orgmode/.rss" org emacs)
 	  ("https://news.ycombinator.com/rss" tech news)
-	  ("https://www.economist.com/international/rss.xml" eco news)
-	  ("https://www.reddit.com/r/leagueoflegends/.rss" lol games)
+	  ("https://v2ex.com/index.xml" tech news)
 	  ))
   (setq elfeed-show-mode-hook
       (lambda ()
@@ -252,39 +212,14 @@
 		  (query . (and emacs (not '(news org))))
 		  (group (:title . "News")
 			 (:elements
-			  (query . (and news emacs))))
-		  ;; (group (:title . "Org")
-		  ;; 	 (:elements
-		  ;; 	  (query . (and org emacs))))
-		  ))
+			  (query . (and news emacs))))))
 	  (group (:title . "News")
 		 (:elements
 		  (query . (and news (not '(tech eco emacs))))
 		  (group (:title . "Tech")
 			 (:elements
-			  (query . (and tech news))))
-		  (group (:title . "Eco")
-			 (:elements
-			  (query . (and eco news))))))
-	  (group (:title . "Games")
-		 (:elements
-		  (query . (and Games (not '(lol))))
-		  (group (:title . "LOL")
-			 (:elements
-			  (query . (and lol games))))))
+			  (query . (and tech news))))))
 	  )))
-
-;; Pomm
-(use-package pomm
-  :commands (pomm)
-  :config
-  (bind-key* "C-c C-p" #'pomm)
-  (setq pomm-audio-enabled nil)
-  (setq pomm-work-period 45)
-  (setq pomm-long-break-period 20)
-  (setq pomm-number-of-periods 2))
-(require 'pomm)
-(pomm-mode-line-mode)
 
 ;;; Chatgpt
 (when *is-mac*
@@ -296,6 +231,7 @@
 		  (match-string 1 passwd))))))
 (when *is-mac*
   (use-package chatgpt-shell
+    :load-path "~/.emacs.d/site-lisp/chatgpt-shell/"
     :bind
     (("C-c q" . chatgpt-shell)
      ("C-c d" . chatgpt-shell-explain-code)
