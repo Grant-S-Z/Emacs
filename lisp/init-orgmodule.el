@@ -166,7 +166,7 @@ linkcolor=black
 (setq org-format-latex-options
         (list :foreground 'default
               :background 'default
-              :scale 0.9
+              :scale 1.3
               :matchers '("begin" "$1" "$" "$$" "\\(" "\\[")))
 
 ;; Header

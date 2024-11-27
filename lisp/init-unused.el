@@ -1130,4 +1130,27 @@ to calculate the decent value of `:ascent'. "
     (funcall orig-func element latex colors cache-file display-image))
 (advice-add 'xenops-math-latex-create-image :around #'eli/xenops-renumber-environment)
 
+;; (use-package eldoc-box
+;;   :hook (emacs-lisp-mode . eldoc-box-hover-at-point-mode)
+;;   :config
+;;   (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-at-point-mode)
+;;   (setq eldoc-box-cleanup-interval 2))
+
+(use-package benchmark-init ;; packages init time
+  :init (benchmark-init/activate))
+
+(use-package easy-hugo
+  :bind ("C-c b" . easy-hugo)
+  :config
+  (setq easy-hugo-basedir "~/research/code/Grant/") ;; website root
+  (setq easy-hugo-url "https://Grant-S-Z.github.io/Grant") ;; url
+  (setq easy-hugo-sshdomain "grant-s-z.github.io")
+  (setq easy-hugo-previewtime "300")
+  (setq easy-hugo-default-ext ".md"))
+
+;; (setq indent-tabs-mode nil)
+
+(use-package yasnippet-capf
+  :init
+  (add-to-list 'completion-at-point-functions #'yasnippet-capf))
 ;;; init-unused.el ends here

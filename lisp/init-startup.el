@@ -12,30 +12,33 @@
 (winner-mode 1) ;; undo window operation
 (delete-selection-mode 1) ;; replace the contents in selected region
 (global-auto-revert-mode 1) ;; auto refresh changed windows
-(mac-auto-operator-composition-mode 1) ;; Ligature for mac port
+(when *is-linux*
+  (menu-bar-mode -1))
 
 (add-hook 'prog-mode-hook #'subword-mode) ;; operation on camel words
 (electric-pair-mode 1) ;; generate parens automatically
 (add-hook 'prog-mode-hook #'show-paren-mode) ;; show paren
 (add-hook 'prog-mode-hook #'hs-minor-mode) ;; hideshow
-(global-hl-line-mode -1)
-(add-hook 'nov-mode-hook 'hl-line-mode)
 
 ;; System locale to use for formatting time values.
 (setq system-time-locale "C") ;; in English
 
-(setq load-prefer-newer t) ;; avoid byte-compiled files that are older than their source files
-(global-hl-line-mode nil) ;; no highlight current line
+;; Avoid byte-compiled files that are older than their source files
+(setq load-prefer-newer t)
 
 ;; Scratch
-(setq initial-scratch-message "Elisp:")
+(setq initial-scratch-message nil)
 
-;;; Scroll
-;; Parameters
-(setq scroll-margin 2)
-;; Mac pixel scroll
-(setq mac-mouse-wheel-smooth-scroll t) ;; smooth scroll, only in Mac and always return error when scrolling up
-(setq mac-mouse-wheel-mode t)
+;;; Mac ligature and scroll
+(when *is-mac*
+  (mac-auto-operator-composition-mode 1) ;; ligature for mac port
+  (setq scroll-margin 2)
+  (setq mac-mouse-wheel-smooth-scroll t) ;; mac pixel scroll
+  (setq mac-mouse-wheel-mode t)
+  (setq mac-redisplay-dont-reset-vscroll t)
+  ;; (let ((inhibit-message t)) ;; inhibit scroll errors
+  ;;   (message "number-or-marker-p, nil"))
+  )
 
 ;;; Load the contents of load-file into custom.el
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))

@@ -56,6 +56,11 @@ Show the heading too, if it is currently invisible."
   (find-file-other-window "~/org/journal.org")
   (goto-char (point-max))) ; 移动至最后
 
+(defun open-blog-dir ()
+  "Open blog dir."
+  (interactive)
+  (find-file-other-window "~/research/code/Grant/content/post/"))
+
 (defun grant/open-in-finder ()
   "Show the current file in finder."
   (interactive)

@@ -5,17 +5,17 @@
 (use-package org
   :bind ("C-x C-y" . org-insert-image)
   :config
-  ;;; 自动折叠
+  ;; Fold
   (setq org-startup-folded 'content) ;; 只显示标题
 
-  ;; 设置内联图片显示
+  ;; Inline image
   (auto-image-file-mode t)
   (setq org-image-actual-width 300)
 
-  ;; babel 配置
+  ;; Babel
   (setq org-confirm-babel-evaluate nil)
   (setq org-plantuml-jar-path "~/Code/plantuml/plantuml-1.2024.3.jar")
-  (setq org-babel-python-command "~/miniconda3/bin/python3")
+  (setq org-babel-python-command "~/miniconda3/envs/hep/bin/python3")
 
   (require 'ob-C)
   (require 'ob-shell)
@@ -24,12 +24,13 @@
    '((python . t)
      (emacs-lisp . t)
      (plantuml . t)
-     ;(dot . t)
+     ;;(dot . t)
+     (scheme . t)
      (C . t)
      (shell . t)
      (latex . t)))
 
-  ;; latex
+  ;; LaTeX
   (setq org-startup-with-latex-preview nil)
   (setq org-latex-default-class "ctexart") ;; latex class
   (setq org-latex-compiler "xelatex") ;; latex compiler
@@ -134,17 +135,15 @@
   :after org
   :custom
   (org-roam-directory "~/org/roam-notes/") ;; default dir
-  (org-roam-db-gc-threshole most-positive-fixnum) ;; 提高性能
   :bind
   (("C-c n f" . org-roam-node-find)
    ("C-c n i" . org-roam-node-insert)
    ("C-c n c" . org-roam-capture)
    ("C-c n l" . org-roam-buffer-toggle) ;; 显示后链窗口
-  ;;("C-c n u" . org-roam-ui-mode) ;; org-roam-ui
   )
   :config
   (org-roam-db-autosync-mode) ;; auto sync when starting
-  ;; one module to combine org-roam and org-noter
+  ;; One module to combine org-roam and org-noter
   (setq grant/paper-template
 	(concat "#+FILETAGS: reading research\n"
 		"- tags :: %^{keywords}\n"
@@ -175,7 +174,7 @@
   (bibtex-completion-library-path zot_pdf)
   )
 
-;; org-roam-bibtex 绑定 helm-bibtex
+;; org-roam-bibtex combined with helm-bibtex
 (use-package org-roam-bibtex
   :hook (org-roam-mode . org-roam-bibtex-mode)
   :bind (("C-c n k" . orb-insert-link)
@@ -200,9 +199,9 @@
   :custom
   (org-noter-always-create-frame nil) ;; stop opening frames
   (org-noter-highlight-selected-text t)
-  (org-noter-max-short-selected-text-length 50) ;; tab 高亮最小字符长度，大于该长度变为 quote
-  (org-noter-auto-save-last-location t) ;; auto save last location
-  (org-noter-notes-search-path '("~/org/roam-notes/")) ;; add search path
+  (org-noter-max-short-selected-text-length 50) ;; critical quote length
+  (org-noter-auto-save-last-location t) ;; remember last location
+  (org-noter-notes-search-path '("~/org/roam-notes/")) ;; search path
   )
 
 ;; org-zettel-ref
@@ -214,6 +213,22 @@
 (setq org-zettel-ref-reference-folder "~/org/zettel/ref/")
 (setq org-zettel-ref-archive-folder "~/org/zettel/archive")
 (setq org-zettel-ref-overview-directory "~/org/zettel/overview")
+
+;;; Hugo
+(use-package easy-hugo
+  :bind ("C-c b" . easy-hugo)
+  :config
+  (setq easy-hugo-basedir "~/research/code/Grant/") ;; website root
+  (setq easy-hugo-postdir "content/post/")
+  (setq easy-hugo-url "https://Grant-S-Z.github.io/Grant") ;; url
+  (setq easy-hugo-sshdomain "grant-s-z.github.io")
+  (setq easy-hugo-previewtime "300")
+  (setq easy-hugo-default-ext ".md"))
+
+(use-package ox-hugo
+  :config
+  (setq org-hugo-base-dir "~/research/code/Grant/")
+  (setq org-hugo-section "post"))
 
 (provide 'init-org)
 ;;; init-org.el ends here

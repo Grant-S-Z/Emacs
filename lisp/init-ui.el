@@ -15,11 +15,6 @@
               (derived-mode-p 'doc-view-mode))
     (display-line-numbers-mode 1)))
 (add-hook 'prog-mode-hook 'grant/enable-line-numbers)
-(custom-set-faces
- '(line-number ((nil (:font "Inconsolata"
-		      :height 140))))
- '(line-number-current-line ((nil (:font "Inconsolata"
-					 :height 140)))))
 
 ;;; Dashboard
 (use-package dashboard
@@ -58,50 +53,68 @@
   :init (doom-modeline-mode 1)
   :config
   (display-time)
+  (setq doom-modeline-time t)
   (setq doom-modeline-icon t)
+  (setq doom-modeline-github nil)
+  (setq doom-modeline-battery nil)
   (setq doom-modeline-buffer-file-name-style 'auto))
 
 ;;; Minibuffer
 (use-package vertico
-  :init (vertico-mode))
+  :init (vertico-mode)
+  :custom
+  (vertico-count 15))
 
-(use-package savehist ;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package vertico-posframe
+  :init (vertico-posframe-mode)
+  :after vertico)
+
+(use-package savehist ;; persist history over restarting Emacs, and vertico sorts by history position.
   :after vertico
   :init (savehist-mode))
 
-(use-package orderless ;; Optionally use the orderless completion style.
+(use-package orderless ;; optionally use the orderless completion style.
   :after vertico
   :init
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+        completion-category-overrides '((file (styles basic partial-completion)))))
 
 (use-package marginalia
   :after vertico
   :init (marginalia-mode t))
 
+;;; Side tree
+(use-package treemacs
+  :bind ("C-c t" . treemacs)
+  :config
+  (setq treemacs-show-hidden-files nil))
+
 ;;; Useful highlights and colors
 (use-package rainbow-delimiters ;; color of delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
-(use-package indent-bars
+(use-package indent-bars ;; indent lines
   :hook (prog-mode . indent-bars-mode)
   :custom
   (indent-bars-no-descend-lists t))
 
-;; Outli, unfold as org
+;; Outli, unfold codes as org
 (add-to-list 'load-path "~/.emacs.d/site-lisp/outli/")
 (require 'outli)
 (add-hook 'prog-mode-hook 'outli-mode)
+
+(use-package hl-todo ;; highlight keywords when coding and jump
+  :hook (prog-mode . hl-todo-mode))
 
 ;;; Fonts and input method
 (use-package cnfonts
   :init (cnfonts-mode 1)
   :bind (("C--" . cnfonts-decrease-fontsize)
-  ("C-=" . cnfonts-increase-fontsize))
+	 ("C-=" . cnfonts-increase-fontsize))
   :custom
-  (cnfonts-personal-fontnames '(("Fira Code" "Ligconsolata" "Fantasque Sans Mono" "FantasqueSansM Nerd Font Mono" "Iosevka")
-                                ("LXGW WenKai Mono" "TsangerJinKai05")
+  (cnfonts-personal-fontnames '(("Ligconsolata" "FantasqueSansM Nerd Font Mono" "Iosevka")
+                                ("FZYouSong GBK")
                                 ("PragmataPro Mono Liga")
                                 ("PragmataPro Mono Liga"))))
 
@@ -110,10 +123,10 @@
   :config
   (set-face-attribute 'variable-pitch nil
                       :font "Iosevka")
-  (setq fixed-pitch "Fantasque Sans Mono") ;; when cnfonts change, this should change as the same.
+  (setq fixed-pitch "FantasqueSansM Nerd Font Mono") ;; this should change by cnfonts.
   )
 
-(use-package posframe) ;; frame
+(use-package posframe)
 
 ;; Input method
 (use-package rime

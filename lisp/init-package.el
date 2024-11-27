@@ -2,9 +2,6 @@
 ;;; Commentary:
 ;;; Code:
 ;;; Basic
-(use-package benchmark-init ;; packages init time
-  :init (benchmark-init/activate))
-
 (use-package restart-emacs ;; restart emacs
   :bind (("C-c r" . restart-emacs)))
 
@@ -12,8 +9,14 @@
   :bind (("M-p" . drag-stuff-up)
 	 ("M-n" . drag-stuff-down)))
 
+(use-package embark ;; act in minibuffer
+  :bind
+  (("C-." . embark-act)))
+
 (use-package consult ;; search
   :bind (("C-s" . consult-line)))
+
+(use-package embark-consult) ;; act in consult
 
 (use-package crux ;; crux bindings
   :bind (("C-a" . crux-move-beginning-of-line)
@@ -21,7 +24,8 @@
 	 ("C-x ," . crux-find-user-init-file)
 	 ("C-S-d" . crux-duplicate-current-line-or-region)
 	 ("C-S-k" . crux-smart-kill-line)
-	 ("C-c C-k" . crux-kill-other-buffers)))
+	 ("C-c C-k" . crux-kill-other-buffers)
+	 ("C-c C-d" . crux-delete-file-and-buffer)))
 
 (use-package yasnippet ;; snippets
   :init (yas-global-mode t)
@@ -64,7 +68,6 @@
 (use-package dimmer ;; dimmer window unfocused
   :hook (prog-mode . dimmer-mode)
   :config
-  (dimmer-configure-company-box)
   (dimmer-configure-which-key)
   (dimmer-configure-posframe)
   (dimmer-configure-org))
@@ -81,8 +84,7 @@
   (setq save-silently t))
 
 (use-package pangu-spacing ;; comfortable space between English and Chinese
-  :init
-  (global-pangu-spacing-mode 1)
+  :init (global-pangu-spacing-mode 1)
   :config
   (setq pangu-spacing-real-insert-separtor t))
 
@@ -96,6 +98,7 @@
 	 (nov-mode . writeroom-mode))
   :custom
   (writeroom-maximize-window nil)
+  (writeroom-mode-line t)
   (writeroom-global-effects '(writeroom-set-alpha
 			      writeroom-set-menu-bar-lines
 			      writeroom-set-tool-bar-lines
@@ -103,21 +106,6 @@
 			      writeroom-set-bottom-divider-width)))
 
 ;;; Daily packages
-;; Hugo
-(use-package easy-hugo
-  :bind ("C-c b" . easy-hugo)
-  :config
-  (setq easy-hugo-basedir "~/Code/GrantSite/") ;; website root
-  (setq easy-hugo-url "https://Grant-S-Z.github.io/GrantSite") ;; url
-  (setq easy-hugo-sshdomain "Grant-S-Z.github.io")
-  (setq easy-hugo-previewtime "300")
-  (setq easy-hugo-default-ext ".org"))
-
-(use-package ox-hugo
-  :config
-  (setq org-hugo-base-dir "~/Code/GrantSite/")
-  (setq org-hugo-section "post"))
-
 ;; Bongo, a music player
 (use-package bongo
   :commands bongo-playlist
@@ -139,7 +127,7 @@
 
 ;; Calculator
 (use-package literate-calc-mode
-  :mode ("\\.cl\\'" . literate-calc-mode))
+  :mode ("calc" . literate-calc-mode))
 
 ;; Reader
 (use-package nov
@@ -228,8 +216,7 @@
 	(let ((cmd (concat "security 2>&1 >/dev/null find-generic-password -ga '" account-name "'")))
 	  (let ((passwd (shell-command-to-string cmd)))
 		(when (string-match (rx "\"" (group (0+ (or (1+ (not (any "\"" "\\"))) (seq "\\" anything)))) "\"") passwd)
-		  (match-string 1 passwd))))))
-(when *is-mac*
+		  (match-string 1 passwd)))))
   (use-package chatgpt-shell
     :load-path "~/.emacs.d/site-lisp/chatgpt-shell/"
     :bind

@@ -1,32 +1,26 @@
 # -*- mode: snippet -*-
 # name: beamer
-# key: beamer
+# key: beamer					   
 # --
-#+LANGUAGE: cn
 #+OPTIONS: H:2 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
 #+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
-#+startup: beamer
-
 #+LATEX_CLASS: beamer
-
 #+LATEX_HEADER: \usepackage{etoolbox}
 #+LATEX_HEADER: \usepackage{pgfopts}
 #+LATEX_HEADER: \usepackage{booktabs}
 #+LATEX_HEADER: \usepackage[scale=2]{ccicons}
-
 #+LATEX_HEADER: \usetheme[block=fill, progressbar=frametitle]{metropolis}
-#+LATEX_HEADER: \useoutertheme{infolines} % 采用 infoline
+#+LATEX_HEADER: \useoutertheme{infolines} % infoline
 #+LATEX_HEADER: \useinnertheme{default}
-#+LATEX_HEADER: \usecolortheme{custom} % 使用 custom 颜色主题
-
+#+LATEX_HEADER: %\usecolortheme{custom} % use custom color theme
 #+LATEX_HEADER: \setbeamertemplate{blocks}[rounded][shadow=false]
 #+LATEX_HEADER: \setbeamertemplate{items}[circle] % circle item symbol
 #+LATEX_HEADER: \setbeamertemplate{sections/subsections in toc}[ball] % ball section symbol
-#+LATEX_HEADER: \setbeamertemplate{headline}[default] % 不使用 infoline 的 headline
-#+LATEX_HEADER: %\setbeamertemplate{footline}[default] % 使用 infoline 的 footline
+#+LATEX_HEADER: \setbeamertemplate{headline}[default] % no infoline headline
+#+LATEX_HEADER: %\setbeamertemplate{footline}[default] % infoline footline
 #+LATEX_HEADER: \setbeamertemplate{frame numbering}[none]
-#+LATEX_HEADER: \setbeamertemplate{bibliography item}[text] % 使用 text 的 references 形式
-#+LATEX_HEADER: %\setbeamerfont{footnote}{\tiny} % 可选择 tiny footnote
+#+LATEX_HEADER: \setbeamertemplate{bibliography item}[text] % text references
+#+LATEX_HEADER: %\setbeamerfont{footnote}{\tiny} % tiny footnote
 
 #+TITLE: $1
 #+SUBTITLE: $2
@@ -34,13 +28,13 @@
 #+DATE:
 ** 目录
 #+begin_export latex
-\tableofcontents
+  \tableofcontents
 #+end_export
 
 * 参考文献
 #+begin_export latex
-\begin{frame}[allowframebreaks]{参考文献}
-\bibliographystyle{abbrv} % tiny is not good
-\bibliography{reference.bib} % 参考文献存放在 "./reference.bib"
-\end{frame}
+  \begin{frame}[allowframebreaks]{参考文献}
+  \bibliographystyle{abbrv} % tiny is not good
+  \bibliography{reference.bib}
+  \end{frame}
 #+end_export
