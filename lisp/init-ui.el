@@ -57,7 +57,8 @@
   (setq doom-modeline-icon t)
   (setq doom-modeline-github nil)
   (setq doom-modeline-battery nil)
-  (setq doom-modeline-buffer-file-name-style 'auto))
+  (setq doom-modeline-buffer-file-name-style 'auto)
+  (setq doom-modeline--eglot t))
 
 ;;; Minibuffer
 (use-package vertico
@@ -91,8 +92,24 @@
   (setq treemacs-show-hidden-files nil))
 
 ;;; Useful highlights and colors
+(use-package paren
+  :config
+  (setq show-paren-when-point-inside-paren t
+        show-paren-when-point-in-periphery t
+        show-paren-context-when-offscreen t
+        show-paren-delay 0.2)
+  )
+
 (use-package rainbow-delimiters ;; color of delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package hl-line
+  :hook (after-init . global-hl-line-mode)
+  :config
+  (setq hl-line-sticky-flag nil)
+  ;; Highlight starts from EOL, to avoid conflicts with other overlays
+  (setq hl-line-range-function (lambda () (cons (line-end-position)
+                                           (line-beginning-position 2)))))
 
 (use-package indent-bars ;; indent lines
   :hook (prog-mode . indent-bars-mode)

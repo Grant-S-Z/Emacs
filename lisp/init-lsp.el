@@ -2,41 +2,26 @@
 ;;; Commentary:
 ;;; Code:
 ;;; LSP
-(use-package lsp-mode
+(require 'eglot)
+
+(add-to-list 'eglot-server-programs
+	     '((c-mode c++-mode) . ("clangd")))
+(add-to-list 'eglot-server-programs
+             '(python-mode . ("~/.local/bin/pyright-langserver" "--stdio")))
+(add-to-list 'eglot-server-programs
+	     '(TeX-mode . ("texlab")))
+
+(add-hook 'c-mode-hook 'eglot-ensure)
+(add-hook 'c++-mode-hook 'eglot-ensure)
+(add-hook 'python-mode-hook 'eglot-ensure)
+(add-hook 'TeX-mode-hook 'eglot-ensure)
+
+;; Cape
+(use-package cape
   :init
-  (defun grant/lsp-mode-setup-completion ()
-     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-	   '(orderless)))
-  :commands (lsp lsp-deferred)
-  :hook
-  ((c++-mode . lsp-deferred)
-   (c-mode . lsp-deferred)
-   (rust-mode . lsp-deferred)
-   (lsp-mode . lsp-enable-which-key-integration)
-   (lsp-completion-mode . grant/lsp-mode-setup-completion))
-  :custom
-  (lsp-keymap-prefix "C-c l")
-  (lsp-file-watch-threshold 500)
-  ;; Completion provider
-  (lsp-completion-provider :none)
-  ;; Python ruff
-  (lsp-ruff-python-path "~/miniconda3/bin/python3")
-  (lsp-ruff-server-command '("~/.local/bin/ruff" "server"))
+  (add-hook 'completion-at-point-functions #'cape-elisp-block) ;; elisp in org babel
+  (add-hook 'completion-at-point-functions #'cape-file) ;; file path
   )
-
-(use-package lsp-pyright
-  :custom (lsp-pyright-langserver-command "~/.local/bin/pyright")
-  :hook (python-mode . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp-deferred))))
-
-(use-package lsp-ui
-  :custom
-  (lsp-ui-sideline-enable nil)
-  (lsp-ui-peek-enable t)
-  (lsp-ui-doc-enable t))
-
-(use-package lsp-treemacs)
 
 ;; Corfu
 (use-package corfu
@@ -54,7 +39,7 @@
   :config
   (setq corfu-auto t
         corfu-auto-prefix 1
-        corfu-auto-delay 0.1
+        corfu-auto-delay 0.2
         corfu-quit-no-match t
         corfu-quit-at-boundary t
 	)
@@ -69,23 +54,6 @@
 (use-package nerd-icons-corfu
   :after corfu
   :init (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
-
-;; Cape
-(use-package cape
-  :init
-  ;; (add-hook 'completion-at-point-functions #'cape-dabbrev) ;; word from current buffers
-  (add-hook 'completion-at-point-functions #'cape-elisp-block) ;; elisp in org babel
-  (add-hook 'completion-at-point-functions #'cape-file) ;; file path
-  )
-
-;; Flycheck
-(use-package flycheck
-  :config
-  (setq truncate-lines nil)
-  (setq flycheck-python-pycompile-executable "~/miniconda3/bin/python3")
-  (setq flycheck-python-ruff-executable "~/.local/bin/ruff")
-  :hook
-  (prog-mode . flycheck-mode))
 
 ;; Quickrun
 (use-package quickrun
@@ -143,12 +111,6 @@
 
 ;; Cmake
 (use-package cmake-mode)
-
-;; Yaml
-(use-package yaml-mode)
-
-;; Csv
-(use-package csv-mode)
 
 (provide 'init-lsp)
 ;;; init-lsp.el ends here

@@ -63,9 +63,9 @@ linkcolor=black
 \% fonts
 \\usepackage{fontspec}
 \\setmainfont{Times New Roman}
-\\setmonofont{Inconsolata}
+\\setmonofont{Ligconsolata}
 \\setCJKmainfont{SimSong}
-\\setCJKmonofont{PingFang SC}
+\\setCJKmonofont{SimSong}
 
 \\usepackage{amsfonts}
 \\usepackage{amsthm}
@@ -83,6 +83,9 @@ linkcolor=black
 \\geometry{a4paper}
 
 \\usepackage{mathrsfs}
+
+\\usepackage{tikz}
+\\usepackage{tikz-feynman}
 \% commands
 \\newcommand{\\mr}[1]{\\mathrm{#1}}
 \\newcommand{\\mb}[1]{\\mathbf{#1}}
@@ -176,6 +179,8 @@ linkcolor=black
 \\usepackage{mathrsfs}
 \\usepackage{amsfonts}
 \\usepackage{bm}
+\\usepackage{tikz}
+\\usepackage{tikz-feynman}
 \[DEFAULT-PACKAGES]
 \[PACKAGES]
 \\pagestyle{empty}             % do not remove

@@ -24,7 +24,6 @@
    '((python . t)
      (emacs-lisp . t)
      (plantuml . t)
-     ;;(dot . t)
      (scheme . t)
      (C . t)
      (shell . t)
@@ -213,6 +212,9 @@
 (setq org-zettel-ref-reference-folder "~/org/zettel/ref/")
 (setq org-zettel-ref-archive-folder "~/org/zettel/archive")
 (setq org-zettel-ref-overview-directory "~/org/zettel/overview")
+
+;;; Org Slide
+(use-package org-tree-slide)
 
 ;;; Hugo
 (use-package easy-hugo

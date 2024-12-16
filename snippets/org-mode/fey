@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: fey
+# key: fey
+# --
+\begin{tikzpicture}
+\begin{feynman}
+\vertex $0
+
+\diagram* {
+
+};
+\end{feynman}
+\end{tikzpicture}
