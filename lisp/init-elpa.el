@@ -19,16 +19,13 @@
 	use-package-expand-minimally t
 	use-package-verbose t))
 
-;; GC
-(require 'gcmh)
-(gcmh-mode 1)
-
 ;; Async
-(require 'async)
-(autoload 'dired-async-mode "dired-async.el" nil t)
-(dired-async-mode 1)
-(async-bytecomp-package-mode 1)
-
+(use-package async
+  :ensure t
+  :init
+  (autoload 'dired-async-mode "dired-async.el" nil t)
+  (dired-async-mode 1)
+  (async-bytecomp-package-mode 1))
 
 (provide 'init-elpa)
 ;;; init-elpa.el ends here

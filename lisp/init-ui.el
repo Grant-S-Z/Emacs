@@ -2,9 +2,12 @@
 ;;; Commentary:
 ;;; Code:
 ;;; Themes
-(add-to-list 'load-path "~/.emacs.d/site-lisp/moe-theme.el")
-(require 'moe-theme)
-(load-theme 'moe-light t)
+(use-package catppuccin-theme
+  :init
+  (load-theme 'catppuccin :no-confirm)
+  :config
+  (setq catppuccin-flavor 'latte) ;; frappe, latte, macchiato, mocha
+  (catppuccin-reload))
 
 ;;; Line number
 (defun grant/enable-line-numbers ()
@@ -39,7 +42,7 @@
   ;; Center contents
   (dashboard-center-content t)
   ;; Logo
-  (dashboard-startup-banner "~/.emacs.d/img/Robin.jpg")
+  ;; (dashboard-startup-banner "~/.emacs.d/img/Robin.jpg")
   ;; Footnote
   (dashboard-footer-messages '
   ("True mastery of any skill takes a lifetime."))
@@ -52,13 +55,15 @@
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :config
+  (setq doom-modeline-height 20)
   (display-time)
   (setq doom-modeline-time t)
   (setq doom-modeline-icon t)
   (setq doom-modeline-github nil)
   (setq doom-modeline-battery nil)
-  (setq doom-modeline-buffer-file-name-style 'auto)
-  (setq doom-modeline--eglot t))
+  (setq doom-modeline-buffer-file-name-style 'buffer-name)
+  (setq doom-modeline--eglot t)
+  (setq doom-modeline-enable-word-count nil))
 
 ;;; Minibuffer
 (use-package vertico
@@ -66,24 +71,17 @@
   :custom
   (vertico-count 15))
 
-(use-package vertico-posframe
-  :init (vertico-posframe-mode)
-  :after vertico)
-
 (use-package savehist ;; persist history over restarting Emacs, and vertico sorts by history position.
-  :after vertico
-  :init (savehist-mode))
+  :init (savehist-mode 1))
 
 (use-package orderless ;; optionally use the orderless completion style.
-  :after vertico
   :init
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
         completion-category-overrides '((file (styles basic partial-completion)))))
 
 (use-package marginalia
-  :after vertico
-  :init (marginalia-mode t))
+  :init (marginalia-mode 1))
 
 ;;; Side tree
 (use-package treemacs
@@ -122,7 +120,7 @@
 (add-hook 'prog-mode-hook 'outli-mode)
 
 (use-package hl-todo ;; highlight keywords when coding and jump
-  :hook (prog-mode . hl-todo-mode))
+  :init (global-hl-todo-mode))
 
 ;;; Fonts and input method
 (use-package cnfonts
@@ -135,14 +133,6 @@
                                 ("PragmataPro Mono Liga")
                                 ("PragmataPro Mono Liga"))))
 
-(use-package mixed-pitch
-  :hook (org-mode . mixed-pitch-mode)
-  :config
-  (set-face-attribute 'variable-pitch nil
-                      :font "Iosevka")
-  (setq fixed-pitch "FantasqueSansM Nerd Font Mono") ;; this should change by cnfonts.
-  )
-
 (use-package posframe)
 
 ;; Input method
@@ -150,7 +140,7 @@
   :custom
   (default-input-method "rime")
   (rime-librime-root "~/.emacs.d/librime/dist") ;; librime path
-  (rime-emacs-module-header-root "/opt/homebrew/cellar/emacs/29.4_1/include") ;; emacs include path
+  ;; (rime-emacs-module-header-root "/opt/homebrew/cellar/emacs/29.4_1/include") ;; emacs include path
   (rime-share-data-dir "~/Library/Rime") ;; share path
   (rime-user-data-dir "~/.emacs.d/rime") ;; real path used in Emacs rime
   (rime-cursor ".")
@@ -159,10 +149,43 @@
   (rime-posframe-properties
    (list :internal-border-width 4 ;; posframe internal border width
          ;; :font "TsangerJinKai05"
-   ))
+	 ))
   (rime-posframe-style 'vertical)
   (mode-line-mule-info '((:eval (rime-lighter)))) ;; show rime symbol on modeline
   (rime-deactivate-when-exit-minibuffer t) ;; deactivate rime in minibuffer automatically
+  )
+
+(use-package mixed-pitch
+  :hook (org-mode . mixed-pitch-mode)
+  :config
+  (set-face-attribute 'variable-pitch nil
+                      :font "Iosevka")
+  (setq fixed-pitch "FantasqueSansM Nerd Font Mono") ;; this should change by cnfonts.
+  )
+
+;;; Dired
+(when (string= system-type "darwin")
+  (setq dired-use-ls-dired t
+        insert-directory-program "/opt/homebrew/bin/gls" ;; replace ls with gls
+        dired-listing-switches "-aBhl --group-directories-first"))
+;; Dirvish
+(use-package dirvish
+  :bind
+  (("C-c l" . dirvish-side)
+   ("C-x d" . dirvish))
+  :custom
+  (dirvish-quick-access-entries
+   '(("h" "~/" "Home")
+     ("d" "~/Downloads" "Downloads")))
+  (dirvish-attributes '(subtree-state
+		        nerd-icons
+		        collapse
+			git-msg
+		        file-size))
+  :config
+  (dirvish-override-dired-mode) ;; replace dired ui with dirvish
+  (dirvish-side-follow-mode)
+  ;; (add-hook 'dirvish-directory-view-mode-hook #'diredfl-mode)
   )
 
 (provide 'init-ui)

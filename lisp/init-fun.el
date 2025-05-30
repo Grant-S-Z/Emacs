@@ -1,22 +1,6 @@
 ;;; init-fun.el --- for functions
 ;;; Commentary:
 ;;; Code:
-;;; Quite useful to avoid the note insert position error
-(defun grant/outline-show-entry ()
-  "Show the body directly following this heading.
-Show the heading too, if it is currently invisible."
-  (interactive)
-  (save-excursion
-    (outline-back-to-heading t)
-    (outline-flag-region (max (1- (point)) (point-min))
-                         (progn
-                           (outline-next-preface)
-                           (if (= 1 (- (point-max) (point)))
-                               (point-max)
-                             (point)))
-                         nil)))
-(advice-add 'outline-show-entry :override #'grant/outline-show-entry)
-
 ;;; Org insert images in Macos
 (defun org-insert-image ()
   "Insert a image from clipboard."
@@ -44,7 +28,7 @@ Show the heading too, if it is currently invisible."
   ;; (org-display-inline-images) ;; no need to display
   )
 
-;;; Personal useful functions
+;;; Open files and dirs
 (defun open-words ()
   "Open words."
   (interactive)
@@ -61,12 +45,43 @@ Show the heading too, if it is currently invisible."
   (interactive)
   (find-file-other-window "~/research/code/Grant/content/post/"))
 
-(defun grant/open-in-finder ()
+(defun open-in-finder ()
   "Show the current file in finder."
   (interactive)
   (let ((path (or (buffer-file-name) default-directory)))
     (shell-command (concat "open -R " (shell-quote-argument path)))))
 
+(defun open-directory-in-vscode ()
+  "Open current file's directory in VSCode."
+  (interactive)
+  (let ((dir (if (buffer-file-name)
+		 (file-name-directory (buffer-file-name))
+	       default-directory)))
+    (start-process "vscode" nil "code" dir)))
+
+(defadvice find-file (before make-directory-maybe (filename &optional wildcards) activate)
+  "Create parent directory if not exists while visiting file."
+  (unless (file-exists-p filename)
+    (let ((dir (file-name-directory filename)))
+      (unless (file-exists-p dir)
+        (make-directory dir t)))))
+
+;;; Remember one position when editing a file
+(defun remember-init ()
+  "Remember current position and setup."
+  (interactive)
+  (point-to-register 8)
+  (message "Have remember one position"))
+
+(defun remember-jump ()
+  "Jump to latest position and setup."
+  (interactive)
+  (let ((tmp (point-marker)))
+    (jump-to-register 8)
+    (set-register 8 tmp))
+  (message "Have back to remember position"))
+
+;;; Rename file and buffer
 (defun grant/rename-this-file-and-buffer (new-name)
   "Rename both current buffer and file to NEW-NAME."
   (interactive "sNew name: ")
@@ -80,18 +95,40 @@ Show the heading too, if it is currently invisible."
       (set-visited-file-name new-name)
       (rename-buffer new-name))))
 
+;;; Run Makefile
 (defun grant/make-in-current-directory ()
   "Run `make` in the directory of the current buffer's file."
   (interactive)
   (let ((default-directory (file-name-directory (or (buffer-file-name) ""))))
     (compile "make")))
 
-(defadvice find-file (before make-directory-maybe (filename &optional wildcards) activate)
-  "Create parent directory if not exists while visiting file."
-  (unless (file-exists-p filename)
-    (let ((dir (file-name-directory filename)))
-      (unless (file-exists-p dir)
-        (make-directory dir t)))))
+;;; Copy buffer name
+(defun grant/copy-buffer-filename (&optional strip-extension)
+  "Copy buffer file name to kill ring.
+With prefix argument, strip file extension."
+  (interactive "P")
+  (if-let ((filename (buffer-file-name)))
+      (kill-new (if strip-extension
+                    (file-name-base filename)
+                  (file-name-nondirectory filename)))
+    (message "No file associated with buffer")))
+
+;;; Count chinese characters asynchronously
+(defun grant/count-chinese-characters-fast ()
+  "Count Chinese characters fastly."
+  (interactive)
+  (let ((count 0)
+        (chunk-size 100000))  ; 每次处理 100KB
+    (save-excursion
+      (goto-char (point-min))
+      (while (< (point) (point-max))
+        (let ((end (min (+ (point) chunk-size) (point-max))))
+          (while (re-search-forward "[\u4e00-\u9fff]" end t)
+            (setq count (1+ count)))
+          (goto-char end)
+          (message "已统计: %d 字..." count)  ; 显示进度
+          (redisplay))))  ; 保持界面响应
+    (message "中文字数总计: %d" count)))
 
 (provide 'init-fun)
 ;;; init-fun.el ends here

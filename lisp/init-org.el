@@ -3,19 +3,21 @@
 ;;; Code:
 ;;; Org
 (use-package org
-  :bind ("C-x C-y" . org-insert-image)
+  :bind
+  (("C-x C-y" . org-insert-image)
+   ("C-/" . org-latex-preview))
   :config
   ;; Fold
-  (setq org-startup-folded 'content) ;; 只显示标题
+  (setq org-startup-folded 'content) ;; show titles only
 
   ;; Inline image
   (auto-image-file-mode t)
-  (setq org-image-actual-width 300)
+  (setq org-image-actual-width 500)
 
   ;; Babel
   (setq org-confirm-babel-evaluate nil)
   (setq org-plantuml-jar-path "~/Code/plantuml/plantuml-1.2024.3.jar")
-  (setq org-babel-python-command "~/miniconda3/envs/hep/bin/python3")
+  (setq org-babel-python-command "~/miniconda3/bin/python3")
 
   (require 'ob-C)
   (require 'ob-shell)
@@ -52,29 +54,17 @@
   (org-agenda-tags-column 0)
   (org-agenda-block-separator ?─)
   (org-agenda-current-time-string
-  "⭠ now ─────────────────────────────────────────────────")
+   "⭠ now ─────────────────────────────────────────────────")
   ;;---------------------------------------------
   ;;org-agenda-time-grid
   ;;--------------------------------------------
   (org-agenda-time-grid (quote ((daily today require-timed)
-                                      (700
-                                       1300
-                                       1800
-                                       2400)
-                                      "......"
-                                      "-----------------------------------------------------"))))
-
-;; org-appear, 方便编辑 latex 公式等
-(use-package org-appear
-  :after org
-  :hook (org-mode . org-appear-mode)
-  :custom
-  (org-appear-autoemphasis t)
-  (org-appear-autolinks t)
-  (org-appear-autoentities t)
-  (org-appear-autosubmarkers t) ;; 下标
-  (org-appear-inside-latex t) ;; latex 符号
-  (org-appear-autokeywords t))
+                                (700
+                                 1300
+                                 1800
+                                 2400)
+                                "......"
+                                "-----------------------------------------------------"))))
 
 ;;; Org UI
 ;; org-modern
@@ -82,7 +72,7 @@
   :after org
   :hook (org-mode . org-modern-mode)
   :custom
-  (org-modern-hide-stars t)
+  (org-modern-hide-stars nil)
   (org-modern-todo t)
   (org-modern-table nil)
   (org-modern-timestamp t)
@@ -119,16 +109,33 @@
   (setq org-modern-todo-faces
 	(quote (("TODO" :background "pink" :foreground "black")
 		("DONE" :background "green" :foreground "black")
-		("CANCELED" :background "grey" :foreground "black")
-		)))
-  )
+		("CANCELED" :background "grey" :foreground "black")))))
+
+;; Org-appear, convenient for editing LaTeX formula
+(use-package org-appear
+  :after org
+  :hook (org-mode . org-appear-mode)
+  :custom
+  (org-appear-autoemphasis t)
+  (org-appear-autolinks t)
+  (org-appear-autoentities t)
+  (org-appear-autosubmarkers t) ;; submarkers
+  (org-appear-inside-latex t) ;; latex
+  (org-appear-autokeywords t))
+
+;; Valign for table
+(use-package valign
+  :after org
+  :hook (org-mode . valign-mode)
+  :custom
+  (valign-fancy-bar t))
 
 ;; View pdf images inline
 (use-package org-inline-pdf
   :after org
   :hook (org-mode . org-inline-pdf-mode))
 
-;;; Org notes
+;;; Org notes and Literature management
 ;; Org roam
 (use-package org-roam
   :after org
@@ -139,41 +146,26 @@
    ("C-c n i" . org-roam-node-insert)
    ("C-c n c" . org-roam-capture)
    ("C-c n l" . org-roam-buffer-toggle) ;; 显示后链窗口
-  )
+   )
   :config
   (org-roam-db-autosync-mode) ;; auto sync when starting
-  ;; One module to combine org-roam and org-noter
-  (setq grant/paper-template
-	(concat "#+FILETAGS: reading research\n"
-		"- tags :: %^{keywords}\n"
-		"* %^{title}\n"
-		":PROPERTIES:\n"
-		":Custom_ID: %^{citekey}\n"
-		":AUTHOR: %^{author-or-editor}\n"
-		":NOTER_DOCUMENT: ~/Nutstore Files/zotero/%^{citekey}.pdf\n"
-		":END:"))
-  (add-to-list 'org-roam-capture-templates
-	       `("r" "Zotero paper" plain
-		 ,grant/paper-template
-		 :target
-		 (file+head "~/org/roam-notes/ref/${citekey}.org" "#+title: ${title}\n"))))
+  )
 
 ;; Zotero path
-(setq zot_bib '("~/Nutstore Files/zotero/My Library.bib") ;; zotero reference bib
+(setq zot_bib '("~/Nutstore Files/zotero/Papers.bib") ;; zotero reference bib
       zot_pdf "~/Nutstore Files/zotero" ;; zotero zotfile dir
       org_refs "~/org/roam-notes/ref" ;; org-roam + helm-bibtex + org-noter notes dir
       )
 
-;; Use helm-bibtex to read Zotero information
+;; Helm-bibtex to read Zotero information
 (use-package helm-bibtex
-  :after org
+  :bind (("C-c h" . helm-bibtex))
   :custom
   (bibtex-completion-notes-path org_refs)
   (bibtex-completion-bibliography zot_bib)
-  (bibtex-completion-library-path zot_pdf)
-  )
+  (bibtex-completion-library-path zot_pdf))
 
-;; org-roam-bibtex combined with helm-bibtex
+;; Org-roam-bibtex combined with helm-bibtex
 (use-package org-roam-bibtex
   :hook (org-roam-mode . org-roam-bibtex-mode)
   :bind (("C-c n k" . orb-insert-link)
@@ -186,35 +178,11 @@
   (orb-process-file-keyword t)
   (orb-attached-file-extensions '("pdf")))
 
-;; org-ref
+;; Org-ref
 (use-package org-ref
   :after org
   :bind (("C-c (" . org-ref-insert-link))
   )
-
-;; org-noter
-(use-package org-noter
-  :bind (("C-c n n" . org-noter))
-  :custom
-  (org-noter-always-create-frame nil) ;; stop opening frames
-  (org-noter-highlight-selected-text t)
-  (org-noter-max-short-selected-text-length 50) ;; critical quote length
-  (org-noter-auto-save-last-location t) ;; remember last location
-  (org-noter-notes-search-path '("~/org/roam-notes/")) ;; search path
-  )
-
-;; org-zettel-ref
-(add-to-list 'load-path "~/.emacs.d/site-lisp/org-zettel-ref-mode")
-(require 'org-zettel-ref-mode)
-(setq org-zettel-ref-mode-type 'org-roam)
-(setq org-zettel-ref-python-file "~/.emacs.d/site-lisp/org-zettel-ref-mode/convert-to-org.py")
-(setq org-zettel-ref-temp-folder "~/org/zettel/tmp/")
-(setq org-zettel-ref-reference-folder "~/org/zettel/ref/")
-(setq org-zettel-ref-archive-folder "~/org/zettel/archive")
-(setq org-zettel-ref-overview-directory "~/org/zettel/overview")
-
-;;; Org Slide
-(use-package org-tree-slide)
 
 ;;; Hugo
 (use-package easy-hugo

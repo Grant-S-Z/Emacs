@@ -1,9 +1,9 @@
 ;;; early-init.el --- early init settings
 ;;; Commentary:
 ;;; Code:
-;;; Window
-(setq frame-inhibit-implied-resize t)
-;(setq default-frame-alist '((height . 50) (width . 98)))
+;; (setq frame-inhibit-implied-resize t)
+(setq window-resize-pixelwise t
+      frame-resize-pixelwise t)
+(add-to-list 'default-frame-alist '(undecorated-round . t))
 
 (provide 'early-init)
-;;; early-init.el ends here

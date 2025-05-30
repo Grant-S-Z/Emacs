@@ -31,14 +31,13 @@
 
 ;;; Mac ligature and scroll
 (when *is-mac*
-  (mac-auto-operator-composition-mode 1) ;; ligature for mac port
-  (setq scroll-margin 2)
-  (setq mac-mouse-wheel-smooth-scroll t) ;; mac pixel scroll
-  (setq mac-mouse-wheel-mode t)
-  (setq mac-redisplay-dont-reset-vscroll t)
-  ;; (let ((inhibit-message t)) ;; inhibit scroll errors
-  ;;   (message "number-or-marker-p, nil"))
-  )
+  ;; (mac-auto-operator-composition-mode 1) ;; ligature for mac port
+  ;; (setq scroll-margin 1)
+  ;; (setq mac-mouse-wheel-smooth-scroll t) ;; mac pixel scroll
+  ;; (setq mac-mouse-wheel-mode t)
+  ;; (setq mac-redisplay-dont-reset-vscroll t)
+  (setq mac-option-modifier nil
+	mac-command-modifier 'meta))
 
 ;;; Load the contents of load-file into custom.el
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))

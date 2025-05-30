@@ -1,0 +1,30 @@
+# -*- mode: snippet -*-
+# name: report
+# key: report
+# --
+#+OPTIONS: H:2 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+LATEX_CLASS: beamer
+#+LATEX_HEADER: \usepackage{etoolbox}
+#+LATEX_HEADER: \usepackage{pgfopts}
+#+LATEX_HEADER: \usepackage{booktabs}
+#+LATEX_HEADER: \usepackage[scale=2]{ccicons}
+#+LATEX_HEADER: \usetheme[block=fill, progressbar=frametitle]{metropolis}
+#+LATEX_HEADER: \useoutertheme{infolines} % infoline
+#+LATEX_HEADER: \useinnertheme{default}
+#+LATEX_HEADER: \setbeamertemplate{blocks}[rounded][shadow=false]
+#+LATEX_HEADER: \setbeamertemplate{items}[circle] % circle item symbol
+#+LATEX_HEADER: \setbeamertemplate{sections/subsections in toc}[ball]
+#+LATEX_HEADER: \setbeamertemplate{headline}[default] % no infoline headline
+#+LATEX_HEADER: \setbeamertemplate{frame numbering}[none]
+#+LATEX_HEADER: \setbeamertemplate{bibliography item}[text] % text references
+#+LATEX_HEADER: \AtBeginSection{}
+
+#+TITLE: $1
+#+SUBTITLE: $2
+#+AUTHOR: 朱宇涛
+#+DATE: \today
+* $1
+** 研究计划
+
+** 本周进展

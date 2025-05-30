@@ -1,8 +1,12 @@
 ;;; init-lsp.el --- for languages
 ;;; Commentary:
 ;;; Code:
+;;; DOCS
+(use-package devdocs)
+
 ;;; LSP
-(require 'eglot)
+;; Eglot
+(require 'eglot) ;; set eglot-inlay-hints-mode nil
 
 (add-to-list 'eglot-server-programs
 	     '((c-mode c++-mode) . ("clangd")))
@@ -15,6 +19,9 @@
 (add-hook 'c++-mode-hook 'eglot-ensure)
 (add-hook 'python-mode-hook 'eglot-ensure)
 (add-hook 'TeX-mode-hook 'eglot-ensure)
+
+(use-package format-all
+  :bind ("C-c C-<return>" . format-all-buffer))
 
 ;; Cape
 (use-package cape
@@ -55,13 +62,6 @@
   :after corfu
   :init (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
-;; Quickrun
-(use-package quickrun
-  :bind ("C-<return>" . quickrun)
-  :config
-  (setq quickrun-timeout-seconds nil) ;; no time limit
-  )
-
 ;;; Languages
 ;; Python basic settings
 (setq python-path "~/miniconda3/bin/python3")
@@ -79,29 +79,7 @@
   (setq numpydoc-insert-examples-block nil)
   (setq numpydoc-insert-return-without-typehint t))
 
-(quickrun-add-command "python/base" ;; quickrun
-  '((:command . "~/miniconda3/bin/python3")
-    (:exec . ("%c %s"))
-    (:tempfile . nil)
-    (:description . "Run Python/base ..."))
-  :default "python")
-
-(quickrun-add-command "python/hep"
-  '((:command . "~/miniconda3/envs/hep/bin/python3")
-    (:exec . ("%c %s"))
-    (:tempfile . nil)
-    (:description . "Run Python/hep ...")))
-
-;; C++ and ROOT
-(quickrun-add-command "c++/c1z" ;; quickrun
-  '((:command . "clang++")
-    (:exec    . ("%c -std=c++1z %o -o %e %s"
-		 "%e %a"))
-    (:remove  . ("%e")))
-  :default "c++")
-
-;; Rust
-(use-package rust-mode)
+(use-package pip-requirements)
 
 ;; Markdown
 (use-package markdown-mode
@@ -109,8 +87,31 @@
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)))
 
+;; Scheme
+(use-package geiser
+  :hook (scheme-mode . geiser-mode))
+
+(use-package geiser-mit
+  :config
+  (setq geiser-active-implementations '(mit))
+  (setq geiser-default-implementation 'mit)
+  (add-hook 'scheme-mode-hook 'geiser-mode)
+  (add-to-list 'auto-mode-alist '("\\.scm\\'" . geiser-mode)))
+
 ;; Cmake
 (use-package cmake-mode)
+
+;; Lua
+(use-package lua-mode)
+
+;; Csv
+(use-package csv-mode)
+
+;; Yaml
+(use-package yaml-mode)
+
+;; Matlab
+(use-package matlab-mode)
 
 (provide 'init-lsp)
 ;;; init-lsp.el ends here

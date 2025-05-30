@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: docx
+# key: docx
+# --
+#+PANDOC_OPTIONS: reference-doc:~/org/roam-notes/templates/templates.docx

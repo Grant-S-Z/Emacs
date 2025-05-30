@@ -26,7 +26,7 @@ linkcolor=black
 \% fonts
 \\usepackage{fontspec}
 \\setmainfont{Times New Roman}
-\\setmonofont{Inconsolata}
+\\setmonofont{Ligconsolata}
 
 \\usepackage{amsfonts}
 \\usepackage{amsthm}
@@ -72,6 +72,7 @@ linkcolor=black
 \\usepackage{bm}
 \\usepackage{siunitx}
 \\usepackage{xcolor}
+\\usepackage{mhchen}
 
 \\usepackage{cite}
 \\usepackage{booktabs}
@@ -107,7 +108,7 @@ linkcolor=black
 \\usepackage{ctex}
 \\usepackage{fontspec}
 \\setmainfont{Times New Roman}
-\\setmonofont{Inconsolata}
+\\setmonofont{Ligconsolata}
 \\setsansfont{Times New Roman}
 \\setCJKmainfont{SimSong} % much more beautiful than STSong, which is sans serif
 \\setCJKsansfont{SimSong}
@@ -118,6 +119,9 @@ linkcolor=black
 \\usepackage{bm}
 \\usepackage{siunitx}
 \\usepackage{xcolor}
+\\usepackage{mhchen}
+
+\\usepackage[fontsize=\small]{minted}
 
 \\usepackage{mathrsfs}
 \% commands
@@ -162,6 +166,9 @@ linkcolor=black
 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 ;;; Org latex preview settings
+(use-package org-xlatex ;; real-time preview
+  :hook (org-mode . org-xlatex-mode))
+
 ;; Process
 (setq org-preview-latex-default-process 'dvisvgm)
 
@@ -169,7 +176,7 @@ linkcolor=black
 (setq org-format-latex-options
         (list :foreground 'default
               :background 'default
-              :scale 1.3
+              :scale 1.6
               :matchers '("begin" "$1" "$" "$$" "\\(" "\\[")))
 
 ;; Header
@@ -202,9 +209,6 @@ linkcolor=black
 \\addtolength{\\textheight}{-3cm}
 \\setlength{\\topmargin}{1.5cm}
 \\addtolength{\\topmargin}{-2.54cm}")
-
-(use-package org-fragtog ;; auto preview
-  :hook (org-mode . org-fragtog-mode))
 
 ;; Center vertically
 (defun grant/org-latex-preview-advice (beg end &rest _args)
@@ -294,7 +298,7 @@ linkcolor=black
 (setq org-agenda-files '("~/org/class.org" "~/org/task.org" "~/org/journal.org"))
 
 (setq org-capture-templates nil)
-(add-to-list 'org-capture-templates '("t" "Tasks")) ;; 任务模版
+(add-to-list 'org-capture-templates '("t" "Tasks"))
 (add-to-list 'org-capture-templates
        '("tw" "Work" entry
 	 (file+headline "~/org/task.org" "Work")
@@ -302,7 +306,7 @@ linkcolor=black
 (add-to-list 'org-capture-templates
        '("th" "Homework" entry
 	 (file+headline "~/org/task.org" "Homework")
-	 "* TODO %^{Homeworkname}\n%u\n")) ;; 没必要放文件位置，实际很难对应
+	 "* TODO %^{Homeworkname}\n%u\n"))
 (add-to-list 'org-capture-templates
        '("tl" "Long Task" entry
 	 (file+headline "~/org/task.org" "Long Task")
@@ -311,14 +315,14 @@ linkcolor=black
        '("tq" "Questions" entry
 	 (file+headline "~/org/task.org" "Questions")
 	 "* TODO %^{Questionname}\n%u\n"))
-(add-to-list 'org-capture-templates ;; 课程
+(add-to-list 'org-capture-templates
 	     '("c" "Class" entry
 	       (file "~/org/class.org")
 	       "* TODO %^{Coursename}\n%u\n"))
-(add-to-list 'org-capture-templates ;; 日志
+(add-to-list 'org-capture-templates
              '("j" "Journal" entry (file "~/org/journal.org")
-	 "* %U - 日志\n  %?"))
-(add-to-list 'org-capture-templates ;; 事件
+	 "* %U - Journal\n  %?"))
+(add-to-list 'org-capture-templates
              '("e" "Event" entry (file "~/org/event.org")
 	 "* TODO %^{Eventname}\n  %?"))
 

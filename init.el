@@ -5,7 +5,6 @@
 
 (require 'early-init)
 (require 'init-const)
-(require 'init-fun)
 (require 'init-startup)
 (require 'init-elpa)
 (require 'init-ui)
@@ -16,6 +15,7 @@
 (require 'init-tex)
 (require 'init-org)
 (require 'init-orgmodule)
+(require 'init-fun)
 (require 'init-kbd)
 
 (provide 'init)

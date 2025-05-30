@@ -5,6 +5,25 @@
 (use-package restart-emacs ;; restart emacs
   :bind (("C-c r" . restart-emacs)))
 
+(use-package desktop
+  :commands restart-emacs-without-desktop
+  :init (desktop-save-mode)
+  :config
+  ;; inhibit no-loaded prompt
+  (setq desktop-file-modtime (file-attribute-modification-time
+                              (file-attributes
+                               (desktop-full-file-name)))
+        desktop-lazy-verbose nil
+        desktop-load-locked-desktop t
+        desktop-restore-eager 1
+        desktop-restore-frames nil
+        desktop-save t)
+
+  (defun restart-emacs-without-desktop (&optional args)
+    "Restart emacs without desktop."
+    (interactive)
+    (restart-emacs (cons "--no-desktop" args))))
+
 (use-package drag-stuff ;; move selected region
   :bind (("M-p" . drag-stuff-up)
 	 ("M-n" . drag-stuff-down)))
@@ -42,6 +61,9 @@
   :bind
   (("C-;" . avy-goto-char-timer)))
 
+(use-package saveplace
+  :hook (after-init . save-place-mode))
+
 ;; Git
 (use-package magit)
 
@@ -57,20 +79,27 @@
 	(holiday-lunar 2 20 "Mother's birthday" 0)))
 
 (setq calendar-holidays
-    (append cal-china-x-important-holidays
-	    holiday-general-holidays
-	    holiday-local-holidays))
+      (append cal-china-x-important-holidays
+	      holiday-general-holidays
+	      holiday-local-holidays))
+
+(use-package openwith
+  :init (openwith-mode t)
+  :config
+  (setq openwith-associations '(("\\.pdf\\'" "open" (file))
+				;; ("\\.png\\'" "open" (file))
+				("\\.epub\\'" "open" (file)))))
+
+(use-package atomic-chrome
+  :config
+  (atomic-chrome-start-server)
+  (setq atomic-chrome-buffer-open-style 'full)
+  (setq atomic-chrome-url-major-mode-alist
+	'(("overleaf\\.com" . latex-mode))))
 
 ;;; UI operation
 (use-package ace-window ;; change window
   :bind (("M-o" . 'ace-window)))
-
-(use-package dimmer ;; dimmer window unfocused
-  :hook (prog-mode . dimmer-mode)
-  :config
-  (dimmer-configure-which-key)
-  (dimmer-configure-posframe)
-  (dimmer-configure-org))
 
 (use-package ws-butler ;; remove space automatically
   :hook (prog-mode . ws-butler-mode))
@@ -94,8 +123,7 @@
   ([remap describe-variable] . #'helpful-variable))
 
 (use-package writeroom-mode ;;; center texts
-  :hook ((org-mode . writeroom-mode)
-	 (nov-mode . writeroom-mode))
+  :hook (org-mode . writeroom-mode)
   :custom
   (writeroom-maximize-window nil)
   (writeroom-mode-line t)
@@ -106,48 +134,9 @@
 			      writeroom-set-bottom-divider-width)))
 
 ;;; Daily packages
-;; Bongo, a music player
-(use-package bongo
-  :commands bongo-playlist
-  :bind (("C-c m m" . bongo-playlist)
-	 ("C-c m ," . bongo-pause/resume)
-	 ("C-c m ." . bongo-start/stop)
-	 ("C-c m n" . bongo-play-next)
-	 ("C-c m p" . bongo-play-previous))
-  :custom
-  (bongo-enabled-backends '(mpv))
-  (bongo-custom-backend-matchers '((mpv local-file "m4a" "opus")))
-  (bongo-default-directory "~/Music/MusicFree/")
-  (bongo-logo nil)
-  (bongo-insert-album-covers nil)
-  (bongo-album-cover-size 100)
-  (bongo-mode-line-indicator-mode nil)
-  (bongo-header-line-mode nil)
-  )
-
 ;; Calculator
 (use-package literate-calc-mode
   :mode ("calc" . literate-calc-mode))
-
-;; Reader
-(use-package nov
-  :mode ("\\.epub\\'" . nov-mode)
-  :config
-  (setq nov-text-width (- writeroom-width 10))
-  )
-(defun my-nov-font-setup ()
-  (face-remap-add-relative 'variable-pitch
-			   :family "Alegreya"
-			   :height 1.5
-			   ))
-(add-hook 'nov-mode-hook 'my-nov-font-setup)
-
-;; Nov notes
-(use-package org-remark
-  :bind (("C-c n m" . org-remark-mark)
-	 ("C-c n ]" . org-remark-view-next)
-	 ("C-c n [" . org-remark-view-prev))
-  :hook (nov-mode . org-remark-nov-mode))
 
 ;; Calibre
 (use-package calibredb
@@ -165,6 +154,13 @@
 		     ))
   (fanyi-verbose nil))
 
+(use-package go-translate
+  :bind ("C-c g" . gt-do-translate)
+  :config
+  (setq gt-langs '(en zh))
+  (setq gt-default-translator (gt-translator :engines (gt-youdao-dict-engine)))
+  (setq gt-taker-pick 'paragraph))
+
 ;; Rss
 (use-package elfeed
   :config
@@ -179,9 +175,9 @@
 	  ("https://v2ex.com/index.xml" tech news)
 	  ))
   (setq elfeed-show-mode-hook
-      (lambda ()
-	(set-face-attribute 'variable-pitch (selected-frame) :font (font-spec :family "Iosevka" :size 18))
-	(setq fill-column 100)))
+	(lambda ()
+	  (set-face-attribute 'variable-pitch (selected-frame) :font (font-spec :family "Iosevka" :size 18))
+	  (setq fill-column 100)))
   )
 
 (use-package elfeed-summary
@@ -209,26 +205,44 @@
 			  (query . (and tech news))))))
 	  )))
 
-;;; Chatgpt
+;;; AI, gptel + minuet -> copilot
 (when *is-mac*
   (defun osx-get-keychain-password (account-name)
-	"Gets ACCOUNT-NAME keychain password from OS X Keychain."
-	(let ((cmd (concat "security 2>&1 >/dev/null find-generic-password -ga '" account-name "'")))
-	  (let ((passwd (shell-command-to-string cmd)))
-		(when (string-match (rx "\"" (group (0+ (or (1+ (not (any "\"" "\\"))) (seq "\\" anything)))) "\"") passwd)
-		  (match-string 1 passwd)))))
-  (use-package chatgpt-shell
-    :load-path "~/.emacs.d/site-lisp/chatgpt-shell/"
+    "Gets ACCOUNT-NAME keychain password from OS X Keychain."
+    (let ((cmd (concat "security 2>&1 >/dev/null find-generic-password -ga '" account-name "'")))
+      (let ((passwd (shell-command-to-string cmd)))
+	(when (string-match (rx "\"" (group (0+ (or (1+ (not (any "\"" "\\"))) (seq "\\" anything)))) "\"") passwd)
+	  (match-string 1 passwd)))))
+  (use-package gptel
     :bind
-    (("C-c q" . chatgpt-shell)
-     ("C-c d" . chatgpt-shell-explain-code)
-     ("C-c p" . chatgpt-shell-prompt))
+    (("C-c q" . gptel)
+     ("C-c d" . gptel-send)
+     ("C-c p" . gptel-add))
+    :config
+    (setq gptel-default-mode 'org-mode)
+    (setq gptel-backend (gptel-make-deepseek "DeepSeek"
+			  :stream t
+			  :key (lambda () (osx-get-keychain-password "deepseek key"))))
+    (setq gptel-model 'deepseek-chat
+	  gptel-backend (gptel-make-deepseek "DeepSeek"
+			  :stream t
+			  :key (lambda () (osx-get-keychain-password "deepseek key")))))
+  (use-package elysium
     :custom
-    ((chatgpt-shell-api-url-base "https://api.gptsapi.net")
-     (chatgpt-shell-openai-key
-      (lambda ()
-        ;; Here the openai-key should be the proxy service key.
-	(osx-get-keychain-password "openai key"))))))
+    (elysium-window-size 0.4)
+    (elysium-window-style 'vertical))
+  (use-package smerge-mode
+    :hook
+    (prog-mode . smerge-mode))
+  (use-package minuet
+    :bind
+    (("M-i" . #'minuet-show-suggestion)
+     ;; These keymaps activate only when a minuet suggestion is displayed
+     ("M-a" . #'minuet-accept-suggestion)
+     ("M-e" . #'minuet-dismiss-suggestion))
+    :config
+    (setq minuet-provider 'gemini)
+    (plist-put minuet-gemini-options :api-key (defun gemini-api-key () "AIzaSyD5l_SxfCTueYJ6VbOOrqz8wqWnZvfSKy0"))))
 
 (provide 'init-package)
 ;;; init-package.el ends here

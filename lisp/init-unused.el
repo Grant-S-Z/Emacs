@@ -1153,4 +1153,99 @@ to calculate the decent value of `:ascent'. "
 (use-package yasnippet-capf
   :init
   (add-to-list 'completion-at-point-functions #'yasnippet-capf))
+
+;; ;; Rust
+;; (use-package rust-mode)
+
+;; Org Slide
+(use-package org-tree-slide)
+
+;; ;; org-noter
+;; (use-package org-noter
+;;   :bind (("C-c n n" . org-noter))
+;;   :custom
+;;   (org-noter-always-create-frame nil) ;; stop opening frames
+;;   (org-noter-highlight-selected-text t)
+;;   (org-noter-max-short-selected-text-length 50) ;; critical quote length
+;;   (org-noter-auto-save-last-location t) ;; remember last location
+;;   (org-noter-notes-search-path '("~/org/roam-notes/")) ;; search path
+;;   )
+
+;; ;; org-zettel-ref
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/org-zettel-ref-mode")
+;; (require 'org-zettel-ref-mode)
+;; (setq org-zettel-ref-mode-type 'org-roam)
+;; (setq org-zettel-ref-python-file "~/.emacs.d/site-lisp/org-zettel-ref-mode/convert-to-org.py")
+;; (setq org-zettel-ref-temp-folder "~/org/zettel/tmp/")
+;; (setq org-zettel-ref-reference-folder "~/org/zettel/ref/")
+;; (setq org-zettel-ref-archive-folder "~/org/zettel/archive")
+;; (setq org-zettel-ref-overview-directory "~/org/zettel/overview")
+
+;; Reader
+(use-package nov
+  :mode ("\\.epub\\'" . nov-mode)
+  :config
+  (setq nov-text-width (- writeroom-width 10))
+  )
+(defun my-nov-font-setup ()
+  (face-remap-add-relative 'variable-pitch
+			   :family "Alegreya"
+			   :height 1.5
+			   ))
+(add-hook 'nov-mode-hook 'my-nov-font-setup)
+
+(use-package dimmer ;; dimmer window unfocused
+  :hook (prog-mode . dimmer-mode)
+  :config
+  (dimmer-configure-which-key)
+  (dimmer-configure-posframe)
+  (dimmer-configure-org)
+  (add-to-list 'dimmer-buffer-exclusion-regexps "^ \\*rime-posframe\\*$")  ;; rime posframe
+  )
+
+;; (use-package elysium ;; I don't like my codes modified by AI directly
+  ;;   :custom
+  ;;   ;; Below are the default values
+  ;;   (elysium-window-size 0.33) ; The elysium buffer will be 1/3 your screen
+  ;;   (elysium-window-style 'vertical)) ; Can be customized to horizontal
+
+  ;; (use-package smerge-mode
+  ;;   :ensure nil
+  ;;   :hook
+  ;;   (prog-mode . smerge-mode))
+
+(use-package pandoc-mode
+  :hook (org-mode . pandoc-mode))
+
+;;; Quite useful to avoid the note insert position error
+(defun grant/outline-show-entry ()
+  "Show the body directly following this heading.
+Show the heading too, if it is currently invisible."
+  (interactive)
+  (save-excursion
+    (outline-back-to-heading t)
+    (outline-flag-region (max (1- (point)) (point-min))
+                         (progn
+                           (outline-next-preface)
+                           (if (= 1 (- (point-max) (point)))
+                               (point-max)
+                             (point)))
+                         nil)))
+(advice-add 'outline-show-entry :override #'grant/outline-show-entry)
+
+(require 'ob-async)
+
+;; MPV
+(use-package empv)
+
+;; Dired-subtree
+(use-package dired-subtree)
+
+(defun grant/count-chinese-characters ()
+  "Count Chinese characters."
+  (interactive)
+  (async-start
+   (lambda ()
+     (with-current-buffer (get-buffer "target-buffer")
+       (count-chinese-characters-fast)))))
 ;;; init-unused.el ends here
