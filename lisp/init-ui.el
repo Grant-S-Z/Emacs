@@ -42,10 +42,10 @@
   ;; Center contents
   (dashboard-center-content t)
   ;; Logo
-  ;; (dashboard-startup-banner "~/.emacs.d/img/Robin.jpg")
+  (dashboard-startup-banner "~/.emacs.d/img/celeste.png")
   ;; Footnote
   (dashboard-footer-messages '
-  ("True mastery of any skill takes a lifetime."))
+   ("True mastery of any skill takes a lifetime."))
   (dashboard-set-heading-icons t)
   (dashboard-set-file-icons t)
   (dashboard-set-init-info t)
@@ -95,8 +95,7 @@
   (setq show-paren-when-point-inside-paren t
         show-paren-when-point-in-periphery t
         show-paren-context-when-offscreen t
-        show-paren-delay 0.2)
-  )
+        show-paren-delay 0.1))
 
 (use-package rainbow-delimiters ;; color of delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -107,17 +106,19 @@
   (setq hl-line-sticky-flag nil)
   ;; Highlight starts from EOL, to avoid conflicts with other overlays
   (setq hl-line-range-function (lambda () (cons (line-end-position)
-                                           (line-beginning-position 2)))))
+						(line-beginning-position 2)))))
 
 (use-package indent-bars ;; indent lines
-  :hook (prog-mode . indent-bars-mode)
-  :custom
-  (indent-bars-no-descend-lists t))
+  :init
+  (setq indent-tabs-mode t
+	indent-bars-no-descend-lists t
+	indent-bars-prefer-character t)
+  :hook (prog-mode . indent-bars-mode))
 
 ;; Outli, unfold codes as org
-(add-to-list 'load-path "~/.emacs.d/site-lisp/outli/")
-(require 'outli)
-(add-hook 'prog-mode-hook 'outli-mode)
+(use-package outli
+  :vc (:url "https://github.com/jdtsmith/outli")
+  :hook (prog-mode . outli-mode))
 
 (use-package hl-todo ;; highlight keywords when coding and jump
   :init (global-hl-todo-mode))
@@ -140,16 +141,13 @@
   :custom
   (default-input-method "rime")
   (rime-librime-root "~/.emacs.d/librime/dist") ;; librime path
-  ;; (rime-emacs-module-header-root "/opt/homebrew/cellar/emacs/29.4_1/include") ;; emacs include path
   (rime-share-data-dir "~/Library/Rime") ;; share path
   (rime-user-data-dir "~/.emacs.d/rime") ;; real path used in Emacs rime
   (rime-cursor ".")
   (rime-show-candidate 'posframe) ;; use posframe
   (rime-commit1-forall t) ;; show the first choice
   (rime-posframe-properties
-   (list :internal-border-width 4 ;; posframe internal border width
-         ;; :font "TsangerJinKai05"
-	 ))
+   (list :internal-border-width 4))
   (rime-posframe-style 'vertical)
   (mode-line-mule-info '((:eval (rime-lighter)))) ;; show rime symbol on modeline
   (rime-deactivate-when-exit-minibuffer t) ;; deactivate rime in minibuffer automatically
@@ -164,7 +162,7 @@
   )
 
 ;;; Dired
-(when (string= system-type "darwin")
+(when *is-mac*
   (setq dired-use-ls-dired t
         insert-directory-program "/opt/homebrew/bin/gls" ;; replace ls with gls
         dired-listing-switches "-aBhl --group-directories-first"))
@@ -184,9 +182,7 @@
 		        file-size))
   :config
   (dirvish-override-dired-mode) ;; replace dired ui with dirvish
-  (dirvish-side-follow-mode)
-  ;; (add-hook 'dirvish-directory-view-mode-hook #'diredfl-mode)
-  )
+  (dirvish-side-follow-mode))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

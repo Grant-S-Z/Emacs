@@ -5,32 +5,12 @@
 (use-package restart-emacs ;; restart emacs
   :bind (("C-c r" . restart-emacs)))
 
-(use-package desktop
-  :commands restart-emacs-without-desktop
-  :init (desktop-save-mode)
-  :config
-  ;; inhibit no-loaded prompt
-  (setq desktop-file-modtime (file-attribute-modification-time
-                              (file-attributes
-                               (desktop-full-file-name)))
-        desktop-lazy-verbose nil
-        desktop-load-locked-desktop t
-        desktop-restore-eager 1
-        desktop-restore-frames nil
-        desktop-save t)
-
-  (defun restart-emacs-without-desktop (&optional args)
-    "Restart emacs without desktop."
-    (interactive)
-    (restart-emacs (cons "--no-desktop" args))))
-
 (use-package drag-stuff ;; move selected region
   :bind (("M-p" . drag-stuff-up)
 	 ("M-n" . drag-stuff-down)))
 
 (use-package embark ;; act in minibuffer
-  :bind
-  (("C-." . embark-act)))
+  :bind ("C-." . embark-act))
 
 (use-package consult ;; search
   :bind (("C-s" . consult-line)))
@@ -39,7 +19,6 @@
 
 (use-package crux ;; crux bindings
   :bind (("C-a" . crux-move-beginning-of-line)
-	 ("C-c ^" . crux-top-join-line)
 	 ("C-x ," . crux-find-user-init-file)
 	 ("C-S-d" . crux-duplicate-current-line-or-region)
 	 ("C-S-k" . crux-smart-kill-line)
@@ -54,8 +33,7 @@
   :after yasnippet)
 
 (use-package which-key ;; key binding tips
-  :defer nil
-  :config (which-key-mode))
+  :init (which-key-mode))
 
 (use-package avy ;; goto directly
   :bind
@@ -65,29 +43,29 @@
   :hook (after-init . save-place-mode))
 
 ;; Git
-(use-package magit)
+(use-package magit
+  :bind ("C-x g" . magit))
 
 ;; Chinese calendar
-(require 'cal-china-x)
-
-(setq calendar-chinese-all-holidays-flag t)
-(setq calendar-mark-holidays-flag t)
-(setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
-
-(setq holiday-local-holidays
-      '((holiday-lunar 1 10 "Father's birthday" 0)
-	(holiday-lunar 2 20 "Mother's birthday" 0)))
-
-(setq calendar-holidays
-      (append cal-china-x-important-holidays
-	      holiday-general-holidays
-	      holiday-local-holidays))
+(use-package cal-china-x
+  :config
+  (setq calendar-chinese-all-holidays-flag t)
+  (setq calendar-mark-holidays-flag t)
+  (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
+  (setq holiday-local-holidays
+	'((holiday-lunar 1 10 "Father's birthday" 0)
+	  (holiday-lunar 2 20 "Mother's birthday" 0)))
+  (setq calendar-holidays
+	(append cal-china-x-important-holidays
+		holiday-general-holidays
+		holiday-local-holidays)))
+(use-package calendar
+  :after cal-china-x)
 
 (use-package openwith
   :init (openwith-mode t)
   :config
   (setq openwith-associations '(("\\.pdf\\'" "open" (file))
-				;; ("\\.png\\'" "open" (file))
 				("\\.epub\\'" "open" (file)))))
 
 (use-package atomic-chrome
@@ -105,10 +83,9 @@
   :hook (prog-mode . ws-butler-mode))
 
 (use-package super-save ;; save automatically
-  :diminish
-  :defer 0.5
+  :diminish ;; hide package mode
+  :init (super-save-mode 1)
   :config
-  (super-save-mode 1)
   (setq super-save-auto-save-when-idle t)
   (setq save-silently t))
 
@@ -216,7 +193,7 @@
   (use-package gptel
     :bind
     (("C-c q" . gptel)
-     ("C-c d" . gptel-send)
+     ("C-c d" . gptel-add-file)
      ("C-c p" . gptel-add))
     :config
     (setq gptel-default-mode 'org-mode)
@@ -227,13 +204,6 @@
 	  gptel-backend (gptel-make-deepseek "DeepSeek"
 			  :stream t
 			  :key (lambda () (osx-get-keychain-password "deepseek key")))))
-  (use-package elysium
-    :custom
-    (elysium-window-size 0.4)
-    (elysium-window-style 'vertical))
-  (use-package smerge-mode
-    :hook
-    (prog-mode . smerge-mode))
   (use-package minuet
     :bind
     (("M-i" . #'minuet-show-suggestion)

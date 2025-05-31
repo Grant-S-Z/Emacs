@@ -1248,4 +1248,31 @@ Show the heading too, if it is currently invisible."
    (lambda ()
      (with-current-buffer (get-buffer "target-buffer")
        (count-chinese-characters-fast)))))
+
+(use-package elysium
+  :custom
+  (elysium-window-size 0.4)
+  (elysium-window-style 'vertical))
+(use-package smerge-mode
+  :hook
+  (prog-mode . smerge-mode))
+
+(use-package desktop
+  :commands restart-emacs-without-desktop
+  :init (desktop-save-mode)
+  :config
+  ;; inhibit no-loaded prompt
+  (setq desktop-file-modtime (file-attribute-modification-time
+                              (file-attributes
+                               (desktop-full-file-name)))
+        desktop-lazy-verbose nil
+        desktop-load-locked-desktop t
+        desktop-restore-eager 1
+        desktop-restore-frames nil
+        desktop-save t)
+
+  (defun restart-emacs-without-desktop (&optional args)
+    "Restart emacs without desktop."
+    (interactive)
+    (restart-emacs (cons "--no-desktop" args))))
 ;;; init-unused.el ends here

@@ -24,9 +24,7 @@
 		     (concat
 		      "file:" image-file)
 		     "")
-    (message image-file))
-  ;; (org-display-inline-images) ;; no need to display
-  )
+    (message image-file)))
 
 ;;; Open files and dirs
 (defun open-words ()

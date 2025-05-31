@@ -4,6 +4,14 @@
 ;;; DOCS
 (use-package devdocs)
 
+;;; Tree sitter
+(use-package treesit-auto
+  :demand t
+  :config
+  (setq treesit-auto-install 'prompt)
+  (global-treesit-auto-mode)
+  (setq treesit-font-lock-level 4))
+
 ;;; LSP
 ;; Eglot
 (require 'eglot) ;; set eglot-inlay-hints-mode nil
