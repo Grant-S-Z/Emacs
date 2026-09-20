@@ -1,4 +1,4 @@
-;;; init-unused.el --- Settings unused
+;;; init-unused.el --- Settings unused  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 (use-package cape
@@ -405,17 +405,20 @@ Argument PDF-PATH The path to the PDF file."
 (setq holo-layer-enable-indent-rainbow t)
 (holo-layer-enable)
 
-;;; eglot
-;; (require 'eglot)
+;;; Eglot
+;; (require 'eglot) ;; set eglot-inlay-hints-mode nil
 
 ;; (add-to-list 'eglot-server-programs
 ;; 	     '((c-mode c++-mode) . ("clangd")))
 ;; (add-to-list 'eglot-server-programs
-;;              '((python-mode python-ts-mode) . ("/Users/grant/miniconda3/envs/hep/bin/pyright")))
+;;              '(python-mode . ("~/.local/bin/pyright-langserver" "--stdio")))
+;; (add-to-list 'eglot-server-programs
+;; 	     '(TeX-mode . ("texlab"))) ;; digestif has not enough authority
 
 ;; (add-hook 'c-mode-hook 'eglot-ensure)
 ;; (add-hook 'c++-mode-hook 'eglot-ensure)
 ;; (add-hook 'python-mode-hook 'eglot-ensure)
+;; (add-hook 'TeX-mode-hook 'eglot-ensure)
 
 ;;; company
 ;; (use-package company
@@ -1275,4 +1278,108 @@ Show the heading too, if it is currently invisible."
     "Restart emacs without desktop."
     (interactive)
     (restart-emacs (cons "--no-desktop" args))))
+
+;; book
+(add-to-list 'org-latex-classes '("book" "
+\\documentclass[10pt, a4paper, pagesize=auto]{book}
+
+\% fonts
+\\usepackage{ctex}
+\\usepackage{fontspec}
+\\setmainfont{Times New Roman}
+\\setmonofont{Inconsolata}
+\\setsansfont{Times New Roman}
+\%\setCJKmainfont{SimSong}
+\%\setCJKsansfont{Kai}
+\%\setCJKmonofont{Kai}
+\\setcounter{secnumdepth}{3}
+
+\\usepackage{amsfonts}
+\\usepackage{amsthm}
+\\usepackage{bm}
+\\usepackage{siunitx}
+\\usepackage{xcolor}
+"
+
+("\\section{%s}" . "\\section*{%s}")
+("\\subsection{%s}" . "\\subsection*{%s}")
+("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+("\\paragraph{%s}" . "\\paragraph*{%s}")
+("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+(setq org-latex-classes '(("article" "
+\\documentclass[11pt]{article}
+\% fonts
+\\usepackage{fontspec}
+\\setmainfont{Times New Roman}
+\\setmonofont{Ligconsolata}
+
+\\usepackage{amsfonts}
+\\usepackage{amsthm}
+\\usepackage{bm}
+\\usepackage{siunitx}
+\\usepackage{xcolor}
+
+\\usepackage{cite}
+\\usepackage{booktabs}
+\\usepackage{graphicx}
+\\usepackage{subfigure}
+\%\usepackage{minted}
+
+\\usepackage[margin=1in]{geometry}
+\\geometry{a4paper}
+
+\\usepackage{mathrsfs}
+\% commands
+\\newcommand{\\mr}[1]{\\mathrm{#1}}
+\\newcommand{\\mb}[1]{\\mathbf{#1}}
+\\newcommand{\\mc}[1]{\\mathcal{#1}}
+\\newcommand{\\ms}[1]{\\mathscr{#1}}
+"
+
+  ("\\section{%s}" . "\\section*{%s}")
+  ("\\subsection{%s}" . "\\subsection*{%s}")
+  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+  ("\\paragraph{%s}" . "\\paragraph*{%s}")
+  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
+;; beamer
+(add-to-list 'org-latex-classes '("beamer" "
+\\documentclass[10pt]{beamer}
+
+\% fonts
+\\usepackage{ctex}
+\\usepackage{fontspec}
+\\setmainfont{Times New Roman}
+\\setmonofont{Ligconsolata}
+\\setsansfont{Times New Roman}
+\\setCJKmainfont{SimSong} % much more beautiful than STSong, which is sans serif
+\\setCJKsansfont{SimSong}
+\\setCJKmonofont{LXGW WenKai Mono}
+
+\\usepackage{amsfonts}
+\\usepackage{amsthm}
+\\usepackage{bm}
+\\usepackage{siunitx}
+\\usepackage{xcolor}
+\\usepackage[version=4]{mhchem}
+
+\%\usepackage[fontsize=\\small]{minted}
+
+\\usepackage{mathrsfs}
+\% commands
+\\newcommand{\\mr}[1]{\\mathrm{#1}}
+\\newcommand{\\mb}[1]{\\mathbf{#1}}
+\\newcommand{\\mc}[1]{\\mathcal{#1}}
+\\newcommand{\\ms}[1]{\\mathscr{#1}}
+"
+
+("\\section{%s}" . "\\section*{%s}")
+("\\subsection{%s}" . "\\subsection*{%s}")
+("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+("\\paragraph{%s}" . "\\paragraph*{%s}")
+("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+;; Matlab
+(use-package matlab-mode)
 ;;; init-unused.el ends here

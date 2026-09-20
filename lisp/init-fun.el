@@ -1,4 +1,4 @@
-;;; init-fun.el --- for functions
+;;; init-fun.el --- for functions  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;; Org insert images in Macos
@@ -30,7 +30,7 @@
 (defun open-words ()
   "Open words."
   (interactive)
-  (find-file-other-window "~/org/words.org"))
+  (find-file-other-window "~/org/english/words.org"))
 
 (defun open-journal-at-today ()
   "Open journal at today."
@@ -43,13 +43,13 @@
   (interactive)
   (find-file-other-window "~/research/code/Grant/content/post/"))
 
-(defun open-in-finder ()
+(defun grant/open-in-finder ()
   "Show the current file in finder."
   (interactive)
   (let ((path (or (buffer-file-name) default-directory)))
     (shell-command (concat "open -R " (shell-quote-argument path)))))
 
-(defun open-directory-in-vscode ()
+(defun grant/open-directory-in-vscode ()
   "Open current file's directory in VSCode."
   (interactive)
   (let ((dir (if (buffer-file-name)
@@ -57,12 +57,36 @@
 	       default-directory)))
     (start-process "vscode" nil "code" dir)))
 
-(defadvice find-file (before make-directory-maybe (filename &optional wildcards) activate)
+
+
+(defun grant/open-pdf-with-presentation (pdf)
+  "Open PDF with Présentation.app."
+  (interactive
+   (list
+    (read-file-name
+     "Choose PDF: " default-directory nil t nil
+     (lambda (f)
+       (or (file-directory-p f)
+           (string-match-p "\\.pdf\\'" (downcase f)))))))
+  (setq pdf (expand-file-name pdf))
+  (unless (file-exists-p pdf)
+    (user-error "File does not exist: %s" pdf))
+  (unless (file-directory-p "/Applications/Présentation.app")
+    (user-error "Présentation.app not found at /Applications/Présentation.app"))
+  ;; (start-process "open-presentation" nil
+  ;;                "open" "-a" "/Applications/Présentation.app" pdf)
+
+  (start-process "open-presentation" nil
+		 "open" "-b" "fr.imag.iihm.blanch.osx-presentation" pdf))
+
+
+(defun grant/find-file-make-directory-maybe (filename &optional _wildcards)
   "Create parent directory if not exists while visiting file."
   (unless (file-exists-p filename)
     (let ((dir (file-name-directory filename)))
       (unless (file-exists-p dir)
         (make-directory dir t)))))
+(advice-add 'find-file :before #'grant/find-file-make-directory-maybe)
 
 ;;; Remember one position when editing a file
 (defun remember-init ()
@@ -105,7 +129,7 @@
   "Copy buffer file name to kill ring.
 With prefix argument, strip file extension."
   (interactive "P")
-  (if-let ((filename (buffer-file-name)))
+  (if-let* ((filename (buffer-file-name)))
       (kill-new (if strip-extension
                     (file-name-base filename)
                   (file-name-nondirectory filename)))

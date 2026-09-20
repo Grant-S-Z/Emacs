@@ -1,4 +1,4 @@
-;;; init-kbd.el --- for kbd
+;;; init-kbd.el --- for kbd  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;; Key settings
@@ -17,6 +17,10 @@
 
 ;; TeX
 (global-set-key (kbd "C-c o") 'cdlatex-environment)
+
+;; Vim
+;; (use-package evil
+;;   :init (evil-mode))
 
 (provide 'init-kbd)
 ;;; init-kbd.el ends here

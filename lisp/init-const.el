@@ -1,4 +1,4 @@
-;;; init-const.el --- for some const
+;;; init-const.el --- for some const  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;; Operation system

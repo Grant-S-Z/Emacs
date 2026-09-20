@@ -1,11 +1,15 @@
-;;; init-elpa.el -- archives of emacs
+;;; init-elpa.el -- archives of emacs  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
-(setq package-check-signature nil) ; No checking signature
-(setq package-install-upgrade-built-in t) ; 内嵌 package 自动更新
+(setq package-check-signature nil) ; no checking signature
+(setq package-install-upgrade-built-in nil) ; no auto upgrade
 
 ;; Sources
 (require 'package)
+
+;; (setq package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
+;; 			 ("melpa" . "https://melpa.org/packages/")
+;; 			 ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
 
 (setq package-archives '(("gnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
                          ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
@@ -20,12 +24,12 @@
 	use-package-verbose t))
 
 ;; Async
-(use-package async
-  :ensure t
-  :init
-  (autoload 'dired-async-mode "dired-async.el" nil t)
-  (dired-async-mode 1)
-  (async-bytecomp-package-mode 1))
+;; (use-package async
+;;   :ensure t
+;;   :init
+;;   (autoload 'dired-async-mode "dired-async.el" nil t)
+;;   (dired-async-mode 1)
+;;   (async-bytecomp-package-mode 1))
 
 (provide 'init-elpa)
 ;;; init-elpa.el ends here

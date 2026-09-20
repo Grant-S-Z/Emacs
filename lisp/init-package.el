@@ -1,4 +1,4 @@
-;;; init-package.el --- for packages
+;;; init-package.el --- for packages  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;; Basic
@@ -47,20 +47,20 @@
   :bind ("C-x g" . magit))
 
 ;; Chinese calendar
-(use-package cal-china-x
-  :config
-  (setq calendar-chinese-all-holidays-flag t)
-  (setq calendar-mark-holidays-flag t)
-  (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
-  (setq holiday-local-holidays
-	'((holiday-lunar 1 10 "Father's birthday" 0)
-	  (holiday-lunar 2 20 "Mother's birthday" 0)))
-  (setq calendar-holidays
-	(append cal-china-x-important-holidays
-		holiday-general-holidays
-		holiday-local-holidays)))
-(use-package calendar
-  :after cal-china-x)
+;; (use-package cal-china-x
+;;   :config
+;;   (setq calendar-chinese-all-holidays-flag t)
+;;   (setq calendar-mark-holidays-flag t)
+;;   (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
+;;   (setq holiday-local-holidays
+;; 	'((holiday-lunar 1 10 "Father's birthday" 0)
+;; 	  (holiday-lunar 2 20 "Mother's birthday" 0)))
+;;   (setq calendar-holidays
+;; 	(append cal-china-x-important-holidays
+;; 		holiday-general-holidays
+;; 		holiday-local-holidays)))
+;; (use-package calendar
+;;   :after cal-china-x)
 
 (use-package openwith
   :init (openwith-mode t)
@@ -99,27 +99,24 @@
   ([remap describe-function] . #'helpful-callable)
   ([remap describe-variable] . #'helpful-variable))
 
-(use-package writeroom-mode ;;; center texts
-  :hook (org-mode . writeroom-mode)
-  :custom
-  (writeroom-maximize-window nil)
-  (writeroom-mode-line t)
-  (writeroom-global-effects '(writeroom-set-alpha
-			      writeroom-set-menu-bar-lines
-			      writeroom-set-tool-bar-lines
-			      writeroom-set-vertical-scroll-bars
-			      writeroom-set-bottom-divider-width)))
+
 
 ;;; Daily packages
 ;; Calculator
-(use-package literate-calc-mode
-  :mode ("calc" . literate-calc-mode))
+;; (use-package literate-calc-mode
+;;   :mode ("calc" . literate-calc-mode))
 
 ;; Calibre
 (use-package calibredb
   :config
   (setq calibredb-root-dir "~/org/books/")
   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir)))
+
+(use-package nov)
+;; (use-package djvu
+;;   :config
+;;   (setq doc-view-resolution 600))
+
 
 ;; Translator
 (use-package fanyi
@@ -131,58 +128,58 @@
 		     ))
   (fanyi-verbose nil))
 
-(use-package go-translate
+(use-package gt
   :bind ("C-c g" . gt-do-translate)
   :config
   (setq gt-langs '(en zh))
   (setq gt-default-translator (gt-translator :engines (gt-youdao-dict-engine)))
   (setq gt-taker-pick 'paragraph))
 
-;; Rss
-(use-package elfeed
-  :config
-  (setq elfeed-feeds
-	'(("https://arxiv.org/rss/hep-ex" study physics)
-	  ("https://arxiv.org/rss/hep-ph" study physics)
-	  ("https://arxiv.org/rss/hep-th" study physics)
-	  ("https://root-forum.cern.ch/posts.rss" root)
-	  ("https://sachachua.com/blog/category/emacs-news/feed/" news emacs)
-	  ("https://emacs-china.org/posts.rss" emacs)
-	  ("https://news.ycombinator.com/rss" tech news)
-	  ("https://v2ex.com/index.xml" tech news)
-	  ))
-  (setq elfeed-show-mode-hook
-	(lambda ()
-	  (set-face-attribute 'variable-pitch (selected-frame) :font (font-spec :family "Iosevka" :size 18))
-	  (setq fill-column 100)))
-  )
+;; ;; Rss
+;; (use-package elfeed
+;;   :config
+;;   (setq elfeed-feeds
+;; 	'(("https://arxiv.org/rss/hep-ex" study physics)
+;; 	  ;; ("https://arxiv.org/rss/hep-ph" study physics)
+;; 	  ;; ("https://arxiv.org/rss/hep-th" study physics)
+;; 	  ("https://root-forum.cern.ch/posts.rss" root)
+;; 	  ("https://sachachua.com/blog/category/emacs-news/feed/" news emacs)
+;; 	  ("https://emacs-china.org/posts.rss" emacs)
+;; 	  ("https://news.ycombinator.com/rss" tech news)
+;; 	  ("https://v2ex.com/index.xml" tech news)
+;; 	  ))
+;;   (setq elfeed-show-mode-hook
+;; 	(lambda ()
+;; 	  (set-face-attribute 'variable-pitch (selected-frame) :font (font-spec :family "Iosevka" :size 18))
+;; 	  (setq fill-column 100)))
+;;   )
 
-(use-package elfeed-summary
-  :bind ("C-c e" . elfeed-summary)
-  :config
-  (setq elfeed-summary-other-window t)
-  (setq elfeed-summary-settings
-	'((group (:title . "Physics")
-		 (:elements
-		  (query . (study physics))))
-	  (group (:title . "ROOT")
-		 (:elements
-		  (query . (root))))
-	  (group (:title . "Emacs")
-		 (:elements
-		  (query . (and emacs (not '(news org))))
-		  (group (:title . "News")
-			 (:elements
-			  (query . (and news emacs))))))
-	  (group (:title . "News")
-		 (:elements
-		  (query . (and news (not '(tech eco emacs))))
-		  (group (:title . "Tech")
-			 (:elements
-			  (query . (and tech news))))))
-	  )))
+;; (use-package elfeed-summary
+;;   :bind ("C-c e" . elfeed-summary)
+;;   :config
+;;   (setq elfeed-summary-other-window t)
+;;   (setq elfeed-summary-settings
+;; 	'((group (:title . "Physics")
+;; 		 (:elements
+;; 		  (query . (study physics))))
+;; 	  (group (:title . "ROOT")
+;; 		 (:elements
+;; 		  (query . (root))))
+;; 	  (group (:title . "Emacs")
+;; 		 (:elements
+;; 		  (query . (and emacs (not '(news org))))
+;; 		  (group (:title . "News")
+;; 			 (:elements
+;; 			  (query . (and news emacs))))))
+;; 	  (group (:title . "News")
+;; 		 (:elements
+;; 		  (query . (and news (not '(tech eco emacs))))
+;; 		  (group (:title . "Tech")
+;; 			 (:elements
+;; 			  (query . (and tech news))))))
+;; 	  )))
 
-;;; AI, gptel + minuet -> copilot
+;;; AI
 (when *is-mac*
   (defun osx-get-keychain-password (account-name)
     "Gets ACCOUNT-NAME keychain password from OS X Keychain."
@@ -197,22 +194,41 @@
      ("C-c p" . gptel-add))
     :config
     (setq gptel-default-mode 'org-mode)
-    (setq gptel-backend (gptel-make-deepseek "DeepSeek"
+    (setq gptel-model 'deepseek-reasoner
+	  gptel-backend (gptel-make-deepseek "deepseek-flash"
 			  :stream t
-			  :key (lambda () (osx-get-keychain-password "deepseek key"))))
-    (setq gptel-model 'deepseek-chat
-	  gptel-backend (gptel-make-deepseek "DeepSeek"
-			  :stream t
-			  :key (lambda () (osx-get-keychain-password "deepseek key")))))
-  (use-package minuet
-    :bind
-    (("M-i" . #'minuet-show-suggestion)
-     ;; These keymaps activate only when a minuet suggestion is displayed
-     ("M-a" . #'minuet-accept-suggestion)
-     ("M-e" . #'minuet-dismiss-suggestion))
-    :config
-    (setq minuet-provider 'gemini)
-    (plist-put minuet-gemini-options :api-key (defun gemini-api-key () "AIzaSyD5l_SxfCTueYJ6VbOOrqz8wqWnZvfSKy0"))))
+			  :key (lambda () (osx-get-keychain-password "deepseek key"))))))
+
+
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/dsh-emacs"))
+(require 'dsh-emacs)
+
+(use-package eca
+  :vc (:url "https://github.com/editor-code-assistant/eca-emacs" :rev :newest)
+  :config
+  (defun my/eca-chat-flyspell-setup ()
+    "Enable Flyspell during typing and disable on submit in `eca-chat-mode`."
+    (when (derived-mode-p 'eca-chat-mode)
+      ;; Disable Flyspell when submitting prompts
+      (add-hook 'pre-command-hook
+		(lambda ()
+                  (when (and (memq this-command '(eca-chat--key-pressed-return
+                                                  eca-chat-send-prompt-at-chat))
+                             flyspell-mode)
+                    (flyspell-mode -1)))
+		nil t)
+      ;; Re-enable Flyspell when typing
+      (add-hook 'pre-command-hook
+		(lambda ()
+                  (when (and (eq this-command 'self-insert-command)
+                             (not flyspell-mode))
+                    (flyspell-mode 1)))
+		nil t)))
+  (add-hook 'eca-chat-mode-hook #'my/eca-chat-flyspell-setup))
+
+;;; Mine
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/word-learn/")
+;; (require 'word-learn)
 
 (provide 'init-package)
 ;;; init-package.el ends here

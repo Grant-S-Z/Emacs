@@ -1,4 +1,4 @@
-;;; init-tex.el --- for tex
+;;; init-tex.el --- for tex  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;; TeX settings

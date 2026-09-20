@@ -1,4 +1,4 @@
-;;; init-startup.el -- when starting
+;;; init-startup.el -- when starting  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;; Basic
@@ -12,6 +12,8 @@
 (winner-mode 1) ;; undo window operation
 (delete-selection-mode 1) ;; replace the contents in selected region
 (global-auto-revert-mode 1) ;; auto refresh changed windows
+(when *is-mac*
+  (menu-bar-mode 1))
 (when *is-linux*
   (menu-bar-mode -1))
 
@@ -25,6 +27,11 @@
 
 ;; Avoid byte-compiled files that are older than their source files
 (setq load-prefer-newer t)
+
+;; Prevent `so-long' from disabling font-lock in org files with long lines
+;; (e.g. long tables in journal.org).
+(with-eval-after-load 'so-long
+  (setq so-long-threshold 1000))
 
 ;; Scratch
 (setq initial-scratch-message nil)

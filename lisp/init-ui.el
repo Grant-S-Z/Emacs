@@ -1,13 +1,6 @@
-;;; init-ui.el -- themes of emacs
+;;; init-ui.el -- themes of emacs  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
-;;; Themes
-(use-package catppuccin-theme
-  :init
-  (load-theme 'catppuccin :no-confirm)
-  :config
-  (setq catppuccin-flavor 'latte) ;; frappe, latte, macchiato, mocha
-  (catppuccin-reload))
 
 ;;; Line number
 (defun grant/enable-line-numbers ()
@@ -63,7 +56,8 @@
   (setq doom-modeline-battery nil)
   (setq doom-modeline-buffer-file-name-style 'buffer-name)
   (setq doom-modeline--eglot t)
-  (setq doom-modeline-enable-word-count nil))
+  (setq doom-modeline-enable-word-count nil)
+  (setq doom-modeline-env-python-executable "~/miniconda3/bin/python3"))
 
 ;;; Minibuffer
 (use-package vertico
@@ -129,8 +123,8 @@
   :bind (("C--" . cnfonts-decrease-fontsize)
 	 ("C-=" . cnfonts-increase-fontsize))
   :custom
-  (cnfonts-personal-fontnames '(("Ligconsolata" "FantasqueSansM Nerd Font Mono" "Iosevka")
-                                ("FZYouSong GBK")
+  (cnfonts-personal-fontnames '(("Ligconsolata" "FantasqueSansM Nerd Font Mono" "Iosevka" "Bookerly" "Literata" "STKaiti")
+                                ("FZYouSong GBK" "Source Han Serif SC" "LXGW WenKai Mono")
                                 ("PragmataPro Mono Liga")
                                 ("PragmataPro Mono Liga"))))
 
@@ -141,25 +135,146 @@
   :custom
   (default-input-method "rime")
   (rime-librime-root "~/.emacs.d/librime/dist") ;; librime path
+  (rime-emacs-module-header-root "")
   (rime-share-data-dir "~/Library/Rime") ;; share path
   (rime-user-data-dir "~/.emacs.d/rime") ;; real path used in Emacs rime
   (rime-cursor ".")
   (rime-show-candidate 'posframe) ;; use posframe
   (rime-commit1-forall t) ;; show the first choice
   (rime-posframe-properties
-   (list :internal-border-width 4))
+   (list :internal-border-width 1))
   (rime-posframe-style 'vertical)
   (mode-line-mule-info '((:eval (rime-lighter)))) ;; show rime symbol on modeline
   (rime-deactivate-when-exit-minibuffer t) ;; deactivate rime in minibuffer automatically
   )
 
+;;; Themes
+;; (load-theme 'modus-operandi-deuteranopia)
+
+;; (use-package doric-themes
+;;   :init
+;;   (load-theme 'doric-light))
+
+;; (use-package catppuccin-theme
+;;   :init
+;;   (load-theme 'catppuccin :no-confirm)
+;;   :config
+;;   (setq catppuccin-flavor 'mocha) ;; frappe, latte, macchiato, mocha
+;;   (catppuccin-reload))
+
+;; (use-package night-owl-theme
+;;   :init
+;;   (load-theme 'night-owl :no-confirm))
+
+;; ;; (set-face-attribute 'variable-pitch nil :family "Bookerly")
+;; (set-face-attribute 'variable-pitch nil :family "Literata")
+;; (set-face-attribute 'fixed-pitch nil :family "FantasqueSansM Nerd Font Mono")
+;; (setq modus-themes-headings
+;;       '((0 . (variable-pitch 1.3 bold))
+;; 	(1 . (variable-pitch 1.15 semibold))
+;;         (2 . (variable-pitch 1.1 semibold))
+;;         (3 . (variable-pitch 1.05))
+;;         (t . (variable-pitch))))
+
+;; (custom-theme-set-faces 'user
+;; 			'(Info-quoted ((t (:inherit fixed-pitch))))
+;; 			;; '(org-block ((t (:inherit fixed-pitch))))
+;; 			;; '(org-code ((t (:inherit (shadow fixed-pitch)))))
+;; 			'(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+;; 			'(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+;; 			'(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+;; 			'(org-property-value ((t (:inherit fixed-pitch))))
+;; 			'(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+;; 			'(org-table ((t (:inherit fixed-pitch))))
+;; 			'(org-link ((t (:inherit fixed-pitch link) :underline t)))
+;; 			'(org-cite ((t (:inherit shadow))))
+;; 			'(org-cite-key ((t (:inherit fixed-pitch link) :underline t)))
+;; 			'(org-tag ((t (:inherit (shadow fixed-pitch) :height 1.0))))
+;; 			'(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
+;; 			'(org-bold ((t (:inherit variable-pitch :weight bold))))
+;; 			'(org-italic ((t (:inherit variable-pitch :slant italic))))
+;; 			;; '(org-level-1 ((t (:inherit variable-pitch :weight bold))))
+;; 			;; '(org-level-2 ((t (:inherit variable-pitch :weight bold))))
+;; 			;; '(org-level-3 ((t (:inherit variable-pitch :weight bold))))
+;; 			;; '(org-level-4 ((t (:inherit variable-pitch :weight bold))))
+;; 			;; '(org-level-3 ((t (:inherit variable-pitch :weight bold :foreground "cyan4")))) ; SkyBlue, violet, cyan1 2 3, ...
+;; 			)
+
+;; Use a "mixed" setup: proportional body, monospace code blocks.
+;; `mixed-pitch-mode` cooperates better with org-src overlays than
+;; enabling `variable-pitch-mode` directly.
 (use-package mixed-pitch
   :hook (org-mode . mixed-pitch-mode)
   :config
-  (set-face-attribute 'variable-pitch nil
-                      :font "Iosevka")
-  (setq fixed-pitch "FantasqueSansM Nerd Font Mono") ;; this should change by cnfonts.
-  )
+  (set-face-attribute 'variable-pitch nil :family "Literata")
+  ;; (set-face-attribute 'variable-pitch nil :family "LXGW WenKai Mono")
+  ;; (set-face-attribute 'variable-pitch nil :family "STKaiti")
+  (set-face-attribute 'fixed-pitch nil :family "FantasqueSansM Nerd Font Mono"))
+
+
+;; (set-face-attribute 'variable-pitch nil :family "Literata")
+;; (set-face-attribute 'fixed-pitch nil :family "FantasqueSansM Nerd Font Mono")
+
+;; (load-theme 'ef-trio-light :no-confirm)
+;; (load-theme 'ef-arbutus :no-confirm)
+;; (load-theme 'ef-light :no-confirm)
+(load-theme 'ef-frost :no-confirm)
+;; (load-theme 'ef-day :no-confirm)
+;; (load-theme 'ef-night :no-confirm)
+;; (load-theme 'ef-winter :no-confirm)
+;; (load-theme 'ef-owl :no-confirm)
+;; (load-theme 'catppuccin :no-confirm)
+;; (setq catppuccin-flavor 'mocha)
+;; (catppuccin-reload)
+;; (load-theme 'modus-operandi)
+;; (load-theme 'modus-operandi-tritanopia)
+;; (load-theme 'modus-operandi-deuteranopia)
+
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/moe-theme.el")
+;; (require 'moe-theme)
+;; (load-theme 'moe-light t)
+
+;; (use-package mixed-pitch
+;;   :hook ((org-mode . mixed-pitch-mode)
+;; 	 (text-mode . mixed-pitch-mode))
+;;   :config
+;;   (set-face-attribute 'variable-pitch nil :family "Bookerly")
+;;   (set-face-attribute 'fixed-pitch nil :family "FantasqueSansM Nerd Font Mono")
+;;   ;; (dolist (charset '(han cjk-misc bopomofo kana symbol))
+;;   ;;   (set-fontset-font t charset
+;;   ;;                     (font-spec :family "LXGW WenKai Mono"
+;;   ;;                                :size (face-attribute 'default :height))))
+
+;;   ;; (setq fixed-pitch "FantasqueSansM Nerd Font Mono") ;; this should change by cnfonts.
+;;   (custom-theme-set-faces 'user
+;; 			  '(Info-quoted ((t (:inherit fixed-pitch))))
+;; 			  '(org-block ((t (:inherit fixed-pitch))))
+;; 			  '(org-code ((t (:inherit (shadow fixed-pitch)))))
+;; 			  '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+;; 			  '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+;; 			  '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+;; 			  '(org-property-value ((t (:inherit fixed-pitch))) t)
+;; 			  '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+;; 			  )
+;;   )
+
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;;             (setq-local line-spacing 0.1)))
+
+
+(use-package writeroom-mode ;;; center texts
+  :hook (org-mode . writeroom-mode)
+  :custom
+  (writeroom-maximize-window nil)
+  (writeroom-mode-line t)
+  (writeroom-width 80)
+  (writeroom-global-effects '(writeroom-set-alpha
+			      writeroom-set-menu-bar-lines
+			      writeroom-set-tool-bar-lines
+			      writeroom-set-vertical-scroll-bars
+			      writeroom-set-bottom-divider-width))
+  (setq-local line-spacing 0.1))
 
 ;;; Dired
 (when *is-mac*
@@ -183,6 +298,37 @@
   :config
   (dirvish-override-dired-mode) ;; replace dired ui with dirvish
   (dirvish-side-follow-mode))
+
+;;; Ligature
+(let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
+               (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
+               (36 . ".\\(?:>\\)")
+               (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
+               (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
+               ;; (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+               (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
+               (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
+               (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
+               (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
+               (48 . ".\\(?:x[a-zA-Z]\\)")
+               (58 . ".\\(?:::\\|[:=]\\)")
+               (59 . ".\\(?:;;\\|;\\)")
+               (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
+               (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
+               (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
+               (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
+               (91 . ".\\(?:]\\)")
+               (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
+               (94 . ".\\(?:=\\)")
+               (119 . ".\\(?:ww\\)")
+               (123 . ".\\(?:-\\)")
+               (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
+               (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)")
+               )
+             ))
+  (dolist (char-regexp alist)
+    (set-char-table-range composition-function-table (car char-regexp)
+                          `([,(cdr char-regexp) 0 font-shape-gstring]))))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

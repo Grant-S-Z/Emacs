@@ -1,4 +1,4 @@
-;;; early-init.el --- early init settings
+;;; early-init.el --- early init settings  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;; (setq frame-inhibit-implied-resize t)

@@ -1,4 +1,4 @@
-;;; init-shell.el --- for shell
+;;; init-shell.el --- for shell  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;; Get commands work in shell and know system variables
@@ -6,6 +6,10 @@
   (exec-path-from-shell-initialize))
 
 ;;; Shell vterm
+;; Use the macOS system compiler for native modules.
+(setenv "CC" "/usr/bin/clang")
+(setenv "CXX" "/usr/bin/clang++")
+
 (use-package vterm
   :init (setq vterm-shell "zsh"))
 
