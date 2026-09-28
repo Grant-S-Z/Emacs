@@ -24,7 +24,7 @@
 		     (concat
 		      "file:" image-file)
 		     "")
-    (message image-file)))
+    (message "%s" image-file)))
 
 ;;; Open files and dirs
 (defun open-words ()

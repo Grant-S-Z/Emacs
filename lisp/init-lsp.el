@@ -127,7 +127,8 @@
 ;;; Eglot
 (require 'eglot)
 (add-to-list 'eglot-server-programs
-	     '((python-ts-mode python-mode) . ("~/miniconda3/bin/pyright-langserver" "--stdio")))
+	     (list '(python-ts-mode python-mode)
+		   (expand-file-name "~/miniconda3/bin/pyright-langserver") "--stdio"))
 (add-to-list 'eglot-server-programs
              '((c-mode c-ts-mode c++-mode c++-ts-mode) . ("clangd")))
 ;; (add-to-list 'eglot-server-programs

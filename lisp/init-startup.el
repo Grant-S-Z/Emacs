@@ -19,7 +19,7 @@
 
 (add-hook 'prog-mode-hook #'subword-mode) ;; operation on camel words
 (electric-pair-mode 1) ;; generate parens automatically
-(add-hook 'prog-mode-hook #'show-paren-mode) ;; show paren
+(show-paren-mode 1) ;; 全局括号匹配高亮（show-paren-mode 是全局模式，不应挂进 prog-mode-hook）
 (add-hook 'prog-mode-hook #'hs-minor-mode) ;; hideshow
 
 ;; System locale to use for formatting time values.

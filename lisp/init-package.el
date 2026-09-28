@@ -32,8 +32,8 @@
 (use-package yasnippet-snippets ;; regular snippets
   :after yasnippet)
 
-(use-package which-key ;; key binding tips
-  :init (which-key-mode))
+;; which-key 自 Emacs 30 起内置，直接用内置版（elpa 里的旧版已移除）
+(which-key-mode 1)
 
 (use-package avy ;; goto directly
   :bind
@@ -82,12 +82,10 @@
 (use-package ws-butler ;; remove space automatically
   :hook (prog-mode . ws-butler-mode))
 
-(use-package super-save ;; save automatically
-  :diminish ;; hide package mode
-  :init (super-save-mode 1)
-  :config
-  (setq super-save-auto-save-when-idle t)
-  (setq save-silently t))
+;; super-save 已移除：用 Emacs 内置的 auto-save-visited-mode 替代
+(setq auto-save-visited-interval 5 ;; 空闲 5 秒自动保存
+      save-silently t)              ;; 保存时不在 echo area 提示
+(auto-save-visited-mode 1)
 
 (use-package pangu-spacing ;; comfortable space between English and Chinese
   :init (global-pangu-spacing-mode 1)
@@ -118,16 +116,7 @@
 ;;   (setq doc-view-resolution 600))
 
 
-;; Translator
-(use-package fanyi
-  :bind ("C-c f" . fanyi-dwim)
-  :custom
-  (fanyi-providers '(fanyi-haici-provider ;; haici
-                     fanyi-youdao-thesaurus-provider ;; youdao
-                     fanyi-longman-provider ;; longman
-		     ))
-  (fanyi-verbose nil))
-
+;; Translator: fanyi 已移除，保留 gt（C-c g）
 (use-package gt
   :bind ("C-c g" . gt-do-translate)
   :config

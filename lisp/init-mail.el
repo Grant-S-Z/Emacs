@@ -4,7 +4,7 @@
 ;;; Basic settings
 ;; Send mails
 (require 'auth-source)
-(setq auth-source '("~/.authinfo"))
+(setq auth-sources '("~/.authinfo"))
 
 (setq message-send-mail-function 'smtpmail-send-it)
 (setq send-mail-function 'smtpmail-send-it)

@@ -1383,3 +1383,47 @@ Show the heading too, if it is currently invisible."
 ;; Matlab
 (use-package matlab-mode)
 ;;; init-unused.el ends here
+
+
+;;; ============================================================
+;;; Neomacs (Rust Emacs fork) workarounds -- archived, not loaded
+;;; 原 lisp/init-neomacs.el，供将来尝试 Neomacs 时参考
+;;; ============================================================
+
+;; 1. Fix cnfonts: Neomacs' `list-fonts' always returns nil (font listing is
+;;    not implemented yet), so `cnfonts--fontspec-valid-p' thinks every
+;;    fontspec is invalid and cnfonts silently skips setting any font.
+;;    `find-font' works fine, so validate with it instead.
+(with-eval-after-load 'cnfonts
+  (defun cnfonts--fontspec-valid-p (fontspec)
+    "检查 FONTSPEC 是否有效 (Neomacs: 用 find-font 替代失效的 list-fonts)."
+    (and fontspec (find-font fontspec))))
+
+;; 2. Nerd icons: Neomacs' automatic per-character font fallback often fails
+;;    to pick up the Nerd Font for private-use-area glyphs.  Point the
+;;    relevant codepoint ranges at "Symbols Nerd Font Mono" explicitly.
+(when (find-font (font-spec :family "Symbols Nerd Font Mono"))
+  (dolist (range '((#xe000   . #xf8ff)    ; Private Use Area
+                   (#xf0000  . #xffffd)   ; Supplementary PUA-A
+                   (#x100000 . #x10fffd))) ; Supplementary PUA-B
+    (set-fontset-font t range (font-spec :family "Symbols Nerd Font Mono"))))
+
+;; 3. Window chrome: Neomacs renders the menu bar as an in-window row and
+;;    ignores `default-frame-alist' entries such as `undecorated-round' when
+;;    creating the initial frame, so a native title bar stays visible.
+;;    Turn the menu bar off and strip the title bar after the frame exists,
+;;    then maximize to recover a sensible window size.  Do the same for any
+;;    frame created later.
+(defun grant/neomacs-fix-frame-chrome (&optional frame)
+  "Apply borderless/maximized chrome to FRAME (or the selected frame)."
+  (when (display-graphic-p frame)
+    (with-selected-frame (or frame (selected-frame))
+      (set-frame-parameter nil 'undecorated-round t)
+      (set-frame-parameter nil 'undecorated t)
+      (set-frame-parameter nil 'fullscreen 'maximized))))
+
+(menu-bar-mode -1)
+(add-hook 'after-init-hook #'grant/neomacs-fix-frame-chrome)
+(add-hook 'after-make-frame-functions #'grant/neomacs-fix-frame-chrome)
+
+(provide 'init-neomacs)

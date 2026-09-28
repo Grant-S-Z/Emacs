@@ -11,7 +11,6 @@
   (setq org-startup-folded 'content) ;; show titles only
 
   ;; Inline image
-  (auto-image-file-mode t)
   (setq org-image-actual-width 500)
 
   ;; Babel
@@ -51,7 +50,6 @@
   (setq org-startup-with-latex-preview nil)
   (setq org-latex-default-class "ctexart") ;; latex class
   (setq org-latex-compiler "lualatex") ;; latex compiler
-  (turn-on-cdlatex)
   (add-hook 'org-mode-hook (lambda () ;; cdlatex
 			     (setq truncate-lines nil)
 			     (org-cdlatex-mode)))

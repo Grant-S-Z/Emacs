@@ -77,11 +77,7 @@
 (use-package marginalia
   :init (marginalia-mode 1))
 
-;;; Side tree
-(use-package treemacs
-  :bind ("C-c t" . treemacs)
-  :config
-  (setq treemacs-show-hidden-files nil))
+;;; Side tree: treemacs 已移除，用 dirvish-side（见下方 Dired 一节，C-c l）
 
 ;;; Useful highlights and colors
 (use-package paren
