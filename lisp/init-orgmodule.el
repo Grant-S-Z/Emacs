@@ -37,6 +37,7 @@ linkcolor=black
 \\usepackage{amsthm}
 \\usepackage{bm}
 \\usepackage{siunitx}
+\\usepackage[version=4]{mhchem}
 \\usepackage{xcolor}
 
 \\usepackage{cite}
@@ -53,6 +54,9 @@ linkcolor=black
 \\newcommand{\\mb}[1]{\\mathbf{#1}}
 \\newcommand{\\mc}[1]{\\mathcal{#1}}
 \\newcommand{\\ms}[1]{\\mathscr{#1}}
+\\renewcommand{\\d}{\\mathrm{d}}          % 微分算子（正体 d）
+\\newcommand{\\kb}{k_{\\mathrm{B}}}        % 玻尔兹曼常数
+\\newcommand{\\zpart}{\\mathcal{Z}}        % 巨正则配分函数
 "
 
 			     ("\\section{%s}" . "\\section*{%s}")
@@ -99,6 +103,9 @@ linkcolor=black
 \\newcommand{\\mb}[1]{\\mathbf{#1}}
 \\newcommand{\\mc}[1]{\\mathcal{#1}}
 \\newcommand{\\ms}[1]{\\mathscr{#1}}
+\\renewcommand{\\d}{\\mathrm{d}}          % 微分算子（正体 d）
+\\newcommand{\\kb}{k_{\\mathrm{B}}}        % 玻尔兹曼常数
+\\newcommand{\\zpart}{\\mathcal{Z}}        % 巨正则配分函数
 "
 
 				    ("\\section{%s}" . "\\section*{%s}")
@@ -147,6 +154,9 @@ linkcolor=black
 \\newcommand{\\mb}[1]{\\mathbf{#1}}
 \\newcommand{\\mc}[1]{\\mathcal{#1}}
 \\newcommand{\\ms}[1]{\\mathscr{#1}}
+\\renewcommand{\\d}{\\mathrm{d}}          % 微分算子（正体 d）
+\\newcommand{\\kb}{k_{\\mathrm{B}}}        % 玻尔兹曼常数
+\\newcommand{\\zpart}{\\mathcal{Z}}        % 巨正则配分函数
 "
 
 				    ("\\section{%s}" . "\\section*{%s}")
@@ -156,7 +166,7 @@ linkcolor=black
 				    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
   (add-to-list 'org-latex-classes '("beamer-en" "
-\\documentclass[aspectratio=169,10pt]{beamer}
+\\documentclass[aspectratio=1610, 10pt]{beamer}
 \\usetheme[block=fill, progressbar=frametitle]{metropolis}
 \% fonts
 \\usepackage{fontspec}
@@ -189,6 +199,9 @@ linkcolor=black
 \\newcommand{\\mb}[1]{\\mathbf{#1}}
 \\newcommand{\\mc}[1]{\\mathcal{#1}}
 \\newcommand{\\ms}[1]{\\mathscr{#1}}
+\\renewcommand{\\d}{\\mathrm{d}}          % 微分算子（正体 d）
+\\newcommand{\\kb}{k_{\\mathrm{B}}}        % 玻尔兹曼常数
+\\newcommand{\\zpart}{\\mathcal{Z}}        % 巨正则配分函数
 "
 
 				    ("\\section{%s}" . "\\section*{%s}")
@@ -255,16 +268,21 @@ linkcolor=black
 \\setmainfont{Libertinus Serif}
 \\setmathfont{Libertinus Math}
 \\usepackage{siunitx}
-\\usepackage{mathrsfs}
-\\usepackage{bm}
+\\usepackage[version=4]{mhchem}
 \\usepackage{tikz}
 \\usepackage{tikz-feynman}
 \\pagestyle{empty}             % do not remove
+% unicode-math 下 bm/mathrsfs 会引发 \"Extended mathchar\" 冲突，
+% 用 \\symbf 替代 \\bm，\\mathscr 由 unicode-math 原生提供
+\\providecommand{\\bm}[1]{\\symbf{#1}}
 % New commands
 \\newcommand{\\mr}[1]{\\mathrm{#1}}
 \\newcommand{\\mb}[1]{\\mathbf{#1}}
 \\newcommand{\\mc}[1]{\\mathcal{#1}}
-\\newcommand{\\ms}[1]{\\mathscr{#1}}")
+\\newcommand{\\ms}[1]{\\mathscr{#1}}
+\\renewcommand{\\d}{\\mathrm{d}}          % 微分算子（正体 d）
+\\newcommand{\\kb}{k_{\\mathrm{B}}}        % 玻尔兹曼常数
+\\newcommand{\\zpart}{\\mathcal{Z}}        % 巨正则配分函数")
 
 ;;   (setq org-latex-default-packages-alist
 ;; 	'(("" "amsmath" t ("lualatex" "xetex"))
@@ -405,8 +423,8 @@ linkcolor=black
     "Enable xenops-mode with cleanup on failure."
     (run-with-idle-timer 0.3 nil
       #'my/xenops-mode-safe--callback (current-buffer)))
-  (setq xenops-math-image-scale-factor 1.4)
-  (setq xenops-math-image-current-scale-factor 1.4)
+  (setq xenops-math-image-scale-factor 1.2)
+  (setq xenops-math-image-current-scale-factor 1.2)
   (setq xenops-math-latex-process-alist
 	'((dvisvgm :programs ("xelatex" "dvisvgm")
                    :description "xdv > svg"
@@ -415,7 +433,10 @@ linkcolor=black
                    :image-output-type "svg"
                    :image-size-adjust (1.7 . 1.5)
                    :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
-                   :image-converter ("dvisvgm %f -n -b min -c %S -o %O"))))
+                   ;; -e: 用精确字形轮廓计算边界框（默认按字体度量值，
+                   ;; 会裁掉 f/j 等斜体字符右侧伸出的笔画）；
+                   ;; -b 0.5: 精确边界框外加 0.5pt 内边距防锯齿裁切。
+                   :image-converter ("dvisvgm %f -n -e -b 0.5 -c %S -o %O"))))
 
   (defun grant/xenops-display-math-p (element)
     "Return non-nil when ELEMENT uses display-math delimiters.

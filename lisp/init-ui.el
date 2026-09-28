@@ -209,7 +209,22 @@
   (set-face-attribute 'variable-pitch nil :family "Literata")
   ;; (set-face-attribute 'variable-pitch nil :family "LXGW WenKai Mono")
   ;; (set-face-attribute 'variable-pitch nil :family "STKaiti")
-  (set-face-attribute 'fixed-pitch nil :family "FantasqueSansM Nerd Font Mono"))
+  (set-face-attribute 'fixed-pitch nil :family "FantasqueSansM Nerd Font Mono")
+  ;; org-level-N 默认继承 outline-N -> font-lock-*-face，mixed-pitch 会把
+  ;; font-lock-* 固定为 fixed-pitch（等宽），导致标题变成 Fantasque。
+  ;; 用列表继承：variable-pitch 在前提供 Literata（family 属性优先取前者），
+  ;; outline-N 在后保留主题（ef-frost）的标题颜色与字重。
+  ;; 注意：不能单独 :inherit 'variable-pitch，那样会切断颜色继承链。
+  (dolist (pair '((org-level-1 . outline-1)
+                  (org-level-2 . outline-2)
+                  (org-level-3 . outline-3)
+                  (org-level-4 . outline-4)
+                  (org-level-5 . outline-5)
+                  (org-level-6 . outline-6)
+                  (org-level-7 . outline-7)
+                  (org-level-8 . outline-8)))
+    (set-face-attribute (car pair) nil :inherit (list 'variable-pitch (cdr pair))))
+  (set-face-attribute 'org-document-title nil :inherit '(variable-pitch)))
 
 
 ;; (set-face-attribute 'variable-pitch nil :family "Literata")
