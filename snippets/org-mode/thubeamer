@@ -2,23 +2,47 @@
 # name: thubeamer
 # key: thubeamer
 # --
-#+LANGUAGE: cn
-#+OPTIONS: H:2 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS: H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
 #+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
-#+startup: beamer
 #+LATEX_CLASS: beamer
-#+LATEX_HEADER: \usetheme{thubeamer}
-#+LATEX_HEADER: \useoutertheme{default}
+#+bibliography: ~/Nutstore Files/zotero/Papers.bib
+#+cite_export: biblatex
+#+BEAMER_HEADER: \setbeamertemplate{bibliography item}[text]   % reference list
+#+LATEX_HEADER: \PassOptionsToPackage{autocite=footnote}{biblatex}
+#+LATEX_HEADER: \AtBeginDocument{\DeclareCiteCommand{\idfootcite}[\mkbibfootnote]{\usebibmacro{prenote}}{\iffieldundef{doi}{\iffieldundef{eprint}{\iffieldundef{url}{}{\printfield{url}}}{arXiv:\printfield{eprint}}}{\printfield{doi}}}{\multicitedelim}{\usebibmacro{postnote}}\let\autocite\idfootcite}
+#+LATEX_HEADER: \AtBeginDocument{\AtEveryBibitem{\clearfield{url}\clearfield{urldate}\clearfield{urlyear}\clearfield{urlmonth}\clearfield{urlday}}\renewbibmacro*{url+urldate}{}}
+#+LATEX_HEADER: \usepackage{etoolbox}
+#+LATEX_HEADER: \usepackage{pgfopts}
+#+LATEX_HEADER: \usecolortheme{thu}
+#+LATEX_HEADER: \useoutertheme{infolines} % infoline
 #+LATEX_HEADER: \useinnertheme{default}
-#+LATEX_HEADER: \usecolortheme{default}
 #+LATEX_HEADER: \setbeamertemplate{blocks}[rounded][shadow=false]
-#+LATEX_HEADER: \setbeamertemplate{items}[ball]
+#+LATEX_HEADER: \setbeamertemplate{items}[circle] % circle item symbol
 #+LATEX_HEADER: \setbeamertemplate{sections/subsections in toc}[ball]
-#+BEAMER_HEADER: \setbeamertemplate{footline}[frame number]
-#+BEAMER_HEADER: \setbeamertemplate{bibliography item}[text]
-#+LATEX_HEADER: \AtBeginSection[]{\begin{frame}\frametitle{目录}\tableofcontents[currentsection]\end{frame}}
+#+LATEX_HEADER: \setbeamertemplate{headline}[default] % no infoline headline
+#+LATEX_HEADER: \setbeamertemplate{frame numbering}[none]
+#+LATEX_HEADER: \usetikzlibrary{arrows.meta, positioning, angles, quotes}
+#+TITLE: $1
+#+BEAMER_HEADER: \AtBeginDocument{\title[$2]{$1}}
+#+AUTHOR: $3
+#+DATE: $4
+#+BEAMER_HEADER: \institute[DEP, THU]{Department of Engineering Physics, Tsinghua University \\ Center for High Energy Physics, Tsinghua University \and \href{mailto:zhu-yt24@mails.tsinghua.edu.cn}{\texttt{zhu-yt24@mails.tsinghua.edu.cn}}}
+* $0
 
-#+TITLE:
-#+SUBTITLE:
-#+AUTHOR:
-#+DATE: \small
+
+* References :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+** Ref
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+#+print_bibliography: :heading none
+
+* Backup :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+** backup
