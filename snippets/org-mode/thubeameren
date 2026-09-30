@@ -1,0 +1,110 @@
+# -*- mode: snippet -*-
+# name: thubeameren
+# key: thubeameren
+# --
+#+OPTIONS: H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+LATEX_COMPILER: lualatex
+#+cite_export: biblatex
+#+BEAMER_HEADER: \setbeamertemplate{bibliography item}[text]   % reference list
+#+LATEX_HEADER: \PassOptionsToPackage{autocite=footnote}{biblatex}
+#+LATEX_HEADER: \AtBeginDocument{\DeclareCiteCommand{\idfootcite}[\mkbibfootnote]{\usebibmacro{prenote}}{\iffieldundef{doi}{\iffieldundef{eprint}{\iffieldundef{url}{}{\printfield{url}}}{arXiv:\printfield{eprint}}}{\printfield{doi}}}{\multicitedelim}{\usebibmacro{postnote}}\let\autocite\idfootcite}
+#+LATEX_HEADER: \AtBeginDocument{\AtEveryBibitem{\clearfield{url}\clearfield{urldate}\clearfield{urlyear}\clearfield{urlmonth}\clearfield{urlday}}\renewbibmacro*{url+urldate}{}}
+#+LATEX_CLASS: beamer-en
+#+LATEX_HEADER: \usepackage{appendixnumberbeamer}
+#+LATEX_HEADER: \usecolortheme{thu}
+#+LATEX_HEADER: \useoutertheme{infolines}
+#+LATEX_HEADER: \useinnertheme{default}
+#+LATEX_HEADER: \setbeamertemplate{blocks}[rounded][shadow=false]
+#+LATEX_HEADER: \setbeamertemplate{items}[circle]
+#+LATEX_HEADER: \setbeamertemplate{sections/subsections in toc}[sections numbered]
+#+LATEX_HEADER: \setbeamertemplate{headline}[default]
+#+LATEX_HEADER: \usetikzlibrary{arrows.meta, positioning, angles, quotes}
+#+BEAMER_HEADER: \addtobeamertemplate{title page}{}{\begin{tikzpicture}[remember picture,overlay]\node[anchor=north east, xshift=-0.3cm, yshift=-0.3cm] at (current page.north east){\includegraphics[height=1.2cm]{thu-fig-logo.pdf}\hspace{0.3cm}};\end{tikzpicture}}
+#+LATEX_HEADER: %\setbeameroption{show notes on second screen}
+#+BEAMER_HEADER: %\addtobeamertemplate{title page}{}{%
+#+BEAMER_HEADER: %\begin{tikzpicture}[remember picture,overlay]
+#+BEAMER_HEADER: %\node[anchor=north east, xshift=-0.3cm, yshift=-0.3cm] at (current page.north east)
+#+BEAMER_HEADER: %{\includegraphics[height=1.2cm]{thu-fig-logo.pdf}\hspace{0.3cm}};
+#+BEAMER_HEADER: %\node[anchor=south west, xshift=0.3cm, yshift=0.3cm, font=\footnotesize, text=black!50] at (current page.south west)
+#+BEAMER_HEADER: %{\href{https://arxiv.org/abs/2507.01675}{\textcolor{black!50}{\texttt{arXiv:2507.01675}}}};
+#+BEAMER_HEADER: %\end{tikzpicture}}
+
+#+title: $1
+#+subtitle: $2
+#+BEAMER_HEADER: %\AtBeginDocument{\title[$3]{$1}}
+#+author: $4
+#+data: \today
+#+BEAMER_HEADER: \institute[DEP, THU]{Department of Engineering Physics, Tsinghua University}
+* $0
+
+* Thank you :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+\appendix
+**
+:PROPERTIES:
+:BEAMER_opt: plain
+:END:
+#+begin_export latex
+\begin{tikzpicture}[remember picture,overlay]
+
+  % Background
+  \fill[ts-light!28]
+    (current page.south west)
+    rectangle
+    (current page.north east);
+
+  % Decorative circle
+  \fill[tsinghua!7]
+    ([xshift=1.2cm,yshift=-0.8cm]current page.north east)
+    circle (3.4cm);
+
+  % Small accent line
+  \fill[tsinghua]
+    ([xshift=-5.0cm,yshift=1.55cm]current page.center)
+    rectangle ++(1.15cm,0.08cm);
+
+  % Main title
+  \node[
+    anchor=west,
+    text=tsinghua,
+    font=\bfseries\fontsize{34}{40}\selectfont
+  ] at ([xshift=-5.0cm,yshift=0.75cm]current page.center)
+  {Thank you};
+
+  % Subtitle
+  \node[
+    anchor=west,
+    text=tsinghua!75!black,
+    font=\fontsize{18}{22}\selectfont
+  ] at ([xshift=-5.0cm,yshift=-0.25cm]current page.center)
+  {Questions and discussion};
+
+  % Footer information
+  \node[
+    anchor=south west,
+    align=left,
+    text=black!55,
+    font=\fontsize{8.5}{11}\selectfont
+  ] at ([xshift=0.8cm,yshift=0.55cm]current page.south west)
+  {Yutao Zhu \quad|\quad \href{mailto:zhu-yt24@mails.tsinghua.edu.cn}{\texttt{zhu-yt24@mails.tsinghua.edu.cn}}};
+
+\end{tikzpicture}
+#+end_export
+* References :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+** Ref
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+#+print_bibliography: :heading none
+* Backup :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+** Backup

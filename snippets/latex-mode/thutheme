@@ -1,0 +1,65 @@
+# -*- mode: snippet -*-
+# name: thutheme
+# key: thutheme
+# --
+\mode<presentation>
+
+% ---- Tsinghua Purple Color Palette ----
+\definecolor{tsinghua}{HTML}{722890}   % 主色：清华紫
+\definecolor{ts-deep}{HTML}{4A1761}    % 强调深紫
+\definecolor{ts-light}{HTML}{D3B1DC}   % 浅紫辅助
+\definecolor{ts-alert}{HTML}{E0702F}   % alert 用暖橙
+
+% ---- Title & Author Section ----
+\setbeamercolor{title}{fg=tsinghua}
+\setbeamercolor{title separator}{fg=tsinghua}
+\setbeamercolor{author}{fg=ts-deep}
+\setbeamercolor{institute}{fg=ts-deep}
+\setbeamercolor{date}{fg=ts-deep}
+
+% ---- Header Palettes ----
+% \setbeamercolor*{palette primary}{fg=white,bg=tsinghua}
+% % \setbeamercolor*{palette secondary}{fg=white,bg=ts-deep}
+% \setbeamercolor*{palette tertiary}{fg=tsinghua,bg=ts-light}
+\setbeamercolor*{palette primary}{fg=white, bg=tsinghua}
+\setbeamercolor*{palette secondary}{fg=tsinghua, bg=ts-light!70!white}
+\setbeamercolor*{palette tertiary}{fg=white, bg=ts-deep!70!white}
+
+
+% ---- Blocks ----
+\setbeamercolor{alerted text}{fg=ts-alert}
+\setbeamercolor*{block title}{bg=tsinghua!25!white, fg=black}
+\setbeamercolor*{block body}{bg=ts-light!30!white}
+
+% ---- Alert block ----
+\setbeamercolor{block title alerted}{bg=ts-alert!30!white, fg=black}
+\setbeamercolor{block body alerted}{bg=ts-alert!10!white}
+
+% ---- Example block ----
+\setbeamercolor{block title example}{bg=ts-deep!30!white, fg=black}
+\setbeamercolor{block body example}{bg=ts-deep!10!white}
+
+\mode<all>
+
+% \mode<presentation>
+
+% \definecolor{pri}{HTML}{0F4C75}
+% \definecolor{sec}{HTML}{3282B8}
+% \definecolor{ter}{HTML}{BBE1FA}
+% \definecolor{ale}{HTML}{FF7E67}
+
+% \setbeamercolor{title}{fg=pri}
+% \setbeamercolor{title separator}{ fg=pri }
+% \setbeamercolor{author}{fg=sec}
+% \setbeamercolor{institute}{fg=sec}
+% \setbeamercolor{date}{fg=sec}
+
+% \setbeamercolor*{palette primary}{fg=white,bg=pri}
+% \setbeamercolor*{palette secondary}{fg=white,bg=sec}
+% \setbeamercolor*{palette tertiary}{fg=pri,bg=ter}
+
+% \setbeamercolor{alerted text}{fg=ale}
+% \setbeamercolor*{block title}{bg=pri!30!white}
+
+% \mode
+% <all>

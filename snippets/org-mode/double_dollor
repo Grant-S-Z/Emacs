@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: Double Dollar
+# key: $$
+# --
+$$
+$0
+$$

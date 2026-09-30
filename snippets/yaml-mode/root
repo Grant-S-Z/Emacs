@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: root
+# key: root
+# --
+If:
+  PathMatch: '.*\.(C|c|cc|cpp|h|hh)$'
+CompileFlags:
+  Add:
+    - "-std=c++17"
+    - "-xc++"
+    - "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
+    - "-I/Users/grant/miniconda3/include"
+    - "-I/Users/grant/miniconda3/include/geant4"
+    - "-I/Users/grant/JSAP-install/Reconstruction/src"
+    - "-I/Users/grant/JSAP-install/Simulation/DataType/include"
+    - "-I/Users/grant/JSAP-install/Utils"

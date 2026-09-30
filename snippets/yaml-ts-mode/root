@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: root
+# key: root
+# --
+If:
+  PathMatch: ".*\.(C)$"  # 应用于 ROOT 文件，可根据实际情况调整
+  CompileFlags:
+    Add: [
+    "-std=c++17",
+    "-I/Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk/usr/include",
+    "-I/Users/grant/miniconda3/include",
+    "-I/Users/grant/miniconda3/include/geant4",
+    "-I/Users/grant/JSAP-install/Reconstruction/src",
+    "-I/Users/grant/JSAP-install/Simulation/DataType/include",
+    "-I/Users/grant/JSAP-install/Utils",
+    ]

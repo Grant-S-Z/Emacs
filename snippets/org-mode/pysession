@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: pysession
+# key: pys_
+# --
+#+begin_src python :session ${1:session01}
+$0
+#+end_src

@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: LR
+# key: LR
+# --
+*** L :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+*** R :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
