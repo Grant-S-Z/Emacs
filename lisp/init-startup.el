@@ -43,7 +43,7 @@
   ;; (setq mac-mouse-wheel-smooth-scroll t) ;; mac pixel scroll
   ;; (setq mac-mouse-wheel-mode t)
   ;; (setq mac-redisplay-dont-reset-vscroll t)
-  (setq mac-option-modifier nil
+  (setq mac-option-modifier nil		;; for emacs-plus
 	mac-command-modifier 'meta))
 
 ;;; Load the contents of load-file into custom.el

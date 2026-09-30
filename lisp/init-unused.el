@@ -1427,3 +1427,118 @@ Show the heading too, if it is currently invisible."
 (add-hook 'after-make-frame-functions #'grant/neomacs-fix-frame-chrome)
 
 (provide 'init-neomacs)
+
+;; Chinese calendar
+;; (use-package cal-china-x
+;;   :config
+;;   (setq calendar-chinese-all-holidays-flag t)
+;;   (setq calendar-mark-holidays-flag t)
+;;   (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
+;;   (setq holiday-local-holidays
+;; 	'((holiday-lunar 1 10 "Father's birthday" 0)
+;; 	  (holiday-lunar 2 20 "Mother's birthday" 0)))
+;;   (setq calendar-holidays
+;; 	(append cal-china-x-important-holidays
+;; 		holiday-general-holidays
+;; 		holiday-local-holidays)))
+;; (use-package calendar
+;;   :after cal-china-x)
+
+;; ;; Rss
+;; (use-package elfeed
+;;   :config
+;;   (setq elfeed-feeds
+;; 	'(("https://arxiv.org/rss/hep-ex" study physics)
+;; 	  ;; ("https://arxiv.org/rss/hep-ph" study physics)
+;; 	  ;; ("https://arxiv.org/rss/hep-th" study physics)
+;; 	  ("https://root-forum.cern.ch/posts.rss" root)
+;; 	  ("https://sachachua.com/blog/category/emacs-news/feed/" news emacs)
+;; 	  ("https://emacs-china.org/posts.rss" emacs)
+;; 	  ("https://news.ycombinator.com/rss" tech news)
+;; 	  ("https://v2ex.com/index.xml" tech news)
+;; 	  ))
+;;   (setq elfeed-show-mode-hook
+;; 	(lambda ()
+;; 	  (set-face-attribute 'variable-pitch (selected-frame) :font (font-spec :family "Iosevka" :size 18))
+;; 	  (setq fill-column 100)))
+;;   )
+
+;; (use-package elfeed-summary
+;;   :bind ("C-c e" . elfeed-summary)
+;;   :config
+;;   (setq elfeed-summary-other-window t)
+;;   (setq elfeed-summary-settings
+;; 	'((group (:title . "Physics")
+;; 		 (:elements
+;; 		  (query . (study physics))))
+;; 	  (group (:title . "ROOT")
+;; 		 (:elements
+;; 		  (query . (root))))
+;; 	  (group (:title . "Emacs")
+;; 		 (:elements
+;; 		  (query . (and emacs (not '(news org))))
+;; 		  (group (:title . "News")
+;; 			 (:elements
+;; 			  (query . (and news emacs))))))
+;; 	  (group (:title . "News")
+;; 		 (:elements
+;; 		  (query . (and news (not '(tech eco emacs))))
+;; 		  (group (:title . "Tech")
+;; 			 (:elements
+;; 			  (query . (and tech news))))))
+;; 	  )))
+
+
+(use-package eca
+  :vc (:url "https://github.com/editor-code-assistant/eca-emacs" :rev :newest)
+  :config
+  (defun my/eca-chat-flyspell-setup ()
+    "Enable Flyspell during typing and disable on submit in `eca-chat-mode`."
+    (when (derived-mode-p 'eca-chat-mode)
+      ;; Disable Flyspell when submitting prompts
+      (add-hook 'pre-command-hook
+		(lambda ()
+                  (when (and (memq this-command '(eca-chat--key-pressed-return
+                                                  eca-chat-send-prompt-at-chat))
+                             flyspell-mode)
+                    (flyspell-mode -1)))
+		nil t)
+      ;; Re-enable Flyspell when typing
+      (add-hook 'pre-command-hook
+		(lambda ()
+                  (when (and (eq this-command 'self-insert-command)
+                             (not flyspell-mode))
+                    (flyspell-mode 1)))
+		nil t)))
+  (add-hook 'eca-chat-mode-hook #'my/eca-chat-flyspell-setup))
+
+;; ;; Zotero path
+;; (setq zot_bib "~/Nutstore Files/zotero/Papers.bib" ;; zotero reference bib
+;;       zot_pdf "~/Nutstore Files/zotero/" ;; zotero zotfile dir
+;;       )
+
+;; ;; Helm-bibtex to read Zotero information
+;; (use-package helm-bibtex
+;;   :bind (("C-c h" . helm-bibtex))
+;;   :custom
+;;   (bibtex-completion-bibliography zot_bib)
+;;   (bibtex-completion-library-path zot_pdf))
+
+;; ;; Org-roam-bibtex combined with helm-bibtex
+;; (use-package org-roam-bibtex
+;;   :hook (org-roam-mode . org-roam-bibtex-mode)
+;;   :bind ("C-c n a" . orb-note-action)
+;;   :custom
+;;   (orb-insert-interface 'helm-bibtex)
+;;   (orb-insert-link-description 'citekey)
+;;   (orb-preformat-keywords
+;;    '("citekey" "title" "author-or-editor" "keywords" "file"))
+;;   (orb-process-file-keyword t)
+;;   (orb-attached-file-extensions '("pdf")))
+
+;; ;; Org-ref
+;; (use-package org-ref
+;;   :after org
+;;   :demand t ;; ensure that it loads so that links work immediately
+;;   :bind (("C-c (" . org-ref-insert-link))
+;;   )

@@ -237,29 +237,7 @@ linkcolor=black
                    :image-converter ("dvisvgm %f -n -b min -c %S -o %O"))))
   )
 
-;;   ;; (setq org-preview-latex-process-alist
-;;   ;; 	'((dvisvgm :programs ("lualatex" "dvisvgm") :description "pdf > svg"
-;;   ;; 		   :message
-;;   ;; 		   "you need to install the programs: lualatex and dvisvgm."
-;;   ;; 		   :image-input-type "pdf" :image-output-type "svg"
-;;   ;; 		   :image-size-adjust (1.7 . 1.5) :latex-compiler
-;;   ;; 		   ("lualatex -interaction nonstopmode -output-directory %o %f")
-;;   ;; 		   :image-converter
-;;   ;; 		   ("dvisvgm %f --pdf --no-fonts --exact-bbox --scale=%S --output=%O"))))
-
-;;   ;; (setq org-preview-latex-process-alist
-;;   ;; 	'((dvisvgm :programs ("latex" "dvisvgm") :description "dvi > svg"
-;;   ;; 		   :message
-;;   ;; 		   "you need to install the programs: latex and dvisvgm."
-;;   ;; 		   :image-input-type "dvi" :image-output-type "svg"
-;;   ;; 		   :image-size-adjust (1.7 . 1.5) :latex-compiler
-;;   ;; 		   ("latex -interaction nonstopmode -output-directory %o %f")
-;;   ;; 		   :image-converter
-;;   ;; 		   ("dvisvgm %f --no-fonts --exact-bbox --scale=%S --output=%O"))))
-
 ;; Header
-;; \\usepackage{newtxtext,newtxmath}
-;; \\setmainfont{STIX Two Text} \\setmathfont{STIX Two Math}
 (setq org-format-latex-header "\\documentclass[preview]{standalone}
 \\usepackage[usenames]{color}
 \\usepackage{amsmath}
@@ -515,6 +493,11 @@ so inspect the source delimiters instead of relying only on its type."
   (add-to-list 'org-capture-templates
 	       '("j" "Journal" entry (file "~/org/journal.org")
 		 "* %U - Journal\n  %?"))
+  (add-to-list 'org-capture-templates
+	       '("w" "Word (org-drill)" entry
+		 (file+headline "~/org/vocabulary.org" "New Words")
+		 ;; 标题保持中性：org-drill 复习时标题始终可见，放单词会剧透
+		 "* Word :drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: twosided\n:END:\n\n** English\n%^{Word}\n\n** 中文释义\n%^{中文释义}\n\n** 例句\n%?\n"))
   (add-to-list 'org-capture-templates
 	       '("e" "Event" entry (file "~/org/event.org")
 		 "* TODO %^{Eventname}\n  %?"))

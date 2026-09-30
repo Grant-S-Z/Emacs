@@ -72,12 +72,11 @@
   :init
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
-        completion-category-overrides '((file (styles basic partial-completion)))))
+        completion-category-overrides '((file (styles basic partial-completion))))
+  )
 
 (use-package marginalia
   :init (marginalia-mode 1))
-
-;;; Side tree: treemacs 已移除，用 dirvish-side（见下方 Dired 一节，C-c l）
 
 ;;; Useful highlights and colors
 (use-package paren
@@ -85,7 +84,8 @@
   (setq show-paren-when-point-inside-paren t
         show-paren-when-point-in-periphery t
         show-paren-context-when-offscreen t
-        show-paren-delay 0.1))
+        show-paren-delay 0.1)
+  )
 
 (use-package rainbow-delimiters ;; color of delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -96,7 +96,8 @@
   (setq hl-line-sticky-flag nil)
   ;; Highlight starts from EOL, to avoid conflicts with other overlays
   (setq hl-line-range-function (lambda () (cons (line-end-position)
-						(line-beginning-position 2)))))
+						(line-beginning-position 2))))
+  )
 
 (use-package indent-bars ;; indent lines
   :init
@@ -145,57 +146,6 @@
   )
 
 ;;; Themes
-;; (load-theme 'modus-operandi-deuteranopia)
-
-;; (use-package doric-themes
-;;   :init
-;;   (load-theme 'doric-light))
-
-;; (use-package catppuccin-theme
-;;   :init
-;;   (load-theme 'catppuccin :no-confirm)
-;;   :config
-;;   (setq catppuccin-flavor 'mocha) ;; frappe, latte, macchiato, mocha
-;;   (catppuccin-reload))
-
-;; (use-package night-owl-theme
-;;   :init
-;;   (load-theme 'night-owl :no-confirm))
-
-;; ;; (set-face-attribute 'variable-pitch nil :family "Bookerly")
-;; (set-face-attribute 'variable-pitch nil :family "Literata")
-;; (set-face-attribute 'fixed-pitch nil :family "FantasqueSansM Nerd Font Mono")
-;; (setq modus-themes-headings
-;;       '((0 . (variable-pitch 1.3 bold))
-;; 	(1 . (variable-pitch 1.15 semibold))
-;;         (2 . (variable-pitch 1.1 semibold))
-;;         (3 . (variable-pitch 1.05))
-;;         (t . (variable-pitch))))
-
-;; (custom-theme-set-faces 'user
-;; 			'(Info-quoted ((t (:inherit fixed-pitch))))
-;; 			;; '(org-block ((t (:inherit fixed-pitch))))
-;; 			;; '(org-code ((t (:inherit (shadow fixed-pitch)))))
-;; 			'(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-;; 			'(org-indent ((t (:inherit (org-hide fixed-pitch)))))
-;; 			'(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-;; 			'(org-property-value ((t (:inherit fixed-pitch))))
-;; 			'(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-;; 			'(org-table ((t (:inherit fixed-pitch))))
-;; 			'(org-link ((t (:inherit fixed-pitch link) :underline t)))
-;; 			'(org-cite ((t (:inherit shadow))))
-;; 			'(org-cite-key ((t (:inherit fixed-pitch link) :underline t)))
-;; 			'(org-tag ((t (:inherit (shadow fixed-pitch) :height 1.0))))
-;; 			'(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
-;; 			'(org-bold ((t (:inherit variable-pitch :weight bold))))
-;; 			'(org-italic ((t (:inherit variable-pitch :slant italic))))
-;; 			;; '(org-level-1 ((t (:inherit variable-pitch :weight bold))))
-;; 			;; '(org-level-2 ((t (:inherit variable-pitch :weight bold))))
-;; 			;; '(org-level-3 ((t (:inherit variable-pitch :weight bold))))
-;; 			;; '(org-level-4 ((t (:inherit variable-pitch :weight bold))))
-;; 			;; '(org-level-3 ((t (:inherit variable-pitch :weight bold :foreground "cyan4")))) ; SkyBlue, violet, cyan1 2 3, ...
-;; 			)
-
 ;; Use a "mixed" setup: proportional body, monospace code blocks.
 ;; `mixed-pitch-mode` cooperates better with org-src overlays than
 ;; enabling `variable-pitch-mode` directly.
@@ -244,35 +194,6 @@
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/moe-theme.el")
 ;; (require 'moe-theme)
 ;; (load-theme 'moe-light t)
-
-;; (use-package mixed-pitch
-;;   :hook ((org-mode . mixed-pitch-mode)
-;; 	 (text-mode . mixed-pitch-mode))
-;;   :config
-;;   (set-face-attribute 'variable-pitch nil :family "Bookerly")
-;;   (set-face-attribute 'fixed-pitch nil :family "FantasqueSansM Nerd Font Mono")
-;;   ;; (dolist (charset '(han cjk-misc bopomofo kana symbol))
-;;   ;;   (set-fontset-font t charset
-;;   ;;                     (font-spec :family "LXGW WenKai Mono"
-;;   ;;                                :size (face-attribute 'default :height))))
-
-;;   ;; (setq fixed-pitch "FantasqueSansM Nerd Font Mono") ;; this should change by cnfonts.
-;;   (custom-theme-set-faces 'user
-;; 			  '(Info-quoted ((t (:inherit fixed-pitch))))
-;; 			  '(org-block ((t (:inherit fixed-pitch))))
-;; 			  '(org-code ((t (:inherit (shadow fixed-pitch)))))
-;; 			  '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-;; 			  '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
-;; 			  '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-;; 			  '(org-property-value ((t (:inherit fixed-pitch))) t)
-;; 			  '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
-;; 			  )
-;;   )
-
-;; (add-hook 'org-mode-hook
-;;           (lambda ()
-;;             (setq-local line-spacing 0.1)))
-
 
 (use-package writeroom-mode ;;; center texts
   :hook (org-mode . writeroom-mode)
