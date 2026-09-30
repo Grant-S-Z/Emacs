@@ -54,35 +54,6 @@
 			     (setq truncate-lines nil)
 			     (org-cdlatex-mode)))
 
-  ;; (add-to-list 'org-structure-template-alist
-  ;;              '("th" . "theorem"))
-  ;; (add-to-list 'org-structure-template-alist
-  ;;              '("lm" . "lemma"))
-  ;; (add-to-list 'org-structure-template-alist
-  ;;              '("pf" . "proof"))
-
-  ;; (defface grant/org-theorem
-  ;;   '((t (:inherit org-block
-  ;; 		   :background "#1e1e1e"
-  ;; 		   :extend t)))
-  ;;   "Face for theorem blocks")
-
-  ;; (font-lock-add-keywords
-  ;;  'org-mode
-  ;;  '(("^#\\+begin_theorem" . 'grant/org-theorem)
-  ;;    ("^#\\+end_theorem"   . 'grant/org-theorem)))
-
-  ;; (defun grant/org-block-left-bar (limit)
-  ;;   (when (re-search-forward "^#\\+begin_theorem" limit t)
-  ;;     (let ((ov (make-overlay (line-beginning-position)
-  ;;                             (line-end-position))))
-  ;; 	(overlay-put ov 'before-string
-  ;;                    (propertize "│ " 'face 'shadow)))))
-
-  ;; (add-hook 'org-mode-hook
-  ;;           (lambda ()
-  ;;             (jit-lock-register #'grant/org-block-left-bar)))
-
   :custom
   ;; Prettify
   (org-pretty-entities t) ;; pretty entities in org
@@ -109,6 +80,34 @@
                                  2400)
                                 "......"
                                 "-----------------------------------------------------"))))
+
+;;; Org drill (spaced repetition flashcards)
+(use-package org-drill
+  :after org
+  :commands (org-drill org-drill-directory org-drill-resume org-drill-cram)
+  :bind (("C-c v d" . org-drill)
+	 ("C-c v r" . org-drill-resume)
+	 ("C-c v D" . org-drill-directory))
+  :custom
+  (org-drill-save-buffers-after-drill-sessions-p nil) ; 复习完不自动保存所有 buffer
+  (org-drill-maximum-items-per-session 30)            ; 每次最多 30 张卡
+  (org-drill-maximum-duration 20)                     ; 每次最多 20 分钟
+  (org-drill-learn-fraction 0.5)                      ; SM2 间隔缩放因子
+  (org-drill-leech-method 'warn))                     ; 总是记不住的卡给警告
+
+;;; Org-fc (间隔重复复习，索引快、支持 FSRS)
+(use-package org-fc
+  :ensure nil ;; 不在 MELPA，从 site-lisp 手动加载
+  :load-path "~/.emacs.d/site-lisp/org-fc"
+  :after org
+  :commands (org-fc-review org-fc-dashboard)
+  :bind (("C-c v f" . org-fc-review)
+	 ("C-c v F" . org-fc-review-all))
+  :custom
+  (org-fc-directories '("~/org/fc/")) ; 只索引词库目录，不扫 roam 笔记
+  :config
+  (require 'org-fc-hydra)
+  (org-fc-cache-mode 1)) ; 缓存索引，千级卡片秒开
 
 ;;; Org UI
 ;; org-modern
@@ -187,8 +186,8 @@
 
 ;; Valign for table
 (use-package valign
-  :after org
-  :hook (org-mode . valign-mode)
+  ;; :after org
+  ;; :hook (org-mode . valign-mode)
   :custom
   (valign-fancy-bar nil))
 
@@ -196,9 +195,6 @@
 (use-package org-inline-pdf
   :after org
   :hook (org-mode . org-inline-pdf-mode))
-
-;; (use-package org-sliced-images
-;;   :hook (org-mode . org-sliced-images-mode))
 
 ;;; Org notes and Literature management
 ;; Org roam
@@ -210,8 +206,7 @@
   (("C-c n f" . org-roam-node-find)
    ("C-c n i" . org-roam-node-insert)
    ("C-c n c" . org-roam-capture)
-   ("C-c n l" . org-roam-buffer-toggle) ;; 显示后链窗口
-   )
+   ("C-c n l" . org-roam-buffer-toggle))
   :config
   (org-roam-db-autosync-mode) ;; auto sync when starting
   )
@@ -279,44 +274,7 @@
                               "#+title: ${author} - ${title}\n#+filetags: :article:\n\n* Abstract\n\n%?\n\n* Notes\n")
            :unnarrowed t))))
 
-;; ;; Zotero path
-;; (setq zot_bib "~/Nutstore Files/zotero/Papers.bib" ;; zotero reference bib
-;;       zot_pdf "~/Nutstore Files/zotero/" ;; zotero zotfile dir
-;;       )
-
-;; ;; Helm-bibtex to read Zotero information
-;; (use-package helm-bibtex
-;;   :bind (("C-c h" . helm-bibtex))
-;;   :custom
-;;   (bibtex-completion-bibliography zot_bib)
-;;   (bibtex-completion-library-path zot_pdf))
-
-;; ;; Org-roam-bibtex combined with helm-bibtex
-;; (use-package org-roam-bibtex
-;;   :hook (org-roam-mode . org-roam-bibtex-mode)
-;;   :bind ("C-c n a" . orb-note-action)
-;;   :custom
-;;   (orb-insert-interface 'helm-bibtex)
-;;   (orb-insert-link-description 'citekey)
-;;   (orb-preformat-keywords
-;;    '("citekey" "title" "author-or-editor" "keywords" "file"))
-;;   (orb-process-file-keyword t)
-;;   (orb-attached-file-extensions '("pdf")))
-
-;; ;; Org-ref
-;; (use-package org-ref
-;;   :after org
-;;   :demand t ;; ensure that it loads so that links work immediately
-;;   :bind (("C-c (" . org-ref-insert-link))
-;;   )
-
 ;;; Org Present
-;; (use-package org-tree-slide
-;;   :ensure t
-;;   :config
-;;   (setq org-tree-slide-header nil)
-;;   (setq org-tree-slide-slide-in-effect t))
-
 (use-package org-tree-slide
   :after org
   :commands (+org-slide-start +org-slide-stop)
@@ -390,7 +348,7 @@
 
 ;;; Hugo
 (use-package easy-hugo
-  :bind ("C-c b" . easy-hugo)
+  :bind ("C-c h" . easy-hugo) ;; 原 C-c b 与 init-kbd.el 的 open-blog-dir 冲突，改绑 C-c h
   :config
   (setq easy-hugo-basedir "~/research/code/Grant/") ;; website root
   (setq easy-hugo-postdir "content/org/")

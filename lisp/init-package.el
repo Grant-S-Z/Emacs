@@ -2,6 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 ;;; Basic
+(which-key-mode 1) ;; which-key internally installed
+
 (use-package restart-emacs ;; restart emacs
   :bind (("C-c r" . restart-emacs)))
 
@@ -23,7 +25,8 @@
 	 ("C-S-d" . crux-duplicate-current-line-or-region)
 	 ("C-S-k" . crux-smart-kill-line)
 	 ("C-c C-k" . crux-kill-other-buffers)
-	 ("C-c C-d" . crux-delete-file-and-buffer)))
+	 ("C-c C-d" . crux-delete-file-and-buffer))
+  )
 
 (use-package yasnippet ;; snippets
   :init (yas-global-mode t)
@@ -31,9 +34,6 @@
 
 (use-package yasnippet-snippets ;; regular snippets
   :after yasnippet)
-
-;; which-key 自 Emacs 30 起内置，直接用内置版（elpa 里的旧版已移除）
-(which-key-mode 1)
 
 (use-package avy ;; goto directly
   :bind
@@ -45,22 +45,6 @@
 ;; Git
 (use-package magit
   :bind ("C-x g" . magit))
-
-;; Chinese calendar
-;; (use-package cal-china-x
-;;   :config
-;;   (setq calendar-chinese-all-holidays-flag t)
-;;   (setq calendar-mark-holidays-flag t)
-;;   (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
-;;   (setq holiday-local-holidays
-;; 	'((holiday-lunar 1 10 "Father's birthday" 0)
-;; 	  (holiday-lunar 2 20 "Mother's birthday" 0)))
-;;   (setq calendar-holidays
-;; 	(append cal-china-x-important-holidays
-;; 		holiday-general-holidays
-;; 		holiday-local-holidays)))
-;; (use-package calendar
-;;   :after cal-china-x)
 
 (use-package openwith
   :init (openwith-mode t)
@@ -98,7 +82,6 @@
   ([remap describe-variable] . #'helpful-variable))
 
 
-
 ;;; Daily packages
 ;; Calculator
 ;; (use-package literate-calc-mode
@@ -111,113 +94,14 @@
   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir)))
 
 (use-package nov)
-;; (use-package djvu
-;;   :config
-;;   (setq doc-view-resolution 600))
 
-
-;; Translator: fanyi 已移除，保留 gt（C-c g）
+;; Translator
 (use-package gt
-  :bind ("C-c g" . gt-do-translate)
+  :bind ("C-c g" . gt-translate)
   :config
   (setq gt-langs '(en zh))
   (setq gt-default-translator (gt-translator :engines (gt-youdao-dict-engine)))
   (setq gt-taker-pick 'paragraph))
-
-;; ;; Rss
-;; (use-package elfeed
-;;   :config
-;;   (setq elfeed-feeds
-;; 	'(("https://arxiv.org/rss/hep-ex" study physics)
-;; 	  ;; ("https://arxiv.org/rss/hep-ph" study physics)
-;; 	  ;; ("https://arxiv.org/rss/hep-th" study physics)
-;; 	  ("https://root-forum.cern.ch/posts.rss" root)
-;; 	  ("https://sachachua.com/blog/category/emacs-news/feed/" news emacs)
-;; 	  ("https://emacs-china.org/posts.rss" emacs)
-;; 	  ("https://news.ycombinator.com/rss" tech news)
-;; 	  ("https://v2ex.com/index.xml" tech news)
-;; 	  ))
-;;   (setq elfeed-show-mode-hook
-;; 	(lambda ()
-;; 	  (set-face-attribute 'variable-pitch (selected-frame) :font (font-spec :family "Iosevka" :size 18))
-;; 	  (setq fill-column 100)))
-;;   )
-
-;; (use-package elfeed-summary
-;;   :bind ("C-c e" . elfeed-summary)
-;;   :config
-;;   (setq elfeed-summary-other-window t)
-;;   (setq elfeed-summary-settings
-;; 	'((group (:title . "Physics")
-;; 		 (:elements
-;; 		  (query . (study physics))))
-;; 	  (group (:title . "ROOT")
-;; 		 (:elements
-;; 		  (query . (root))))
-;; 	  (group (:title . "Emacs")
-;; 		 (:elements
-;; 		  (query . (and emacs (not '(news org))))
-;; 		  (group (:title . "News")
-;; 			 (:elements
-;; 			  (query . (and news emacs))))))
-;; 	  (group (:title . "News")
-;; 		 (:elements
-;; 		  (query . (and news (not '(tech eco emacs))))
-;; 		  (group (:title . "Tech")
-;; 			 (:elements
-;; 			  (query . (and tech news))))))
-;; 	  )))
-
-;;; AI
-(when *is-mac*
-  (defun osx-get-keychain-password (account-name)
-    "Gets ACCOUNT-NAME keychain password from OS X Keychain."
-    (let ((cmd (concat "security 2>&1 >/dev/null find-generic-password -ga '" account-name "'")))
-      (let ((passwd (shell-command-to-string cmd)))
-	(when (string-match (rx "\"" (group (0+ (or (1+ (not (any "\"" "\\"))) (seq "\\" anything)))) "\"") passwd)
-	  (match-string 1 passwd)))))
-  (use-package gptel
-    :bind
-    (("C-c q" . gptel)
-     ("C-c d" . gptel-add-file)
-     ("C-c p" . gptel-add))
-    :config
-    (setq gptel-default-mode 'org-mode)
-    (setq gptel-model 'deepseek-reasoner
-	  gptel-backend (gptel-make-deepseek "deepseek-flash"
-			  :stream t
-			  :key (lambda () (osx-get-keychain-password "deepseek key"))))))
-
-
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/dsh-emacs"))
-(require 'dsh-emacs)
-
-(use-package eca
-  :vc (:url "https://github.com/editor-code-assistant/eca-emacs" :rev :newest)
-  :config
-  (defun my/eca-chat-flyspell-setup ()
-    "Enable Flyspell during typing and disable on submit in `eca-chat-mode`."
-    (when (derived-mode-p 'eca-chat-mode)
-      ;; Disable Flyspell when submitting prompts
-      (add-hook 'pre-command-hook
-		(lambda ()
-                  (when (and (memq this-command '(eca-chat--key-pressed-return
-                                                  eca-chat-send-prompt-at-chat))
-                             flyspell-mode)
-                    (flyspell-mode -1)))
-		nil t)
-      ;; Re-enable Flyspell when typing
-      (add-hook 'pre-command-hook
-		(lambda ()
-                  (when (and (eq this-command 'self-insert-command)
-                             (not flyspell-mode))
-                    (flyspell-mode 1)))
-		nil t)))
-  (add-hook 'eca-chat-mode-hook #'my/eca-chat-flyspell-setup))
-
-;;; Mine
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/word-learn/")
-;; (require 'word-learn)
 
 (provide 'init-package)
 ;;; init-package.el ends here

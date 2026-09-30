@@ -9,6 +9,7 @@
 (require 'init-elpa)
 (require 'init-ui)
 (require 'init-package)
+(require 'init-ai)
 (require 'init-mail)
 (require 'init-shell)
 (require 'init-lsp)
