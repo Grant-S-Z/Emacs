@@ -42,12 +42,22 @@
   (setq agent-shell-preferred-agent-config 'kimi)
   ;; GUI 启动的 Emacs 不继承终端 PATH，用绝对路径稳妥
   (setq agent-shell-kimi-acp-command '("/opt/homebrew/bin/kimi" "acp"))
+  (setq agent-shell-kimi-default-session-mode-id "auto")
   ;; 恢复历史会话时完整回放全部消息（走 session/load，Kimi ACP 已支持）；
   ;; 默认 'minimal 只显示会话标题、不回放历史。可选 last / first-last / full
   (setq agent-shell-session-restore-verbosity 'last)
   ;; 新建 shell 时询问：恢复历史会话还是开新会话（agent-shell 默认即为 prompt）
   ;; 用法：C-u M-x agent-shell（或 M-x agent-shell-new-shell）后挑选会话
-  (setq agent-shell-session-strategy 'prompt))
+  (setq agent-shell-session-strategy 'prompt)
+  ;; 在项目子目录启动：M-x grant/agent-shell-here
+  ;; 默认填当前 buffer 目录，回车即用；不解析项目根，不影响全局 cwd 探测
+  (defun grant/agent-shell-here (dir)
+    "在 DIR 启动 agent-shell，不解析项目根。
+交互时默认使用当前 buffer 所在目录，可修改。"
+    (interactive
+     (list (read-directory-name "agent-shell 工作目录: " default-directory)))
+    (let ((agent-shell-cwd-function (lambda () dir)))
+      (agent-shell))))
 
 ;;; agent-shell-math-renderer: 把 agent 回复中的 LaTeX 公式渲染成 SVG（MELPA）
 ;; 依赖本机 latex + dvisvgm（TeX Live / MacTeX 自带）；公式原文仍保留在 buffer 中
@@ -63,6 +73,10 @@
             #'agent-shell-math-renderer-on-appearance-change)
   (setq agent-shell-math-renderer-rescale-inline 1.2)
   (setq agent-shell-math-renderer-rescale-display 1.2)
+  ;; 公式里允许中文：引擎走 latex (DVI) 路线，ctex 在 macOS 默认的
+  ;; macold fontset 在 pdftex 下不可用，必须指定 fandol（TeX Live 自带）
+  (setq latex-to-svg-backend-appended-preamble
+        "\\usepackage[UTF8,fontset=fandol]{ctex}")
   )
 
 (provide 'init-ai)

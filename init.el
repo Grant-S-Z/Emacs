@@ -3,7 +3,6 @@
 ;;; Code:
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
-(require 'early-init)
 (require 'init-const)
 (require 'init-startup)
 (require 'init-elpa)
@@ -15,7 +14,10 @@
 (require 'init-lsp)
 (require 'init-tex)
 (require 'init-org)
-(require 'init-orgmodule)
+(require 'init-org-latex)
+(require 'init-org-ui)
+(require 'init-org-research)
+(require 'init-org-publish)
 (require 'init-fun)
 (require 'init-kbd)
 

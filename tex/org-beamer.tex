@@ -1,0 +1,36 @@
+
+\documentclass[aspectratio=169,10pt,fontset=none]{ctexbeamer}
+\usetheme[block=fill, progressbar=frametitle]{metropolis}
+% fonts
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setsansfont{Times New Roman}
+\setmonofont{Fantasque Sans Mono}
+\setCJKmainfont{SimSun}
+\setCJKsansfont{KaiTi}
+\setCJKmonofont{LXGW WenKai Mono}
+
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{esint}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage[version=4]{mhchem}
+% usepackage{minted}
+% setminted{frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\small}
+
+\usepackage{tikz}
+
+\usepackage{slashed}
+\usepackage{cancel}
+
+\usepackage{unicode-math}
+\setmathfont{STIX Two Math}
+% keep unicode-math symbols out of PDF bookmarks (hyperref)
+\AtBeginDocument{\pdfstringdefDisableCommands{%
+\def\nu{ν}\def\mu{μ}\def\tau{τ}\def\beta{β}\def\theta{θ}%
+\def\Gamma{Γ}\def\Phi{Φ}\def\Omega{Ω}\def\ce#1{#1}}}
+% commands
+%%ORG-MATH-MACROS%%

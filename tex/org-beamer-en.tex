@@ -1,0 +1,31 @@
+
+\documentclass[aspectratio=1610, 10pt]{beamer}
+\usetheme[block=fill, progressbar=frametitle]{metropolis}
+% fonts
+\usepackage{fontspec}
+\setmainfont{STIX Two Text}
+\setsansfont{STIX Two Text}
+\setmonofont{Fantasque Sans Mono}
+
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage[version=4]{mhchem}
+
+\usepackage{tikz}
+
+\usepackage{slashed}
+\usepackage{cancel}
+
+\usepackage{unicode-math}
+\setmathfont{STIX Two Math}
+% keep unicode-math symbols out of PDF bookmarks (hyperref)
+\AtBeginDocument{\pdfstringdefDisableCommands{%
+\def\nu{ν}\def\mu{μ}\def\tau{τ}\def\beta{β}\def\theta{θ}%
+\def\Gamma{Γ}\def\Phi{Φ}\def\Omega{Ω}\def\ce#1{#1}}}
+% commands
+%%ORG-MATH-MACROS%%

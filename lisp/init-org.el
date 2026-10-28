@@ -1,17 +1,84 @@
-;;; init-org.el --- for org  -*- lexical-binding: t; -*-
+;;; init-org.el --- Org core, Babel, agenda and capture  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
-;;; Org
+
+;;; Org-specific functions
+(defun org-insert-image ()
+  "Insert a image from clipboard."
+  (interactive)
+  (let* ((path (concat default-directory "./img/"))
+	 ;; Remove the file extension from the buffer name
+	 (base-name (file-name-sans-extension (buffer-name)))
+	 (image-file (concat
+		      path
+		      base-name
+		      (format-time-string "_%Y%m%d%H%M%S.png"))))
+    (if (not (file-exists-p path))
+	(mkdir path))
+    (do-applescript (concat
+		     "set the_path to \"" image-file "\" \n"
+		     "set png_data to the clipboard as «class PNGf» \n"
+		     "set the_file to open for access (POSIX file the_path as string) with write permission \n"
+		     "write png_data to the_file \n"
+		     "close access the_file"))
+    (org-insert-link nil
+		     (concat
+		      "file:" image-file)
+		     "")
+    (message "%s" image-file)))
+
+;;; LaTeX delimiter completion
+(defun grant/org-electric-latex-pairs ()
+  "Auto-close inline and display LaTeX math delimiters in Org buffers."
+  (setq-local electric-pair-pairs
+              (append
+               `((,(regexp-quote "\\(") . "\\)")
+                 (,(regexp-quote "\\[") . "\\]"))
+               electric-pair-pairs))
+  (electric-pair-local-mode 1))
+(add-hook 'org-mode-hook #'grant/org-electric-latex-pairs)
+
+;; (defun grant/org-return-between-display-math (orig &optional indent)
+;;   "Open an empty display-math pair, or call ORIG with INDENT."
+;;   (interactive "P")
+;;   (if (and (>= (- (point) (point-min)) 2)
+;;            (string= (buffer-substring-no-properties (- (point) 2) (point)) "\\[")
+;;            (looking-at-p (regexp-quote "\\]")))
+;;       (progn
+;;         (newline)
+;;         (save-excursion (newline)))
+;;     (funcall orig indent)))
+;; (with-eval-after-load 'org
+;;   (advice-add 'org-return :around #'grant/org-return-between-display-math))
+
+;;; Org global keys
+(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c w") 'open-words)
+(global-set-key (kbd "C-c j") 'open-journal-at-today)
+(global-set-key (kbd "C-c b") 'open-blog-dir)
+
+;;; Org core
 (use-package org
   :bind
   (("C-x C-y" . org-insert-image)
    ("C-/" . org-latex-preview))
   :config
-  ;; Fold
-  (setq org-startup-folded 'content) ;; show titles only
-
-  ;; Inline image
+  ;; Fold and inline images
+  (setq org-startup-folded 'content)
   (setq org-image-actual-width 500)
+
+  ;; Editing and TODO settings
+  (setq org-auto-align-tags t
+	org-tags-column 0
+	org-fold-catch-invisible-edits 'show-and-error
+	org-special-ctrl-a/e t
+	org-insert-heading-respect-content t
+	org-hide-emphasis-markers t
+	org-ellipsis "…")
+  (setq org-todo-keywords '((sequence "TODO" "DONE" "CANCELED")))
+  (add-hook 'org-mode-hook (lambda ()
+			     (setq truncate-lines nil)))
 
   ;; Babel
   (setq org-confirm-babel-evaluate nil)
@@ -20,7 +87,7 @@
 
   (require 'ob-C)
   (require 'ob-shell)
-  (require 'ob-latex)
+  (require 'ob-mermaid)
 
   (org-babel-do-load-languages
    'org-babel-load-languages
@@ -32,47 +99,66 @@
      (shell . t)
      (latex . t)))
 
-  (setq org-babel-latex-preamble (lambda (_) "\\documentclass[tikz]{standalone}\n\\usetikzlibrary{arrows.meta,patterns}"))
-  (setq org-babel-latex-pdf-svg-process
-	"dvisvgm %f --pdf --no-fonts --exact-bbox -o %O")
-  (setq org-babel-latex-process-alist
-	'((png :programs ("xelatex" "convert")
-               :description "pdf > png"
-               :message "you need to install the programs: xelatex and imagemagick."
-               :image-input-type "pdf"
-               :image-output-type "png"
-               :image-size-adjust (1.0 . 1.0)
-               :latex-compiler ("xelatex -interaction nonstopmode -output-directory %o %f")
-               :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O"))))
-
-
-  ;; LaTeX
-  (setq org-startup-with-latex-preview nil)
-  (setq org-latex-default-class "ctexart") ;; latex class
-  (setq org-latex-compiler "lualatex") ;; latex compiler
-  (add-hook 'org-mode-hook (lambda () ;; cdlatex
-			     (setq truncate-lines nil)
-			     (org-cdlatex-mode)))
+  ;; Agenda files and capture templates
+  (setq org-agenda-files '("~/org/class.org" "~/org/task.org" "~/org/journal.org"))
+  (setq org-capture-templates nil)
+  (add-to-list 'org-capture-templates '("t" "Tasks"))
+  (add-to-list 'org-capture-templates
+	       '("tw" "Work" entry
+		 (file+headline "~/org/task.org" "Work")
+		 "* TODO %^{Workname}\n%u\n"))
+  (add-to-list 'org-capture-templates
+	       '("th" "Homework" entry
+		 (file+headline "~/org/task.org" "Homework")
+		 "* TODO %^{Homeworkname}\n%u\n"))
+  (add-to-list 'org-capture-templates
+	       '("tl" "Long Task" entry
+		 (file+headline "~/org/task.org" "Long Task")
+		 "* TODO %^{Longtaskname}\n%u\n"))
+  (add-to-list 'org-capture-templates
+	       '("tq" "Questions" entry
+		 (file+headline "~/org/task.org" "Questions")
+		 "* TODO %^{Questionname}\n%u\n"))
+  (add-to-list 'org-capture-templates
+	       '("c" "Class" entry
+		 (file "~/org/class.org")
+		 "* TODO %^{Coursename}\n%u\n"))
+  (add-to-list 'org-capture-templates
+	       '("i" "Inbox" entry (file "~/org/inbox.org")
+		 "* %U - %^{Inboxname}\n%?"))
+  (add-to-list 'org-capture-templates
+	       '("j" "Journal" entry (file "~/org/journal.org")
+		 "* %U - Journal\n  %?"))
+  (add-to-list 'org-capture-templates
+	       '("w" "Word (org-drill)" entry
+		 (file+headline "~/org/vocabulary.org" "New Words")
+		 ;; 标题保持中性：org-drill 复习时标题始终可见，放单词会剧透
+		 "* Word :drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: twosided\n:END:\n\n** English\n%^{Word}\n\n** 中文释义\n%^{中文释义}\n\n** 例句\n%?\n"))
+  (add-to-list 'org-capture-templates
+	       '("e" "Event" entry (file "~/org/event.org")
+		 "* TODO %^{Eventname}\n  %?"))
+  (add-to-list 'org-capture-templates
+	       `("s" "Sketch"
+		 plain
+		 (file (lambda ()
+			 (let ((title (read-string "Title: ")))
+			   (setq my/sketch-title title)
+			   (format "~/org/sketch/%s.org" title))))
+		 "#+title: %(capitalize my/sketch-title)\n#+author: Grant\n#+date: %t\n-----\n"))
 
   :custom
   ;; Prettify
-  (org-pretty-entities t) ;; pretty entities in org
-  (org-startup-indented t) ;; indent
-  (org-highlight-latex-and-related '(latex entities)) ;; latex highlight
+  (org-pretty-entities t)
+  (org-startup-indented t)
+  (org-highlight-latex-and-related '(latex entities))
 
   ;; Agenda
   (org-agenda-include-diary t)
-
-  ;; Agenda style
   (org-agenda-use-time-grid t)
-
   (org-agenda-tags-column 0)
   (org-agenda-block-separator ?─)
   (org-agenda-current-time-string
    "⭠ now ─────────────────────────────────────────────────")
-  ;;---------------------------------------------
-  ;;org-agenda-time-grid
-  ;;--------------------------------------------
   (org-agenda-time-grid (quote ((daily today require-timed)
                                 (700
                                  1300
@@ -80,287 +166,6 @@
                                  2400)
                                 "......"
                                 "-----------------------------------------------------"))))
-
-;;; Org drill (spaced repetition flashcards)
-(use-package org-drill
-  :after org
-  :commands (org-drill org-drill-directory org-drill-resume org-drill-cram)
-  :bind (("C-c v d" . org-drill)
-	 ("C-c v r" . org-drill-resume)
-	 ("C-c v D" . org-drill-directory))
-  :custom
-  (org-drill-save-buffers-after-drill-sessions-p nil) ; 复习完不自动保存所有 buffer
-  (org-drill-maximum-items-per-session 30)            ; 每次最多 30 张卡
-  (org-drill-maximum-duration 20)                     ; 每次最多 20 分钟
-  (org-drill-learn-fraction 0.5)                      ; SM2 间隔缩放因子
-  (org-drill-leech-method 'warn))                     ; 总是记不住的卡给警告
-
-;;; Org-fc (间隔重复复习，索引快、支持 FSRS)
-(use-package org-fc
-  :ensure nil ;; 不在 MELPA，从 site-lisp 手动加载
-  :load-path "~/.emacs.d/site-lisp/org-fc"
-  :after org
-  :commands (org-fc-review org-fc-dashboard)
-  :bind (("C-c v f" . org-fc-review)
-	 ("C-c v F" . org-fc-review-all))
-  :custom
-  (org-fc-directories '("~/org/fc/")) ; 只索引词库目录，不扫 roam 笔记
-  :config
-  (require 'org-fc-hydra)
-  (org-fc-cache-mode 1)) ; 缓存索引，千级卡片秒开
-
-;;; Org UI
-;; org-modern
-(use-package org-modern
-  :after org
-  :hook (org-mode . org-modern-mode)
-  :custom
-  (org-modern-hide-stars nil)
-  (org-modern-todo t)
-  (org-modern-table nil)
-  (org-modern-timestamp t)
-  (org-modern-tag t)
-  (org-modern-priority t)
-  (org-modern-star 'replace)
-  :config
-  (setq org-modern-list '((43 . "◦")
-			  (45 . "•")
-			  (42 . "–")))
-  (setq org-modern-block-name
-	'(("src" . ("λ" ""))		;∎
-	  ("quote" . ("❝" ""))		;❞
-	  ("example" . ("⊢" ""))	;⊣
-	  (t . t)))
-  (setq org-modern-keyword
-	'(("title"  . "𝒯")
-	  ("subtitle" . "")
-	  ("author" . "✍")
-	  ("date"   . "◷")
-          ("name" . "↪")
-          ("caption" . "§")
-          ("results" . "⟾")
-	  ("attr_latex" . "ℒ")
-	  (t . t)))
-
-
-
-  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
-  ;; Add frame borders and window dividers
-  (modify-all-frames-parameters
-   '((right-divider-width . 5)
-     (internal-border-width . 5)))
-  (dolist (face '(window-divider
-                  window-divider-first-pixel
-                  window-divider-last-pixel))
-    (face-spec-reset-face face)
-    (set-face-foreground face (face-attribute 'default :background)))
-  (set-face-background 'fringe (face-attribute 'default :background))
-  (setq
-   ;; Edit settings
-   org-auto-align-tags t
-   org-tags-column 0
-   org-fold-catch-invisible-edits 'show-and-error
-   org-special-ctrl-a/e t
-   org-insert-heading-respect-content t
-   ;; Org styling, hide markup etc.
-   org-hide-emphasis-markers t
-   org-ellipsis "…")
-  ;; Org todo keywords
-  (setq org-todo-keywords '((sequence "TODO" "DONE" "CANCELED")))
-  (setq org-modern-todo-faces
-	(quote (("TODO" :background "pink" :foreground "black")
-		("DONE" :background "green" :foreground "black")
-		("CANCELED" :background "grey" :foreground "black")))))
-
-;; Org-appear, convenient for editing LaTeX formula
-(use-package org-appear
-  :after org
-  :hook (org-mode . org-appear-mode)
-  :custom
-  (org-appear-autoemphasis t)
-  (org-appear-autolinks t)
-  (org-appear-autoentities t)
-  (org-appear-autosubmarkers t) ;; submarkers
-  (org-appear-inside-latex t) ;; latex
-  (org-appear-autokeywords t))
-
-;; Valign for table
-(use-package valign
-  ;; :after org
-  ;; :hook (org-mode . valign-mode)
-  :custom
-  (valign-fancy-bar nil))
-
-;; View pdf images inline
-(use-package org-inline-pdf
-  :after org
-  :hook (org-mode . org-inline-pdf-mode))
-
-;;; Org notes and Literature management
-;; Org roam
-(use-package org-roam
-  :after org
-  :custom
-  (org-roam-directory "~/org/roam-notes/") ;; default dir
-  :bind
-  (("C-c n f" . org-roam-node-find)
-   ("C-c n i" . org-roam-node-insert)
-   ("C-c n c" . org-roam-capture)
-   ("C-c n l" . org-roam-buffer-toggle))
-  :config
-  (org-roam-db-autosync-mode) ;; auto sync when starting
-  )
-
-(use-package org-roam-ui)
-
-(use-package citar
-  :hook
-  (LaTeX-mode . citar-capf-setup)
-  (org-mode . citar-capf-setup)
-  :bind
-  (:map org-mode-map :package org ("C-c (" . #'org-cite-insert))
-  :custom
-  (org-cite-global-bibliography '("~/Nutstore Files/zotero/Papers.bib"))
-  (org-cite-insert-processor 'citar)
-  (org-cite-follow-processor 'citar)
-  (org-cite-activate-processor 'citar)
-  (citar-bibliography org-cite-global-bibliography)
-  (citar-notes-paths '("~/org/roam-notes/citar-notes/"))
-  :config
-  (defvar citar-indicator-notes-icons
-    (citar-indicator-create
-     :symbol (nerd-icons-mdicon
-              "nf-md-notebook"
-              :face 'nerd-icons-blue
-              :v-adjust -0.3)
-     :function #'citar-has-notes
-     :padding "  "
-     :tag "has:notes"))
-
-  (defvar citar-indicator-links-icons
-    (citar-indicator-create
-     :symbol (nerd-icons-octicon
-              "nf-oct-link"
-              :face 'nerd-icons-orange
-              :v-adjust -0.1)
-     :function #'citar-has-links
-     :padding "  "
-     :tag "has:links"))
-
-  (defvar citar-indicator-files-icons
-    (citar-indicator-create
-     :symbol (nerd-icons-faicon
-              "nf-fa-file"
-              :face 'nerd-icons-green
-              :v-adjust -0.1)
-     :function #'citar-has-files
-     :padding "  "
-     :tag "has:files"))
-
-  (setq citar-indicators
-	(list citar-indicator-files-icons
-	      citar-indicator-links-icons
-              citar-indicator-notes-icons)))
-
-(use-package citar-org-roam
-  :ensure t
-  :after (citar org-roam)
-  :config
-  (citar-org-roam-mode 1)
-  (setq citar-org-roam-note-title-template "${author} - ${title}")
-  (setq org-roam-capture-templates
-        '(("d" "default" plain "%?"
-           :target (file+head "reference/${citekey}.org"
-                              "#+title: ${author} - ${title}\n#+filetags: :article:\n\n* Abstract\n\n%?\n\n* Notes\n")
-           :unnarrowed t))))
-
-;;; Org Present
-(use-package org-tree-slide
-  :after org
-  :commands (+org-slide-start +org-slide-stop)
-  :config
-  (defun +hide-tab-bar ()
-    "Hide the tab bar (used when starting a presentation)."
-    (when (bound-and-true-p tab-bar-mode)
-      (tab-bar-mode -1)))
-
-  (defun +show-tab-bar ()
-    "Show the tab bar again (used when stopping a presentation)."
-    (unless (bound-and-true-p tab-bar-mode)
-      (tab-bar-mode 1)))
-
-  (defun +org-slide-start ()
-    (interactive)
-
-    (when (eq major-mode 'org-mode)
-      ;; hide emephasis marks
-      (setq org-hide-emphasis-markers t)
-      ;; restart emacs to apply new settings above
-      (org-mode-restart)
-
-      ;; set faces for better presentation
-      (set-face-attribute 'org-meta-line nil :foreground (face-attribute 'default :background))
-      (set-face-attribute 'org-tree-slide-header-overlay-face nil :foreground (face-attribute 'default :background))
-      (set-face-attribute 'org-block-begin-line nil :background (face-attribute 'default :background))
-      (set-face-attribute 'org-block-end-line nil :background (face-attribute 'default :background))
-      (set-face-attribute 'org-block-begin-line nil :foreground (face-attribute 'default :background))
-      (set-face-attribute 'org-block-end-line nil :foreground (face-attribute 'default :background))
-      (set-face-attribute 'org-quote nil :foreground (face-attribute 'default :foreground))
-
-      ;; the following settings must be set after restarting org-mode
-      (setq-local header-line-format nil
-                  mode-line-format nil
-                  line-spacing 10)
-      (+hide-tab-bar)
-      (text-scale-increase 3)
-      (visual-line-mode)
-      (show-paren-local-mode -1)
-      (hl-line-mode -1)
-      (org-tree-slide-mode)
-      ))
-
-  (defun +org-slide-stop ()
-    (interactive)
-
-    (when (eq major-mode 'org-mode)
-      ;; reset
-      (setq org-hide-emphasis-markers nil)
-      (set-face-attribute 'org-meta-line nil :foreground nil)
-      (set-face-attribute 'org-tree-slide-header-overlay-face nil :foreground nil)
-      (set-face-attribute 'org-block-begin-line nil :background nil)
-      (set-face-attribute 'org-block-end-line nil :background nil)
-      (set-face-attribute 'org-block-begin-line nil :foreground nil)
-      (set-face-attribute 'org-block-end-line nil :foreground nil)
-      (set-face-attribute 'org-quote nil :foreground nil)
-      (+show-tab-bar)
-
-      (org-tree-slide-mode -1)
-
-      ;; `org-mode-restart' will clear all local variables,
-      ;; so there is no need to reset them manually
-      (org-mode-restart)
-      )
-    )
-  (setq org-tree-slide-heading-emphasis t
-        org-tree-slide-content-margin-top 1
-        org-tree-slide-slide-in-effect nil)
-  )
-
-;;; Hugo
-(use-package easy-hugo
-  :bind ("C-c h" . easy-hugo) ;; 原 C-c b 与 init-kbd.el 的 open-blog-dir 冲突，改绑 C-c h
-  :config
-  (setq easy-hugo-basedir "~/research/code/Grant/") ;; website root
-  (setq easy-hugo-postdir "content/org/")
-  (setq easy-hugo-url "https://Grant-S-Z.github.io/Grant") ;; url
-  (setq easy-hugo-sshdomain "grant-s-z.github.io")
-  (setq easy-hugo-previewtime "300")
-  (setq easy-hugo-default-ext ".md"))
-
-(use-package ox-hugo
-  :config
-  (setq org-hugo-base-dir "~/research/code/Grant/")
-  (setq org-hugo-section "post"))
 
 (provide 'init-org)
 ;;; init-org.el ends here

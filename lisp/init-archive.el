@@ -1,4 +1,4 @@
-;;; init-unused.el --- Settings unused  -*- lexical-binding: t; -*-
+;;; init-archive.el --- Archived, inactive settings  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 (use-package cape
@@ -16,6 +16,11 @@
 (add-hook 'conda-postactivate-hook
 	  (lambda ()
 	    (lsp-bridge-restart-process)))
+
+(use-package hdf5-viewer
+  :mode ("\\.h5\\'" . hdf5-viewer-find-file-mode)
+  :custom
+  (hdf5-viewer-python-command "~/miniconda3/bin/python3"))
 
 (use-package auto-package-update ;; package 更新
   :config
@@ -1382,7 +1387,7 @@ Show the heading too, if it is currently invisible."
 
 ;; Matlab
 (use-package matlab-mode)
-;;; init-unused.el ends here
+;;; Archived settings continue below; this file is intentionally not loaded.
 
 
 ;;; ============================================================
@@ -1542,3 +1547,505 @@ Show the heading too, if it is currently invisible."
 ;;   :demand t ;; ensure that it loads so that links work immediately
 ;;   :bind (("C-c (" . org-ref-insert-link))
 ;;   )
+
+;;; From early-init.el
+;; (setq frame-inhibit-implied-resize t)
+
+;;; From init-elpa.el
+;; (setq package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
+;; 			 ("melpa" . "https://melpa.org/packages/")
+;; 			 ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
+
+;; Async
+;; (use-package async
+;;   :ensure t
+;;   :init
+;;   (autoload 'dired-async-mode "dired-async.el" nil t)
+;;   (dired-async-mode 1)
+;;   (async-bytecomp-package-mode 1))
+
+;;; From init-startup.el
+;; Mac ligature and scroll
+;; (mac-auto-operator-composition-mode 1) ;; ligature for mac port
+;; (setq scroll-margin 1)
+;; (setq mac-mouse-wheel-smooth-scroll t) ;; mac pixel scroll
+;; (setq mac-mouse-wheel-mode t)
+;; (setq mac-redisplay-dont-reset-vscroll t)
+
+;;; From init-kbd.el
+;; Vim
+;; (use-package evil
+;;   :init (evil-mode))
+
+;;; From init-package.el
+;; (use-package openwith
+;;   :init (openwith-mode t)
+;;   :config
+;;   (setq openwith-associations '(("\\.pdf\\'" "open" (file))
+;; 				("\\.epub\\'" "open" (file)))))
+
+;; Calculator
+;; (use-package literate-calc-mode
+;;   :mode ("calc" . literate-calc-mode))
+
+;;; From init-fun.el
+;; Alternative PDF presentation launcher
+;; (start-process "open-presentation" nil
+;;                "open" "-a" "/Applications/Présentation.app" pdf)
+
+;;; From init-org.el
+;; MathJax previews; entering a formula reveals its source.
+;; (use-package org-appear-mathjax
+;;   :ensure nil ;; 本地包，从 site-lisp 加载
+;;   :load-path "~/.emacs.d/site-lisp/org-appear-mathjax"
+;;   :after org
+;;   :hook (org-mode . org-appear-mathjax-mode)
+;;   :custom
+;;   (org-appear-mathjax-scale 0.9)
+;;   (org-appear-mathjax-center-display t)
+;;   (org-appear-mathjax-inline-ascent 'center)
+;;   (org-appear-mathjax-edit-preview t)
+;;   (org-appear-mathjax-edit-preview-style 'posframe)
+;;   (org-appear-mathjax-siunitx-compat t)
+;;   (org-appear-mathjax-macros
+;;    (concat
+;;     "\\newcommand{\\bm}[1]{\\boldsymbol{#1}}\n"
+;;     "\\renewcommand{\\d}{\\mathrm{d}}\n"
+;;     "\\newcommand{\\kb}{k_{\\mathrm{B}}}\n"
+;;     "\\newcommand{\\zpart}{\\mathcal{Z}}")))
+
+;; Optional org-appear LaTeX handling; conflicts with org-latex-preview-mode.
+;; (org-appear-inside-latex t)
+
+;; Optional valign hooks
+;; :after org
+;; :hook (org-mode . valign-mode)
+
+;;; From init-orgmodule.el
+;; Alternative LaTeX export settings
+;; (setq org-latex-listings 'minted)
+;; (setq org-latex-pdf-process '("latexmk --xelatex -shell-escape -interaction=nonstopmode -output-directory=%o %f")) ;; add "-shell-escape" for minted
+
+;; (use-package org-xlatex ;; real-time preview
+;;   :hook (org-mode . org-xlatex-mode))
+
+;;   (setq org-latex-default-packages-alist
+;; 	'(("" "amsmath" t ("lualatex" "xetex"))
+;; 	  ("" "fontspec" t ("lualatex" "xetex"))
+;; 	  ("" "graphicx" t) ("" "longtable" nil) ("" "wrapfig" nil)
+;; 	  ("" "rotating" nil) ("normalem" "ulem" t)
+;; 	  ("" "amsmath" t ("pdflatex")) ("" "amssymb" t ("pdflatex"))
+;; 	  ("" "capt-of" nil) ("" "hyperref" nil)))
+;;   ;; Center vertically
+;;   ;; (defun grant/org-latex-preview-advice (beg end &rest _args)
+;;   ;;   (let* ((ov (car (overlays-in beg end)))
+;;   ;;          (img (cdr (overlay-get ov 'display)))
+;;   ;;          (new-img (plist-put img :ascent 90)))
+;;   ;;     (overlay-put ov 'display (cons 'image new-img))))
+;;   ;; (advice-add 'org--make-preview-overlay
+;;   ;;             :after #'grant/org-latex-preview-advice)
+
+;;   ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
+;;   ;; Justifying LaTeX preview fragments in org
+;;   ;; (plist-put org-format-latex-options :justify 'center)
+
+;;   ;; (defun eli/org-justify-fragment-overlay (beg end image imagetype)
+;;   ;;   (let* ((position (plist-get org-format-latex-options :justify))
+;;   ;;          (img (create-image image 'svg t))
+;;   ;;          (ov (car (overlays-at (/ (+ beg end) 2) t)))
+;;   ;;          (width (car (image-display-size (overlay-get ov 'display))))
+;;   ;;          offset)
+;;   ;;     (cond
+;;   ;;      ((and (eq 'center position)
+;;   ;;            (= beg (line-beginning-position)))
+;;   ;; 	(setq offset (floor (- (/ fill-column 2)
+;;   ;;                              (/ width 2))))
+;;   ;; 	(if (< offset 0)
+;;   ;;           (setq offset 0))
+;;   ;; 	(overlay-put ov 'before-string (make-string offset ? )))
+;;   ;;      ((and (eq 'right position)
+;;   ;;            (= beg (line-beginning-position)))
+;;   ;; 	(setq offset (floor (- fill-column
+;;   ;;                              width)))
+;;   ;; 	(if (< offset 0)
+;;   ;;           (setq offset 0))
+;;   ;; 	(overlay-put ov 'before-string (make-string offset ? ))))))
+;;   ;; (advice-add 'org--make-preview-overlay
+;;   ;;             :after 'eli/org-justify-fragment-overlay)
+
+;;   ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/07/
+;;   ;; Better-equation-numbering-in-LaTeX-fragments-in-org-mode/
+;;   ;; (defun org-renumber-environment (orig-func &rest args)
+;;   ;;   (let ((results '())
+;;   ;;         (counter -1)
+;;   ;;         (numberp))
+;;   ;;     (setq results (cl-loop for (begin .  env) in
+;;   ;;                            (org-element-map (org-element-parse-buffer)
+;;   ;; 				 'latex-environment
+;;   ;;                              (lambda (env)
+;;   ;; 				 (cons
+;;   ;;                                 (org-element-property :begin env)
+;;   ;;                                 (org-element-property :value env))))
+;;   ;;                            collect
+;;   ;;                            (cond
+;;   ;;                             ((and (string-match "\\\\begin{equation}" env)
+;;   ;;                                   (not (string-match "\\\\tag{" env)))
+;;   ;;                              (cl-incf counter)
+;;   ;;                              (cons begin counter))
+;;   ;;                             ((and (string-match "\\\\begin{align}" env)
+;;   ;;                                   (string-match "\\\\notag" env))
+;;   ;;                              (cl-incf counter)
+;;   ;;                              (cons begin counter))
+;;   ;;                             ((string-match "\\\\begin{align}" env)
+;;   ;;                              (prog2
+;;   ;;                                  (cl-incf counter)
+;;   ;;                                  (cons begin counter)
+;;   ;; 				 (with-temp-buffer
+;;   ;;                                  (insert env)
+;;   ;;                                  (goto-char (point-min))
+;;   ;;                                  ;; \\ is used for a new line. Each one leads
+;;   ;;                                  ;; to a number
+;;   ;;                                  (cl-incf counter (count-matches "\\\\$"))
+;;   ;;                                  ;; unless there are nonumbers.
+;;   ;;                                  (goto-char (point-min))
+;;   ;;                                  (cl-decf counter
+;;   ;;                                           (count-matches "\\nonumber")))))
+;;   ;;                             (t
+;;   ;;                              (cons begin nil)))))
+;;   ;;     (when (setq numberp (cdr (assoc (point) results)))
+;;   ;; 	(setf (car args)
+;;   ;;             (concat
+;;   ;;              (format "\\setcounter{equation}{%s}\n" numberp)
+;;   ;;              (car args)))))
+;;   ;;   (apply orig-func args))
+;;   ;; (advice-add 'org-create-formula-image :around #'org-renumber-environment)
+
+;; LaTeX Preview
+;; (use-package xenops
+;;   :hook (org-mode . my/xenops-mode-safe)
+;;   :config
+;;   (setq org-format-latex-options
+;;         (plist-put org-format-latex-options :justify 'center))
+
+;;   ;; Fix incompatibility with Org 9.7+ deferred element properties (Emacs 31).
+;;   ;; `xenops-src-do-in-org-mode' parses the src block in a temp buffer; the
+;;   ;; returned org-element still references that buffer, so resolving deferred
+;;   ;; properties (e.g. :value) after the temp buffer is killed throws
+;;   ;; (error "Selecting deleted buffer").  Compute the babel info while the
+;;   ;; temp buffer is still alive.
+;;   (defun grant/xenops-src-parse-at-point ()
+;;     "Fixed `xenops-src-parse-at-point' for Org 9.7+ deferred properties."
+;;     (when-let* ((element (xenops-parse-element-at-point 'src))
+;;                 (org-babel-info
+;;                  (xenops-src-do-in-org-mode
+;;                   (when-let* ((org-element (org-element-context)))
+;;                     (org-babel-get-src-block-info 'light org-element)))))
+;;       (xenops-util-plist-update
+;;        element
+;;        :type 'src
+;;        :language (nth 0 org-babel-info)
+;;        :org-babel-info org-babel-info)))
+;;   (advice-add 'xenops-src-parse-at-point :override #'grant/xenops-src-parse-at-point)
+;;   ;; Xenops adds a 20 px horizontal image margin by default.  It shifts the
+;;   ;; visible formula to the right after Emacs has centered the image spec.
+;;   (setq xenops-math-image-margin 0)
+
+;;   (defun my/xenops-mode-safe--callback (buf)
+;;     "Callback for deferred xenops init in BUF."
+;;     (when (buffer-live-p buf)
+;;       (with-current-buffer buf
+;;         (condition-case err
+;;             (xenops-mode 1)
+;;           (error
+;;            (message "xenops-mode init skipped (non-fatal): %s" err)
+;;            (ignore-errors
+;;              (when xenops-mode
+;;                (xenops-mode -1))
+;;              (font-lock-flush)
+;;              (font-lock-ensure)))))))
+
+;;   (defun my/xenops-mode-safe ()
+;;     "Enable xenops-mode with cleanup on failure."
+;;     (run-with-idle-timer 0.3 nil
+;;       #'my/xenops-mode-safe--callback (current-buffer)))
+;;   (setq xenops-math-image-scale-factor 1.2)
+;;   (setq xenops-math-image-current-scale-factor 1.2)
+;;   (setq xenops-math-latex-process-alist
+;; 	'((dvisvgm :programs ("xelatex" "dvisvgm")
+;;                    :description "xdv > svg"
+;;                    :message "XeLaTeX and dvisvgm process..."
+;;                    :image-input-type "xdv"
+;;                    :image-output-type "svg"
+;;                    :image-size-adjust (1.7 . 1.5)
+;;                    :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
+;;                    ;; -e: 用精确字形轮廓计算边界框（默认按字体度量值，
+;;                    ;; 会裁掉 f/j 等斜体字符右侧伸出的笔画）；
+;;                    ;; -b 0.5: 精确边界框外加 0.5pt 内边距防锯齿裁切。
+;;                    :image-converter ("dvisvgm %f -n -e -b 0.5 -c %S -o %O"))))
+
+;;   (defun grant/xenops-display-math-p (element)
+;;     "Return non-nil when ELEMENT uses display-math delimiters.
+
+;; Xenops classifies a single-line \\[...\\] expression as `inline-math',
+;; so inspect the source delimiters instead of relying only on its type."
+;;     (or (memq (plist-get element :type) '(block-math table))
+;;         (save-excursion
+;;           (goto-char (plist-get element :begin))
+;;           (skip-chars-forward " \t")
+;;           (or (looking-at-p "\\\\\\[")
+;;               (looking-at-p "\\$\\$")
+;;               (looking-at-p
+;;                "\\\\begin{\\(?:align\\|equation\\|gather\\)\\*?}")))))
+
+;;   (defun grant/xenops-center-math-preview (element &rest _args)
+;;     "Center a Xenops display-math overlay in the current window."
+;;     (when (grant/xenops-display-math-p element)
+;;       (let* ((beg (plist-get element :begin))
+;;              (end (plist-get element :end))
+;;              (search-beg (save-excursion
+;;                            (goto-char beg)
+;;                            (line-beginning-position)))
+;;              (search-end (save-excursion
+;;                            (goto-char end)
+;;                            (min (point-max) (1+ (line-end-position)))))
+;;              (ov (seq-find
+;;                   (lambda (candidate)
+;;                     (and (overlay-get candidate 'xenops-overlay-type)
+;;                          (imagep (overlay-get candidate 'display))))
+;;                   (overlays-in search-beg search-end))))
+;;         (when ov
+;;           (let* ((image (overlay-get ov 'display))
+;;                  (width (car (image-size image t)))
+;;                  (offset (max 0 (/ (- (window-body-width nil t) width) 2))))
+;;             (overlay-put ov 'before-string
+;;                          (propertize " " 'display
+;;                                      `(space :align-to (,offset)))))))))
+
+;;   ;; Remove legacy advice when re-evaluating this configuration.
+;;   (advice-remove 'xenops-math-display-image #'eli/xenops-justify-fragment-overlay)
+;;   (advice-remove 'xenops-math-display-image #'grant/xenops-justify-fragment-overlay)
+;;   (advice-remove 'xenops-math-display-image #'grant/xenops-center-math-preview)
+;;   (advice-add 'xenops-math-display-image :after #'grant/xenops-center-math-preview))
+
+;;; From init-lsp.el
+;; (use-package devdocs)
+
+;; (use-package flycheck
+;;   :hook (prog-mode . flycheck-mode))
+
+;; Corfu optional settings
+;; :init (global-corfu-mode)
+;; (org-mode . corfu-mode)
+
+;; (use-package lsp-mode
+;;   :init
+;;   (defun grant/lsp-mode-setup-completion ()
+;;     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+;; 	  '(orderless)))
+;;   :commands (lsp lsp-deferred)
+;;   :hook
+;;   ((c++-mode . lsp-deferred)
+;;    (c-mode . lsp-deferred)
+;;    (python-mode . lsp-deferred)
+;;    (python-ts-mode .lsp-deferred)
+;;    (TeX-mode . lsp-deferred)
+;;    (lsp-mode . lsp-enable-which-key-integration)
+;;    (lsp-completion-mode . grant/lsp-mode-setup-completion))
+;;   :custom
+;;   (lsp-keymap-prefix "C-x C-l")
+;;   (lsp-file-watch-threshold 500)
+;;   ;; Completion provider
+;;   (lsp-completion-provider :capf)
+;;   ;; Python ruff
+;;   (lsp-ruff-python-path "~/miniconda3/bin/python3")
+;;   (lsp-ruff-server-command '("~/miniconda3/bin/ruff" "server")))
+
+;; (use-package lsp-pyright
+;;   :custom (lsp-pyright-langserver-command "~/miniconda3/bin/pyright")
+;;   :hook (python-ts-mode . (lambda ()
+;;                             (require 'lsp-pyright)
+;;                             (lsp-deferred))))
+
+;; (use-package lsp-ui
+;;   :after lsp-mode
+;;   :custom
+;;   (lsp-ui-sideline-enable nil)
+;;   (lsp-ui-peek-enable t)
+;;   (lsp-ui-doc-enable t))
+
+;; (use-package lsp-treemacs)
+
+;; (use-package dap-mode
+;;   :config
+;;   (dap-mode 1)
+;;   (dap-ui-mode 1)
+;;   (dap-tooltip-mode 1)
+;;   (tooltip-mode 1)
+;;   (dap-ui-controls-mode 1)
+;;   ;; Python
+;;   (require 'dap-python)
+;;   (setq dap-python-debugger 'debugpy)
+;;   ;; C
+;;   (require 'dap-gdb-lldb)
+;;   ;(setq dap-lldb-debug-program "/usr/bin/lldb")
+;;   )
+
+;; Lsp-bridge
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/lsp-bridge/")
+;; (require 'lsp-bridge)
+;; (global-lsp-bridge-mode)
+
+;; Alternative Eglot server registration
+;; (add-to-list 'eglot-server-programs
+;;              `((python-ts-mode python-mode)
+;;                . (,(expand-file-name "~/miniconda3/bin/pyright-langserver") "--stdio")))
+
+;; (use-package eldoc-box
+;;   :after eglot
+;;   :hook (prog-mode . eldoc-box-hover-at-point-mode)
+;;   :custom
+;;   (eldoc-idle-delay 1.5))
+
+;; (use-package grip-mode ;; preview md
+;;   :init
+;;   (defvar grip-theme 'auto)
+
+  ;; ;; Compatibility patch: mdopen 0.5.x doesn't support `--theme=...`, while
+  ;; ;; some grip-mode versions still pass it.
+  ;; (defun my/grip--filter-mdopen-start-process-args (args)
+  ;;   "Remove unsupported `--theme=' arg when launching mdopen."
+  ;;   (let* ((program (nth 2 args))
+  ;;          (is-mdopen (and (stringp program)
+  ;;                          (string= (file-name-nondirectory program) "mdopen"))))
+  ;;     (if (not is-mdopen)
+  ;;         args
+  ;;       (let ((prefix (seq-take args 3))
+  ;;             (rest (nthcdr 3 args))
+  ;;             (filtered nil))
+  ;;         (dolist (arg rest)
+  ;;           (unless (and (stringp arg)
+  ;;                        (string-prefix-p "--theme=" arg))
+  ;;             (push arg filtered)))
+  ;;         (append prefix (nreverse filtered))))))
+  ;; :custom
+  ;; (grip-command 'mdopen)
+  ;; (grip-preview-in-webkit nil)
+  ;; :config
+  ;; (advice-add 'start-process :filter-args #'my/grip--filter-mdopen-start-process-args))
+
+;; Lisp
+;; (use-package geiser
+;;   :hook (scheme-mode . geiser-mode))
+;; (use-package geiser-mit)
+
+;; (use-package slime
+;;   :custom
+;;   (inferior-lisp-program "sbcl"))
+
+;; Lua
+;; (use-package lua-mode)
+
+;;; From init-mail.el
+;; (setq user-mail-address "2206627826@qq.com")
+;; (setq user-full-name "Yutao Zhu")
+;; (setq smtpmail-smtp-user "2206627826@qq.com"
+;;       smtpmail-smtp-server "smtp.qq.com")
+
+;; Optional mu4e load path
+;; :load-path "/opt/homebrew/share/emacs/site-lisp/mu/mu4e/"
+
+;; Alternative message signature
+;; (format "Best regards,\n\nYutao Zhu\n%s" (format-time-string "%Y-%m-%d"))
+
+;; Gnus
+;; (gnus-delay-initialize)
+;; (setq gnus-asynchronous t)
+
+;; ;; (setq gnus-select-method
+;; ;;       '(nnimap "qq.com"
+;; ;;                (nnimap-address "imap.qq.com")
+;; ;;                (nnimap-inbox "INBOX")
+;; ;;                (nnimap-expunge t)
+;; ;;                (nnimap-server-port 993)
+;; ;;                (nnimap-stream ssl)))
+
+;; (setq gnus-select-method
+;;       '(nnimap "thu"
+;;                (nnimap-address "mails.tsinghua.edu.cn")
+;;                (nnimap-inbox "INBOX")
+;;                (nnimap-expunge t)
+;;                (nnimap-server-port 993)
+;;                (nnimap-stream ssl)))
+
+;; ;; (setq gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+
+;; (setq gnus-use-full-window nil)
+;; ;; (setq gnus-message-archive-group nil)
+
+;; ;; color
+;; (cond (window-system
+;;        (setq custom-background-mode 'light)
+;;        (defface my-group-face-1
+;;          '((t (:foreground "Red" :bold t))) "First group face")
+;;        (defface my-group-face-2
+;;          '((t (:foreground "DarkSeaGreen4" :bold t)))
+;;          "Second group face")
+;;        (defface my-group-face-3
+;;          '((t (:foreground "Green4" :bold t))) "Third group face")
+;;        (defface my-group-face-4
+;;          '((t (:foreground "SteelBlue" :bold t))) "Fourth group face")
+;;        (defface my-group-face-5
+;;          '((t (:foreground "Blue" :bold t))) "Fifth group face")))
+
+;; (setq gnus-group-highlight
+;;       '(((> unread 200) . my-group-face-1)
+;;         ((and (< level 3) (zerop unread)) . my-group-face-2)
+;;         ((< level 3) . my-group-face-3)
+;;         ((zerop unread) . my-group-face-4)
+;;         (t . my-group-face-5)))
+
+;; ;; block
+;; (setq gnus-blocked-images "ads")
+
+;; ;; timestamp
+;; (add-hook 'gnus-select-group-hook 'gnus-group-set-timestamp)
+
+;; ;; delete / expiry
+;; ;; Your IMAP server exposes these folders (from Group buffer):
+;; ;;   Deleted Messages, Drafts, INBOX, Junk E-mail, Sent Items, Sent Messages, Trash, Virus Items
+;; ;; Use "Trash" as the delete target.
+;; (setq nnmail-expiry-wait 'never)
+;; (setq nnmail-expiry-target "Trash")
+
+;;; From init-ui.el
+;; Alternative variable-pitch families
+;; (set-face-attribute 'variable-pitch nil :family "LXGW WenKai Mono")
+;; (set-face-attribute 'variable-pitch nil :family "STKaiti")
+
+;; Standalone face settings
+;; (set-face-attribute 'variable-pitch nil :family "Literata")
+;; (set-face-attribute 'fixed-pitch nil :family "FantasqueSansM Nerd Font Mono")
+
+;; Alternative themes
+;; (load-theme 'ef-trio-light :no-confirm)
+;; (load-theme 'ef-arbutus :no-confirm)
+;; (load-theme 'ef-light :no-confirm)
+;; (load-theme 'ef-day :no-confirm)
+;; (load-theme 'ef-night :no-confirm)
+;; (load-theme 'ef-winter :no-confirm)
+;; (load-theme 'ef-owl :no-confirm)
+;; (load-theme 'catppuccin :no-confirm)
+;; (setq catppuccin-flavor 'mocha)
+;; (catppuccin-reload)
+;; (load-theme 'modus-operandi)
+;; (load-theme 'modus-operandi-tritanopia)
+;; (load-theme 'modus-operandi-deuteranopia)
+
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/moe-theme.el")
+;; (require 'moe-theme)
+;; (load-theme 'moe-light t)
+
+;; Optional ligature
+;; (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
+
+;;; init-archive.el ends here

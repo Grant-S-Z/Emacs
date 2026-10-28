@@ -2,6 +2,11 @@
 ;;; Commentary:
 ;;; Code:
 
+;;; Reading and scrolling
+(pixel-scroll-precision-mode 1)
+(add-hook 'text-mode-hook #'visual-line-mode)
+(add-hook 'text-mode-hook #'visual-line-fill-column-mode)
+
 ;;; Line number
 (defun grant/enable-line-numbers ()
   "Enable line numbers except in specific modes."
@@ -21,10 +26,9 @@
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
   ;; Items
-  (setq dashboard-items '((recents . 8)
-                          (agenda . 7)))
+  (setq dashboard-items '((recents . 8)))
   (setq dashboard-item-shortcuts '((recents . "r")
-				   (agenda . "a")))
+				   ))
 
   ;; Icons
   (setq dashboard-display-icons-p t)
@@ -115,15 +119,22 @@
   :init (global-hl-todo-mode))
 
 ;;; Fonts and input method
-(use-package cnfonts
-  :init (cnfonts-mode 1)
-  :bind (("C--" . cnfonts-decrease-fontsize)
-	 ("C-=" . cnfonts-increase-fontsize))
-  :custom
-  (cnfonts-personal-fontnames '(("Ligconsolata" "FantasqueSansM Nerd Font Mono" "Iosevka" "Bookerly" "Literata" "STKaiti")
-                                ("FZYouSong GBK" "Source Han Serif SC" "LXGW WenKai Mono")
-                                ("PragmataPro Mono Liga")
-                                ("PragmataPro Mono Liga"))))
+;; Use one font family for Latin, CJK, code and proportional text.
+(defun grant-setup-fonts (&optional frame)
+  "Use Maple Mono NF CN for all Latin and CJK text."
+  (when (display-graphic-p frame)
+    (set-face-attribute 'default frame :family "Maple Mono NF CN" :height 170)
+    (set-face-attribute 'fixed-pitch frame :family "Maple Mono NF CN")
+    (set-face-attribute 'variable-pitch frame :family "Maple Mono NF CN")
+    (dolist (charset '(kana han cjk-misc bopomofo hangul))
+      (set-fontset-font "fontset-default" charset
+                        (font-spec :family "Maple Mono NF CN" :size 17.0)))))
+
+(grant-setup-fonts)
+(add-hook 'after-make-frame-functions #'grant-setup-fonts)
+
+(global-set-key (kbd "C--") #'text-scale-decrease)
+(global-set-key (kbd "C-=") #'text-scale-increase)
 
 (use-package posframe)
 
@@ -146,61 +157,29 @@
   )
 
 ;;; Themes
-;; Use a "mixed" setup: proportional body, monospace code blocks.
-;; `mixed-pitch-mode` cooperates better with org-src overlays than
-;; enabling `variable-pitch-mode` directly.
-(use-package mixed-pitch
-  :hook (org-mode . mixed-pitch-mode)
-  :config
-  (set-face-attribute 'variable-pitch nil :family "Literata")
-  ;; (set-face-attribute 'variable-pitch nil :family "LXGW WenKai Mono")
-  ;; (set-face-attribute 'variable-pitch nil :family "STKaiti")
-  (set-face-attribute 'fixed-pitch nil :family "FantasqueSansM Nerd Font Mono")
-  ;; org-level-N 默认继承 outline-N -> font-lock-*-face，mixed-pitch 会把
-  ;; font-lock-* 固定为 fixed-pitch（等宽），导致标题变成 Fantasque。
-  ;; 用列表继承：variable-pitch 在前提供 Literata（family 属性优先取前者），
-  ;; outline-N 在后保留主题（ef-frost）的标题颜色与字重。
-  ;; 注意：不能单独 :inherit 'variable-pitch，那样会切断颜色继承链。
-  (dolist (pair '((org-level-1 . outline-1)
-                  (org-level-2 . outline-2)
-                  (org-level-3 . outline-3)
-                  (org-level-4 . outline-4)
-                  (org-level-5 . outline-5)
-                  (org-level-6 . outline-6)
-                  (org-level-7 . outline-7)
-                  (org-level-8 . outline-8)))
-    (set-face-attribute (car pair) nil :inherit (list 'variable-pitch (cdr pair))))
-  (set-face-attribute 'org-document-title nil :inherit '(variable-pitch)))
+;; ;; Use a "mixed" setup: proportional body, monospace code blocks.
+;; ;; `mixed-pitch-mode` cooperates better with org-src overlays than
+;; ;; enabling `variable-pitch-mode` directly.
 
-
-;; (set-face-attribute 'variable-pitch nil :family "Literata")
-;; (set-face-attribute 'fixed-pitch nil :family "FantasqueSansM Nerd Font Mono")
-
+;; (load-theme 'ef-frost :no-confirm)
+(load-theme 'ef-reverie :no-confirm)
 ;; (load-theme 'ef-trio-light :no-confirm)
-;; (load-theme 'ef-arbutus :no-confirm)
-;; (load-theme 'ef-light :no-confirm)
-(load-theme 'ef-frost :no-confirm)
-;; (load-theme 'ef-day :no-confirm)
-;; (load-theme 'ef-night :no-confirm)
-;; (load-theme 'ef-winter :no-confirm)
-;; (load-theme 'ef-owl :no-confirm)
+;; (load-theme 'doom-nord-light :no-confirm)
 ;; (load-theme 'catppuccin :no-confirm)
-;; (setq catppuccin-flavor 'mocha)
+;; (setq catppuccin-flavor 'latte)
 ;; (catppuccin-reload)
-;; (load-theme 'modus-operandi)
-;; (load-theme 'modus-operandi-tritanopia)
-;; (load-theme 'modus-operandi-deuteranopia)
+;; (load-theme 'doric-beach :no-confirm) ;; yellow bkg, i do not like
+;; (load-theme 'doric-beach :no-confirm) ;; few colors, black
+;; (load-theme 'modus-operandi :no-confirm) ;; few colors
+;; (load-theme 'doom-flatwhite :no-confirm) ;; no contrast
 
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/moe-theme.el")
-;; (require 'moe-theme)
-;; (load-theme 'moe-light t)
 
 (use-package writeroom-mode ;;; center texts
   :hook (org-mode . writeroom-mode)
   :custom
   (writeroom-maximize-window nil)
   (writeroom-mode-line t)
-  (writeroom-width 80)
+  (writeroom-width 100)
   (writeroom-global-effects '(writeroom-set-alpha
 			      writeroom-set-menu-bar-lines
 			      writeroom-set-tool-bar-lines
@@ -215,9 +194,7 @@
         dired-listing-switches "-aBhl --group-directories-first"))
 ;; Dirvish
 (use-package dirvish
-  :bind
-  (("C-c l" . dirvish-side)
-   ("C-x d" . dirvish))
+  :bind ("C-x d" . dirvish)
   :custom
   (dirvish-quick-access-entries
    '(("h" "~/" "Home")
@@ -231,13 +208,35 @@
   (dirvish-override-dired-mode) ;; replace dired ui with dirvish
   (dirvish-side-follow-mode))
 
+;; Treemacs
+(use-package treemacs
+  :bind (("C-c t" . treemacs)
+         ("M-0" . treemacs-select-window)
+         ("C-c T" . treemacs-add-and-display-current-project-exclusively))
+  :custom
+  (treemacs-width 32)
+  (treemacs-indentation 1)                  ;; more compact file tree
+  (treemacs-collapse-dirs 3)                ;; collapse single-child directories
+  (treemacs-sorting 'alphabetic-numeric-asc) ;; natural file name sorting
+  (treemacs-silent-refresh t)               ;; suppress refresh messages
+  :config
+  (treemacs-follow-mode 1)       ;; locate the current file in the tree
+  (treemacs-filewatch-mode 1)    ;; refresh when files change
+  (treemacs-git-mode 'deferred)  ;; show Git status asynchronously
+  (treemacs-fringe-indicator-mode 'always))
+
+(use-package treemacs-nerd-icons
+  :after treemacs
+  :demand t
+  :config
+  (treemacs-load-theme "nerd-icons"))
+
 ;;; Ligature
 (let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
                (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
                (36 . ".\\(?:>\\)")
                (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
                (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-               ;; (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
                (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
                (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
                (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
@@ -261,6 +260,17 @@
   (dolist (char-regexp alist)
     (set-char-table-range composition-function-table (car char-regexp)
                           `([,(cdr char-regexp) 0 font-shape-gstring]))))
+
+;;; Frame borders and window dividers
+(modify-all-frames-parameters
+ '((right-divider-width . 5)
+   (internal-border-width . 5)))
+(dolist (face '(window-divider
+                window-divider-first-pixel
+                window-divider-last-pixel))
+  (face-spec-reset-face face)
+  (set-face-foreground face (face-attribute 'default :background)))
+(set-face-background 'fringe (face-attribute 'default :background))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

@@ -1,31 +1,6 @@
 ;;; init-fun.el --- for functions  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
-;;; Org insert images in Macos
-(defun org-insert-image ()
-  "Insert a image from clipboard."
-  (interactive)
-  (let* ((path (concat default-directory "./img/"))
-	 ;; Remove the file extension from the buffer name
-	 (base-name (file-name-sans-extension (buffer-name)))
-	 (image-file (concat
-		      path
-		      base-name
-		      (format-time-string "_%Y%m%d%H%M%S.png"))))
-    (if (not (file-exists-p path))
-	(mkdir path))
-    (do-applescript (concat
-		     "set the_path to \"" image-file "\" \n"
-		     "set png_data to the clipboard as «class PNGf» \n"
-		     "set the_file to open for access (POSIX file the_path as string) with write permission \n"
-		     "write png_data to the_file \n"
-		     "close access the_file"))
-    (org-insert-link nil
-		     (concat
-		      "file:" image-file)
-		     "")
-    (message "%s" image-file)))
-
 ;;; Open files and dirs
 (defun open-words ()
   "Open words."
@@ -73,9 +48,6 @@
     (user-error "File does not exist: %s" pdf))
   (unless (file-directory-p "/Applications/Présentation.app")
     (user-error "Présentation.app not found at /Applications/Présentation.app"))
-  ;; (start-process "open-presentation" nil
-  ;;                "open" "-a" "/Applications/Présentation.app" pdf)
-
   (start-process "open-presentation" nil
 		 "open" "-b" "fr.imag.iihm.blanch.osx-presentation" pdf))
 

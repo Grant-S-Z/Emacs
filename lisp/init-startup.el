@@ -2,7 +2,15 @@
 ;;; Commentary:
 ;;; Code:
 ;;; Basic
-(setq make-backup-files nil) ;; no backup files
+(setq make-backup-files t
+      backup-directory-alist
+      `(("." . ,(expand-file-name ".cache/backups/" user-emacs-directory)))
+      backup-by-copying t
+      version-control t
+      kept-new-versions 6
+      kept-old-versions 2
+      delete-old-versions t)
+(make-directory (expand-file-name ".cache/backups/" user-emacs-directory) t)
 (setq inhibit-startup-message t) ;; no startup message
 (setq frame-title-format "Emacs") ;; frame title
 (setq-default cursor-type 'bar) ;; set cursor type to hollow box
@@ -19,6 +27,7 @@
 
 (add-hook 'prog-mode-hook #'subword-mode) ;; operation on camel words
 (electric-pair-mode 1) ;; generate parens automatically
+(repeat-mode 1) ;; repeat compatible navigation commands
 (show-paren-mode 1) ;; 全局括号匹配高亮（show-paren-mode 是全局模式，不应挂进 prog-mode-hook）
 (add-hook 'prog-mode-hook #'hs-minor-mode) ;; hideshow
 
@@ -38,11 +47,6 @@
 
 ;;; Mac ligature and scroll
 (when *is-mac*
-  ;; (mac-auto-operator-composition-mode 1) ;; ligature for mac port
-  ;; (setq scroll-margin 1)
-  ;; (setq mac-mouse-wheel-smooth-scroll t) ;; mac pixel scroll
-  ;; (setq mac-mouse-wheel-mode t)
-  ;; (setq mac-redisplay-dont-reset-vscroll t)
   (setq mac-option-modifier nil		;; for emacs-plus
 	mac-command-modifier 'meta))
 

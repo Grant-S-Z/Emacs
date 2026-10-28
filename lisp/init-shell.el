@@ -2,7 +2,14 @@
 ;;; Commentary:
 ;;; Code:
 ;;; Get commands work in shell and know system variables
-(when (memq window-system '(mac ns x))
+(use-package exec-path-from-shell
+  :demand t
+  :if (memq window-system '(mac ns x neo))
+  :config
+  ;; 只启动非交互式登录 zsh：读取 ~/.zprofile 中的 PATH，
+  ;; 避免加载 Oh My Zsh、Powerlevel10k、Conda hook 等交互式配置。
+  (setq exec-path-from-shell-shell-name "/bin/zsh"
+        exec-path-from-shell-arguments '("-l"))
   (exec-path-from-shell-initialize))
 
 ;;; Shell vterm

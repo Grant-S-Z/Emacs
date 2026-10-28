@@ -1,0 +1,25 @@
+\documentclass{article}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{unicode-math}
+% \setmainfont{Libertinus Serif}
+% \setmathfont{Libertinus Math}
+% \setmainfont{STIX Two Text}
+\setmainfont{Maple Mono NF CN}
+% \setmathfont{STIX Two Math}
+% \setmathfont{XCharter Math}
+% \setmathfont{Erewhon Math}
+\setmathfont{Concrete Math}
+% \setmathfont{KpMath Semibold}
+\usepackage{siunitx}
+\usepackage[version=4]{mhchem}
+\usepackage{tikz}
+\usepackage{tikz-feynman}
+\pagestyle{empty}
+% unicode-math 下 bm/mathrsfs 会引发 "Extended mathchar" 冲突，
+% 用 \symbf 替代 \bm，\mathscr 由 unicode-math 原生提供
+\providecommand{\bm}[1]{\symbf{#1}}
+%%ORG-MATH-MACROS%%

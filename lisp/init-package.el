@@ -4,6 +4,9 @@
 ;;; Basic
 (which-key-mode 1) ;; which-key internally installed
 
+(use-package benchmark-init
+  :init (benchmark-init/activate))
+
 (use-package restart-emacs ;; restart emacs
   :bind (("C-c r" . restart-emacs)))
 
@@ -46,12 +49,6 @@
 (use-package magit
   :bind ("C-x g" . magit))
 
-(use-package openwith
-  :init (openwith-mode t)
-  :config
-  (setq openwith-associations '(("\\.pdf\\'" "open" (file))
-				("\\.epub\\'" "open" (file)))))
-
 (use-package atomic-chrome
   :config
   (atomic-chrome-start-server)
@@ -62,6 +59,17 @@
 ;;; UI operation
 (use-package ace-window ;; change window
   :bind (("M-o" . 'ace-window)))
+
+(use-package expand-region
+  :bind ("C-c e" . er/expand-region))
+
+(use-package wgrep
+  :commands (wgrep-change-to-wgrep-mode))
+
+(use-package diff-hl
+  :hook ((prog-mode . diff-hl-mode)
+         (LaTeX-mode . diff-hl-mode)
+         (org-mode . diff-hl-mode)))
 
 (use-package ws-butler ;; remove space automatically
   :hook (prog-mode . ws-butler-mode))
@@ -83,10 +91,6 @@
 
 
 ;;; Daily packages
-;; Calculator
-;; (use-package literate-calc-mode
-;;   :mode ("calc" . literate-calc-mode))
-
 ;; Calibre
 (use-package calibredb
   :config
@@ -102,6 +106,21 @@
   (setq gt-langs '(en zh))
   (setq gt-default-translator (gt-translator :engines (gt-youdao-dict-engine)))
   (setq gt-taker-pick 'paragraph))
+
+;;; MaiMemo (墨墨背单词开放 API，Token 与官方 CLI 共享 ~/.config/memo-api.json)
+(use-package maimemo
+  :ensure nil ;; 不在 MELPA，从 site-lisp 手动加载
+  :load-path "~/.emacs.d/site-lisp/maimemo"
+  :commands (maimemo-add-word
+             maimemo-add-word-to-notepad
+             maimemo-study-progress
+             maimemo-today-items)
+  :bind (("C-c m a" . maimemo-add-word)            ; 加入学习规划（C-u 提前复习）
+         ("C-c m n" . maimemo-add-word-to-notepad) ; 加入云词本
+         ("C-c m p" . maimemo-study-progress)      ; 今日学习进度
+         ("C-c m t" . maimemo-today-items))        ; 今日单词列表
+  )
+
 
 (provide 'init-package)
 ;;; init-package.el ends here

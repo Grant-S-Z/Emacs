@@ -1,21 +1,14 @@
 ;;; init-lsp.el --- for languages  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
-;;; DOCS
-;; (use-package devdocs)
-
-
 ;;; TS
 (use-package treesit-auto
-  :demand t
+  :hook (prog-mode . global-treesit-auto-mode)
   :config
   (setq treesit-auto-install 'prompt)
-  (setq treesit-font-lock-level 4))
-
-
-;;; Check
-;; (use-package flycheck
-;;   :hook (prog-mode . flycheck-mode))
+  (setq treesit-font-lock-level 4)
+  ;; Prefer ready tree-sitter modes; keep classic modes as fallback.
+  (treesit-auto-add-to-auto-mode-alist))
 
 
 ;;; Format
@@ -33,13 +26,11 @@
 
 ;; Corfu
 (use-package corfu
-  :init (global-corfu-mode)
-  ;; :hook ((emacs-lisp-mode . corfu-mode)
-  ;; 	 (lisp-interaction-mode . corfu-mode)
-  ;; 	 (prog-mode . corfu-mode)
-  ;; 	 (TeX-mode . corfu-mode)
-  ;; 	 (org-mode . corfu-mode)
-  ;; 	 (message-mode . corfu-mode))
+  :hook ((emacs-lisp-mode . corfu-mode)
+	 (lisp-interaction-mode . corfu-mode)
+	 (prog-mode . corfu-mode)
+	 (TeX-mode . corfu-mode)
+		 (message-mode . corfu-mode))
   :bind (:map corfu-map
               ("M-n" . corfu-next)
               ("M-p" . corfu-previous))
@@ -63,84 +54,23 @@
   :init (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 
-;;; Lsp-mode
-;; (use-package lsp-mode
-;;   :init
-;;   (defun grant/lsp-mode-setup-completion ()
-;;     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-;; 	  '(orderless)))
-;;   :commands (lsp lsp-deferred)
-;;   :hook
-;;   ((c++-mode . lsp-deferred)
-;;    (c-mode . lsp-deferred)
-;;    (python-mode . lsp-deferred)
-;;    (python-ts-mode .lsp-deferred)
-;;    (TeX-mode . lsp-deferred)
-;;    (lsp-mode . lsp-enable-which-key-integration)
-;;    (lsp-completion-mode . grant/lsp-mode-setup-completion))
-;;   :custom
-;;   (lsp-keymap-prefix "C-x C-l")
-;;   (lsp-file-watch-threshold 500)
-;;   ;; Completion provider
-;;   (lsp-completion-provider :capf)
-;;   ;; Python ruff
-;;   (lsp-ruff-python-path "~/miniconda3/bin/python3")
-;;   (lsp-ruff-server-command '("~/miniconda3/bin/ruff" "server")))
-
-;; (use-package lsp-pyright
-;;   :custom (lsp-pyright-langserver-command "~/miniconda3/bin/pyright")
-;;   :hook (python-ts-mode . (lambda ()
-;;                             (require 'lsp-pyright)
-;;                             (lsp-deferred))))
-
-;; (use-package lsp-ui
-;;   :after lsp-mode
-;;   :custom
-;;   (lsp-ui-sideline-enable nil)
-;;   (lsp-ui-peek-enable t)
-;;   (lsp-ui-doc-enable t))
-
-;; (use-package lsp-treemacs)
-
-;; (use-package dap-mode
-;;   :config
-;;   (dap-mode 1)
-;;   (dap-ui-mode 1)
-;;   (dap-tooltip-mode 1)
-;;   (tooltip-mode 1)
-;;   (dap-ui-controls-mode 1)
-;;   ;; Python
-;;   (require 'dap-python)
-;;   (setq dap-python-debugger 'debugpy)
-;;   ;; C
-;;   (require 'dap-gdb-lldb)
-;;   ;(setq dap-lldb-debug-program "/usr/bin/lldb")
-;;   )
-
-
-;;; Lsp-bridge
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/lsp-bridge/")
-;; (require 'lsp-bridge)
-;; (global-lsp-bridge-mode)
-
-
 ;;; Eglot
-(require 'eglot)
+(with-eval-after-load 'eglot
+  ;; Ignore dynamic LSP file-watch registration; `eglot-ignored-server-capabilities'
+  ;; does not intercept this path on macOS, where recursive watchers can exhaust kqueue.
+  (cl-defmethod eglot-register-capability :around
+      (_server (method (eql workspace/didChangeWatchedFiles)) _id &rest _params)
+    "Disable recursive LSP file watchers to preserve file descriptors."
+    nil)
+;; Pyright 的分析解释器（与 Emacs 的 python-shell-interpreter 分开配置）。
+;; 不设置时 Pyright 会按 PATH 自动选择，可能误用 Homebrew Python。
+(setq-default eglot-workspace-configuration
+              '(:python (:pythonPath "/Users/grant/miniconda3/bin/python3")))
 (add-to-list 'eglot-server-programs
 	     (list '(python-ts-mode python-mode)
 		   (expand-file-name "~/miniconda3/bin/pyright-langserver") "--stdio"))
 (add-to-list 'eglot-server-programs
-             '((c-mode c-ts-mode c++-mode c++-ts-mode) . ("clangd")))
-;; (add-to-list 'eglot-server-programs
-;;              `((python-ts-mode python-mode)
-;;                . (,(expand-file-name "~/miniconda3/bin/pyright-langserver") "--stdio")))
-
-;; (use-package eldoc-box
-;;   :after eglot
-;;   :hook (prog-mode . eldoc-box-hover-at-point-mode)
-;;   :custom
-;;   (eldoc-idle-delay 1.5))
-
+             '((c-mode c-ts-mode c++-mode c++-ts-mode) . ("clangd"))))
 
 ;;; Languages
 ;; Python
@@ -164,52 +94,13 @@
   (setq numpydoc-insert-examples-block nil)
   (setq numpydoc-insert-return-without-typehint t))
 
-(use-package hdf5-viewer
-  :mode ("\\.h5\\'" . hdf5-viewer-find-file-mode)
-  :custom
-  (hdf5-viewer-python-command "~/miniconda3/bin/python3"))
-
 ;; Markdown
-(use-package markdown-mode
-  :commands (markdown-mode gfm-mode)
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)))
-(use-package grip-mode ;; preview md
-  :init
-  (defvar grip-theme 'auto)
-
-  ;; Compatibility patch: mdopen 0.5.x doesn't support `--theme=...`, while
-  ;; some grip-mode versions still pass it.
-  (defun my/grip--filter-mdopen-start-process-args (args)
-    "Remove unsupported `--theme=' arg when launching mdopen."
-    (let* ((program (nth 2 args))
-           (is-mdopen (and (stringp program)
-                           (string= (file-name-nondirectory program) "mdopen"))))
-      (if (not is-mdopen)
-          args
-        (let ((prefix (seq-take args 3))
-              (rest (nthcdr 3 args))
-              (filtered nil))
-          (dolist (arg rest)
-            (unless (and (stringp arg)
-                         (string-prefix-p "--theme=" arg))
-              (push arg filtered)))
-          (append prefix (nreverse filtered))))))
-  :custom
-  (grip-command 'mdopen)
-  (grip-preview-in-webkit nil)
-  :config
-  (advice-add 'start-process :filter-args #'my/grip--filter-mdopen-start-process-args))
-
-;; ;; Lisp
-;; (use-package geiser
-;;   :hook (scheme-mode . geiser-mode))
-;; (use-package geiser-mit)
-
-;; (use-package slime
-;;   :custom
-;;   (inferior-lisp-program "sbcl"))
-
+(use-package markdown-ts-mode
+  :mode (("README\\.md\\'" . markdown-ts-mode)
+         ("\\.md\\'" . markdown-ts-mode)))
+(use-package markdown-ts-appear
+  :hook ((markdown-ts-mode . markdown-ts-appear-mode)
+	 (markdown-ts-mode . markdown-ts-appear-mathjax-mode)))
 ;; Cmake
 (use-package cmake-mode)
 
@@ -218,9 +109,6 @@
 (add-hook 'c-ts-mode-hook #'eglot-ensure)
 (add-hook 'c++-mode-hook #'eglot-ensure)
 (add-hook 'c++-ts-mode-hook #'eglot-ensure)
-
-;; ;; Lua
-;; (use-package lua-mode)
 
 ;; Csv
 (use-package csv-mode)

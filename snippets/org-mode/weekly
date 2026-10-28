@@ -1,0 +1,34 @@
+# -*- mode: snippet -*-
+# name: weekly
+# key: weekly
+# --
+#+PROPERTY: header-args :eval never-export
+#+OPTIONS: H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+LATEX_COMPILER: lualatex
+#+LATEX_CLASS: beamer-en
+#+LATEX_HEADER: \usepackage{appendixnumberbeamer}
+#+LATEX_HEADER: \usecolortheme{thu}
+#+LATEX_HEADER: \useoutertheme{infolines}
+#+LATEX_HEADER: \useinnertheme{default}
+#+LATEX_HEADER: \setbeamertemplate{blocks}[rounded][shadow=false]
+#+LATEX_HEADER: \setbeamertemplate{items}[circle]
+#+LATEX_HEADER: \setbeamertemplate{sections/subsections in toc}[sections numbered]
+#+LATEX_HEADER: \setbeamertemplate{headline}[default]
+#+LATEX_HEADER: \usetikzlibrary{arrows.meta, positioning, angles, quotes}
+#+BEAMER_HEADER: \addtobeamertemplate{title page}{}{\begin{tikzpicture}[remember picture,overlay]\node[anchor=north east, xshift=-0.3cm, yshift=-0.3cm] at (current page.north east){\includegraphics[height=1.2cm]{thu-fig-logo.pdf}\hspace{0.3cm}};\end{tikzpicture}}
+
+#+title: $1
+#+subtitle: $2
+#+BEAMER_HEADER: %\AtBeginDocument{\title[$3]{$1}}
+#+author: $4
+#+data: \today
+#+BEAMER_HEADER: \institute[DEP, THU]{Department of Engineering Physics, Tsinghua University}
+* $0
+
+
+* Backup :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+** Backup

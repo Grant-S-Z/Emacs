@@ -1,15 +1,16 @@
 ;;; init-elpa.el -- archives of emacs  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
-(setq package-check-signature nil) ; no checking signature
+(setq package-check-signature nil) ; verify package signatures
 (setq package-install-upgrade-built-in nil) ; no auto upgrade
 
 ;; Sources
 (require 'package)
-
-;; (setq package-archives '(("gnu"   . "https://elpa.gnu.org/packages/")
-;; 			 ("melpa" . "https://melpa.org/packages/")
-;; 			 ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
+;; Make Org main visible before activating packages that may load Org.
+(let ((org-main-lisp (expand-file-name "elpa/org/lisp" user-emacs-directory)))
+  (when (file-directory-p org-main-lisp)
+    (add-to-list 'load-path org-main-lisp)))
+(package-initialize)
 
 (setq package-archives '(("gnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
                          ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
@@ -21,15 +22,7 @@
 	use-package-always-defer t ;; 延迟加载
 	use-package-always-demand nil ;; demand 可覆盖触发器，强制立即加载
 	use-package-expand-minimally t
-	use-package-verbose t))
-
-;; Async
-;; (use-package async
-;;   :ensure t
-;;   :init
-;;   (autoload 'dired-async-mode "dired-async.el" nil t)
-;;   (dired-async-mode 1)
-;;   (async-bytecomp-package-mode 1))
+	use-package-verbose nil))
 
 (provide 'init-elpa)
 ;;; init-elpa.el ends here
