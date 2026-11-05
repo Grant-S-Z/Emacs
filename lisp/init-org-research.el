@@ -24,10 +24,58 @@
   :bind (("C-c v f" . org-fc-review)
 	 ("C-c v F" . org-fc-review-all))
   :custom
-  (org-fc-directories '("~/org/fc/")) ; index only the vocabulary dir, not roam notes
+  (org-fc-directories '("~/org/English/")) ; the vocab deck lives next to the notes
   :config
+  ;; No `org-fc-cache-mode': its incremental update calls the indexer with an
+  ;; empty file list when nothing changed, and the resulting bare `find -L'
+  ;; makes the BSD find on macOS error out. Re-indexing takes about a second.
+  ;; The bundled checkout ships `org-fc-type-vocab.el' but never loads it.
+  (require 'org-fc-type-vocab)
   (require 'org-fc-hydra)
-  (org-fc-cache-mode 1)) ; cache the index so thousands of cards load fast
+  (advice-add 'org-fc-set-header-line :override #'grant/org-fc-review-header-line))
+
+;; org-fc only puts "Flip" / "Rate" / "Edit" in the header line.  Show the keys
+;; for the state that is active instead, so the review buffer is self-explanatory.
+;; Each entry is a `(mode-variable . string)' pair, re-evaluated on redisplay.
+(defun grant/org-fc-review-header-line ()
+  "Set the review header line to the keys of the current state."
+  (let* ((session org-fc-review--session)
+         (remaining (1+ (length (oref (oref session scheduler) positions))))
+         (current (oref session current-item))
+         (title (unless (or org-fc-review-hide-title-in-header-line
+                            (member "notitle" (oref (oref current card) tags)))
+                  (oref (oref (oref current card) file) title))))
+    (setq org-fc-original-header-line-format header-line-format)
+    (setq-local header-line-format
+                `((org-fc-review-flip-mode
+                   " Flip:  RET 翻面 / s 暂停 / p 编辑 / q 退出 ")
+                  (org-fc-review-rate-mode
+                   " Rate:  a again / h hard / g good / e easy / s 暂停 / p 编辑 / q 退出 ")
+                  (org-fc-review-edit-mode
+                   " Edit:  C-c C-c 继续 / C-c C-k 退出 ")
+                  ,(format " (%d) " remaining)
+                  ,title))))
+
+;; The deck is one 30k-line file with more than 1500 `:REVIEW_DATA:' tables.
+;; `valign-mode' measures every table cell inside jit-lock (and again on each
+;; fold, through its `org-flag-region' advice), which makes opening and
+;; reviewing it crawl.  Keep it off there; the tables are metadata, not
+;; something worth pixel-aligning.
+(defun grant/org-fc-deck-buffer-p ()
+  "Non-nil when the current buffer visits the vocabulary deck."
+  (and buffer-file-name
+       (string-prefix-p (expand-file-name "~/org/English/")
+                        (expand-file-name buffer-file-name))))
+
+(defun grant/org-fc-deck-disable-valign ()
+  "Turn off `valign-mode' in the vocabulary deck."
+  (when (and (fboundp 'valign-mode)
+             (grant/org-fc-deck-buffer-p)
+             (bound-and-true-p valign-mode))
+    (valign-mode -1)))
+
+(add-hook 'find-file-hook #'grant/org-fc-deck-disable-valign)
+(add-hook 'org-fc-before-setup-hook #'grant/org-fc-deck-disable-valign)
 
 ;;; Notes and literature
 (use-package org-roam

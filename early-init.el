@@ -3,7 +3,10 @@
 ;;; Code:
 (setq window-resize-pixelwise t
       frame-resize-pixelwise t)
-(add-to-list 'default-frame-alist '(undecorated-round . t))
+;; Keep the borderless style on the main frame only: `default-frame-alist'
+;; also applies to the tiny child frames made by corfu/posframe, and an
+;; undecorated window there confuses macOS's window/Space handling.
+(add-to-list 'initial-frame-alist '(undecorated-round . t))
 
 ;; Leave package activation to init-elpa, so its load-path ordering happens
 ;; before any package is put on `load-path'.

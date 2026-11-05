@@ -3,7 +3,7 @@
 ;;; Code:
 ;;; Key settings
 ;; Global
-(global-set-key (kbd "C-M-<return>") 'toggle-frame-fullscreen)
+(global-set-key (kbd "C-M-<return>") 'toggle-frame-maximized)
 (global-set-key (kbd "M-[") 'backward-paragraph)
 (global-set-key (kbd "M-]") 'forward-paragraph)
 
