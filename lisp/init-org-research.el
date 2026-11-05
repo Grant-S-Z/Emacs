@@ -32,7 +32,27 @@
   ;; The bundled checkout ships `org-fc-type-vocab.el' but never loads it.
   (require 'org-fc-type-vocab)
   (require 'org-fc-hydra)
-  (advice-add 'org-fc-set-header-line :override #'grant/org-fc-review-header-line))
+  (advice-add 'org-fc-set-header-line :override #'grant/org-fc-review-header-line)
+  (dolist (map '(org-fc-review-flip-mode-map org-fc-review-rate-mode-map))
+    (define-key (symbol-value map) (kbd "k") #'grant/org-fc-mark-known)))
+
+;; `suspended' is the only state org-fc honours when building the queue; there
+;; is no "known" state.  Keep `:known:' as the human-readable label and retire
+;; the card in one action, so the tag and the scheduling agree.
+(defun grant/org-fc-mark-known ()
+  "Tag the card at point as known and stop scheduling it."
+  (interactive)
+  (org-fc-with-point-at-entry (org-toggle-tag "known" 'on))
+  (if (bound-and-true-p org-fc-review--session)
+      (org-fc-review-suspend-card)
+    (org-fc-suspend-card)))
+
+(defun grant/org-fc-unmark-known ()
+  "Put a `:known:' card back into the review queue."
+  (interactive)
+  (org-fc-with-point-at-entry
+   (org-toggle-tag "known" 'off)
+   (org-toggle-tag org-fc-suspended-tag 'off)))
 
 ;; org-fc only puts "Flip" / "Rate" / "Edit" in the header line.  Show the keys
 ;; for the state that is active instead, so the review buffer is self-explanatory.
@@ -48,9 +68,9 @@
     (setq org-fc-original-header-line-format header-line-format)
     (setq-local header-line-format
                 `((org-fc-review-flip-mode
-                   " Flip:  RET 翻面 / s 暂停 / p 编辑 / q 退出 ")
+                   " Flip:  RET 翻面 / k 已掌握 / s 暂停 / p 编辑 / q 退出 ")
                   (org-fc-review-rate-mode
-                   " Rate:  a again / h hard / g good / e easy / s 暂停 / p 编辑 / q 退出 ")
+                   " Rate:  a again / h hard / g good / e easy / k 已掌握 / s 暂停 / p 编辑 / q 退出 ")
                   (org-fc-review-edit-mode
                    " Edit:  C-c C-c 继续 / C-c C-k 退出 ")
                   ,(format " (%d) " remaining)
