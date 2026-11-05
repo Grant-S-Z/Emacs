@@ -41,8 +41,8 @@ Interactive use defaults to the current buffer's directory."
             #'agent-shell-math-renderer-on-appearance-change)
   (add-hook 'after-setting-font-hook
             #'agent-shell-math-renderer-on-appearance-change)
-  (setq agent-shell-math-renderer-rescale-inline 1.2)
-  (setq agent-shell-math-renderer-rescale-display 1.0)
+  (setq agent-shell-math-renderer-rescale-inline 0.9)
+  (setq agent-shell-math-renderer-rescale-display 0.9)
   ;; Allow Chinese in formulas.
   (setq latex-to-svg-backend-appended-preamble
         "\\usepackage[UTF8,fontset=fandol]{ctex}")

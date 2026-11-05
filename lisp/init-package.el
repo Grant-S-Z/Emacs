@@ -65,7 +65,15 @@
 
 ;;; UI operation
 (use-package ace-window
-  :bind (("M-o" . 'ace-window)))
+  :bind (("M-o" . 'ace-window))
+  :config
+  ;; `aw-ignored-p' only honours `no-other-window' for `ace-select-window',
+  ;; not for the dispatcher bound to M-o, so the dirvish side window still
+  ;; shows up.  Follow the parameter the way `other-window' does.
+  (advice-add 'aw-ignored-p :around
+              (lambda (orig window)
+                (or (funcall orig window)
+                    (window-parameter window 'no-other-window)))))
 
 (use-package expand-region
   :bind ("M-=" . er/expand-region))
@@ -101,7 +109,8 @@
   (setq calibredb-root-dir "~/org/books/")
   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir)))
 
-(use-package nov)
+(use-package nov
+  :mode ("\\.epub\\'" . nov-mode))
 
 ;; Translator
 (use-package gt

@@ -182,14 +182,39 @@
         insert-directory-program "/opt/homebrew/bin/gls" ; GNU ls for --group-directories-first
         dired-listing-switches "-aBhl --group-directories-first"))
 
+;; Drag files out of Dired/Dirvish and drop them into other applications.
+(setq dired-mouse-drag-files t
+      mouse-drag-and-drop-region-cross-program t)
+
 ;;; Dirvish: file manager in Dired, plus a side panel
 (use-package dirvish
   :bind (("C-x d" . dirvish)
-         ("C-c l" . dirvish-side))
+         ("C-c l" . dirvish-side)
+         :map dirvish-mode-map
+         ("?" . dirvish-dispatch)       ; cheatsheet
+         ("C-c o" . dirvish-quick-access) ; `o' keeps find-file-other-window
+         ("s" . dirvish-quicksort)      ; superset of dired-sort-toggle
+         ("r" . dirvish-history-jump)   ; unbound in dired
+         ("y" . dirvish-yank-menu)
+         ("N" . dirvish-narrow)
+         ("TAB" . dirvish-subtree-toggle)
+         ("M-f" . dirvish-history-go-forward)
+         ("M-b" . dirvish-history-go-backward)
+         ("M-e" . dirvish-emerge-menu))
   :custom
   (dirvish-attributes '(subtree-state nerd-icons collapse git-msg file-size))
+  ;; The side panel is narrow: no git-msg there, or the file name vanishes.
+  (dirvish-side-attributes '(vc-state nerd-icons collapse file-size))
   (dirvish-subtree-state-style 'nerd)
   (dirvish-side-width 32)
+  ;; List huge directories asynchronously with fd instead of blocking.
+  (dirvish-large-directory-threshold 5000)
+  ;; Keep preview/thumbnail caches out of the config directory.
+  (dirvish-cache-dir (expand-file-name "dirvish/"
+                                       (expand-file-name ".cache" user-emacs-directory)))
+  ;; No epub dispatcher: it needs `epub-thumbnailer', which is not installed.
+  ;; .epub files open in nov instead (see init-package.el).
+  (dirvish-preview-dispatchers '(video image gif audio archive font pdf))
   (dirvish-quick-access-entries
    '(("h" "~/" "Home")
      ("d" "~/Downloads" "Downloads")
