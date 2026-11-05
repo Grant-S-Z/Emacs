@@ -2,6 +2,13 @@
 ;;; Commentary:
 ;;; Code:
 ;;; Basic settings
+(when *is-wsl*
+  ;; Debian's mu4e is outside the load-path of a locally built Emacs.
+  (let ((dir (car (file-expand-wildcards "/usr/share/emacs/site-lisp/elpa/mu4e-*"))))
+    (when (and dir (not (locate-library "mu4e")))
+      (add-to-list 'load-path dir)
+      (load (expand-file-name "mu4e-autoloads.el" dir) nil t))))
+
 (require 'auth-source)
 (setq auth-sources '("~/.authinfo"))
 
