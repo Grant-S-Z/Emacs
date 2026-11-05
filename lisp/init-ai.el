@@ -17,7 +17,14 @@
   (agent-shell-file-display-action
    '((display-buffer-reuse-window display-buffer-pop-up-window)
      (inhibit-same-window . t)))
-  (agent-shell-kimi-default-model-id "DeepSeek/deepseek-flash")
+  ;; Kimi matches model IDs case-sensitively against ~/.kimi-code/config.toml.
+  ;; The WSL config spells this model in lower case; the mac config uses the
+  ;; capitalized key.
+  (agent-shell-kimi-default-model-id
+   (if *is-wsl* "deepseek/deepseek-flash" "DeepSeek/deepseek-flash"))
+  ;; WSL has no logind session, so the D-Bus inhibit call is denied; disable
+  ;; it there.  macOS can still block idle sleep through native APIs.
+  (agent-shell-inhibit-system-sleep (not *is-wsl*))
   :config
   ;; (setq agent-shell-preferred-agent-config 'pi)
   ;; (setq agent-shell-preferred-agent-config 'omp)

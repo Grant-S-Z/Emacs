@@ -2,50 +2,16 @@
 ;;; Commentary:
 ;;; Code:
 ;;; TS
-;; Enable available Tree-sitter major modes.
-(setq treesit-enabled-modes t)
-
-(when *is-wsl*
-  ;; WSL explicit remaps; only add when the grammar is installed.
-  (require 'treesit)
+;; Emacs 31 knows which classic modes have a tree-sitter counterpart:
+;; `treesit-major-mode-remap-alist' is pre-populated, and setting
+;; `treesit-enabled-modes' through Custom (hence `setopt', not `setq')
+;; copies those pairs into `major-mode-remap-alist'.
+(require 'treesit)
+;; `init-org', `init-tex' and `init-fun' use `string-trim' / `when-let*'.
 (require 'subr-x)
 (setq treesit-font-lock-level 4)
-
-(defun grant/treesit-language-for-mode (mode)
-  "Return the tree-sitter language symbol for MODE."
-  (pcase mode
-    ('c++-ts-mode 'cpp)
-    ('js-ts-mode 'javascript)
-    ('tsx-ts-mode 'tsx)
-    (_ (intern (string-remove-suffix "-ts-mode" (symbol-name mode))))))
-
-(defvar grant/treesit-mode-remaps
-  '((python-mode . python-ts-mode)
-    (sh-mode . bash-ts-mode)
-    (c-mode . c-ts-mode)
-    (c++-mode . c++-ts-mode)
-    (cmake-mode . cmake-ts-mode)
-    (yaml-mode . yaml-ts-mode)
-    (lua-mode . lua-ts-mode)
-    (json-mode . json-ts-mode)
-    (js-mode . js-ts-mode)
-    (typescript-mode . typescript-ts-mode)
-    (css-mode . css-ts-mode)
-    (html-mode . html-ts-mode)
-    (java-mode . java-ts-mode)
-    (go-mode . go-ts-mode)
-    (rust-mode . rust-ts-mode)
-    (ruby-mode . ruby-ts-mode)
-    (dockerfile-mode . dockerfile-ts-mode))
-  "Classic major modes remapped to tree-sitter modes.")
-
-(dolist (pair grant/treesit-mode-remaps)
-  (let ((lang (grant/treesit-language-for-mode (cdr pair))))
-    (when (and (fboundp (cdr pair))
-               (treesit-language-available-p lang))
-      (add-to-list 'major-mode-remap-alist pair)))))
-
-
+(when (boundp 'treesit-enabled-modes)
+  (setopt treesit-enabled-modes t))
 
 ;;; Format
 (use-package format-all
@@ -124,24 +90,14 @@
   (setq python-shell-completion-native-enable t))
 
 ;; Markdown
-;; Emacs 31 has built-in markdown-ts-mode; the external package rejects 31+.
-(if (and *is-wsl* (version<= "31" emacs-version))
-    (progn
-      (load (expand-file-name "textmodes/markdown-ts-mode.elc" lisp-directory))
-      (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-ts-mode)))
-  (use-package markdown-ts-mode
-    :mode (("README\\.md\\'" . markdown-ts-mode)
-           ("\\.md\\'" . markdown-ts-mode))))
-(when (version<= "31.1" emacs-version)
-  (use-package markdown-ts-appear
-    :after markdown-ts-mode
-    :hook ((markdown-ts-mode . markdown-ts-appear-mode)
-           (markdown-ts-mode . markdown-ts-appear-mathjax-mode))
-    :custom
-    (markdown-ts-appear-mathjax-scale 0.9)))
-
-;; CMake
-(use-package cmake-mode)
+(use-package markdown-ts-mode
+  :mode (("README\\.md\\'" . markdown-ts-mode)
+         ("\\.md\\'" . markdown-ts-mode)))
+(use-package markdown-ts-appear
+  :hook ((markdown-ts-mode . markdown-ts-appear-mode)
+         (markdown-ts-mode . markdown-ts-appear-mathjax-mode))
+  :custom
+  (markdown-ts-appear-mathjax-scale 0.9))
 
 ;; C/C++
 (add-hook 'c-ts-mode-hook #'eglot-ensure)
@@ -149,10 +105,6 @@
 
 ;; CSV
 (use-package csv-mode)
-
-;; YAML
-(use-package yaml-mode)
-
 
 (provide 'init-lsp)
 ;;; init-lsp.el ends here
