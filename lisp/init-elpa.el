@@ -1,12 +1,12 @@
-;;; init-elpa.el -- archives of emacs  -*- lexical-binding: t; -*-
+;;; init-elpa.el -- package archives  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
-(setq package-check-signature nil) ; verify package signatures
-(setq package-install-upgrade-built-in nil) ; no auto upgrade
+(setq package-check-signature nil)          ; no signature checks
+(setq package-install-upgrade-built-in nil) ; never upgrade built-in packages
 
 ;; Sources
 (require 'package)
-;; Make Org main visible before activating packages that may load Org.
+;; Put the Org main branch ahead of the built-in Org before packages load it.
 (let ((org-main-lisp (expand-file-name "elpa/org/lisp" user-emacs-directory)))
   (when (file-directory-p org-main-lisp)
     (add-to-list 'load-path org-main-lisp)))
@@ -16,13 +16,13 @@
                          ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
                          ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")))
 
-;; Use-package settings
+;; Use-package defaults
 (eval-and-compile
-  (setq use-package-always-ensure t ;; 自动确保安装
-	use-package-always-defer t ;; 延迟加载
-	use-package-always-demand nil ;; demand 可覆盖触发器，强制立即加载
-	use-package-expand-minimally t
-	use-package-verbose nil))
+  (setq use-package-always-ensure t
+        use-package-always-defer t
+        use-package-always-demand nil ; :demand overrides deferral per package
+        use-package-expand-minimally t
+        use-package-verbose nil))
 
 (provide 'init-elpa)
 ;;; init-elpa.el ends here

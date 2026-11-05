@@ -82,9 +82,8 @@
 
   ;; Babel
   (setq org-confirm-babel-evaluate nil)
-  (setq org-plantuml-jar-path "~/Code/plantuml/plantuml-1.2024.3.jar")
   (setq org-babel-python-command "~/miniconda3/bin/python3")
-
+  ;; (setq org-plantuml-jar-path "~/Code/plantuml/plantuml-1.2024.3.jar")
   (require 'ob-C)
   (require 'ob-shell)
   (require 'ob-mermaid)
@@ -93,8 +92,8 @@
    'org-babel-load-languages
    '((python . t)
      (emacs-lisp . t)
-     (plantuml . t)
-     (scheme . t)
+     ;; (plantuml . t)
+     ;; (scheme . t)
      (C . t)
      (shell . t)
      (latex . t)))
@@ -132,7 +131,8 @@
   (add-to-list 'org-capture-templates
 	       '("w" "Word (org-drill)" entry
 		 (file+headline "~/org/vocabulary.org" "New Words")
-		 ;; 标题保持中性：org-drill 复习时标题始终可见，放单词会剧透
+		 ;; Keep the heading neutral: org-drill shows it during review, so
+			 ;; putting the word there would spoil the answer.
 		 "* Word :drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: twosided\n:END:\n\n** English\n%^{Word}\n\n** 中文释义\n%^{中文释义}\n\n** 例句\n%?\n"))
   (add-to-list 'org-capture-templates
 	       '("e" "Event" entry (file "~/org/event.org")
@@ -166,6 +166,16 @@
                                  2400)
                                 "......"
                                 "-----------------------------------------------------"))))
+
+;;; Preload one-time heavy modes during idle time
+;; org and AUCTeX are deferred by use-package; without preloading, the
+;; first org/LaTeX file open pays the full load cost up front (and org
+;; src blocks containing LaTeX load AUCTeX mid-fontification).
+(run-with-idle-timer
+ 3 nil
+ (lambda ()
+   (require 'org nil t)
+   (require 'latex nil t)))
 
 (provide 'init-org)
 ;;; init-org.el ends here

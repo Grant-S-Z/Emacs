@@ -5,4 +5,20 @@
       frame-resize-pixelwise t)
 (add-to-list 'default-frame-alist '(undecorated-round . t))
 
+;; Leave package activation to init-elpa, so its load-path ordering happens
+;; before any package is put on `load-path'.
+(setq package-enable-at-startup nil)
+
+;; Turn these off before the first frame is drawn; doing it in init.el lets
+;; the initial frame flash with a toolbar and scroll bars.
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+
+;; Postpone GC while loading init files; restore a generous threshold
+;; after startup.  Repeated garbage collection during init is a common
+;; cause of slow startup.
+(setq gc-cons-threshold most-positive-fixnum)
+(add-hook 'emacs-startup-hook
+          (lambda () (setq gc-cons-threshold (* 32 1024 1024))))
+
 (provide 'early-init)

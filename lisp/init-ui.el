@@ -1,11 +1,11 @@
-;;; init-ui.el -- themes of emacs  -*- lexical-binding: t; -*-
+;;; init-ui.el --- theme, fonts and UI chrome  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 
 ;;; Reading and scrolling
 (pixel-scroll-precision-mode 1)
+(setq fill-column 68)
 (add-hook 'text-mode-hook #'visual-line-mode)
-(add-hook 'text-mode-hook #'visual-line-fill-column-mode)
 
 ;;; Line number
 (defun grant/enable-line-numbers ()
@@ -22,25 +22,18 @@
   :init
   (add-hook 'after-init-hook 'dashboard-open)
   :config
-  ;; Initial buffer
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
-  ;; Items
   (setq dashboard-items '((recents . 8)))
   (setq dashboard-item-shortcuts '((recents . "r")
 				   ))
 
-  ;; Icons
   (setq dashboard-display-icons-p t)
   (setq dashboard-icon-type 'nerd-icons)
   :custom
-  ;; Set the title
   (dashboard-banner-logo-title "Welcome Grant. Have a good time!")
-  ;; Center contents
   (dashboard-center-content t)
-  ;; Logo
   (dashboard-startup-banner "~/.emacs.d/img/celeste.png")
-  ;; Footnote
   (dashboard-footer-messages '
    ("True mastery of any skill takes a lifetime."))
   (dashboard-set-heading-icons t)
@@ -69,10 +62,10 @@
   :custom
   (vertico-count 15))
 
-(use-package savehist ;; persist history over restarting Emacs, and vertico sorts by history position.
+(use-package savehist ; persist history across restarts; vertico sorts by it
   :init (savehist-mode 1))
 
-(use-package orderless ;; optionally use the orderless completion style.
+(use-package orderless
   :init
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
@@ -91,7 +84,7 @@
         show-paren-delay 0.1)
   )
 
-(use-package rainbow-delimiters ;; color of delimiters
+(use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package hl-line
@@ -103,19 +96,19 @@
 						(line-beginning-position 2))))
   )
 
-(use-package indent-bars ;; indent lines
+(use-package indent-bars
   :init
   (setq indent-tabs-mode t
 	indent-bars-no-descend-lists t
 	indent-bars-prefer-character t)
   :hook (prog-mode . indent-bars-mode))
 
-;; Outli, unfold codes as org
+;; Outli: org-style folding in code buffers
 (use-package outli
   :vc (:url "https://github.com/jdtsmith/outli")
   :hook (prog-mode . outli-mode))
 
-(use-package hl-todo ;; highlight keywords when coding and jump
+(use-package hl-todo
   :init (global-hl-todo-mode))
 
 ;;; Fonts and input method
@@ -138,29 +131,24 @@
 
 (use-package posframe)
 
-;; Input method
 (use-package rime
   :custom
   (default-input-method "rime")
-  (rime-librime-root "~/.emacs.d/librime/dist") ;; librime path
+  (rime-librime-root "~/.emacs.d/librime/dist")
   (rime-emacs-module-header-root "")
-  (rime-share-data-dir "~/Library/Rime") ;; share path
-  (rime-user-data-dir "~/.emacs.d/rime") ;; real path used in Emacs rime
+  (rime-share-data-dir "~/Library/Rime")
+  (rime-user-data-dir "~/.emacs.d/rime")
   (rime-cursor ".")
-  (rime-show-candidate 'posframe) ;; use posframe
-  (rime-commit1-forall t) ;; show the first choice
+  (rime-show-candidate 'posframe)
+  (rime-commit1-forall t)
   (rime-posframe-properties
    (list :internal-border-width 1))
   (rime-posframe-style 'vertical)
-  (mode-line-mule-info '((:eval (rime-lighter)))) ;; show rime symbol on modeline
-  (rime-deactivate-when-exit-minibuffer t) ;; deactivate rime in minibuffer automatically
+  (mode-line-mule-info '((:eval (rime-lighter))))
+  (rime-deactivate-when-exit-minibuffer t)
   )
 
 ;;; Themes
-;; ;; Use a "mixed" setup: proportional body, monospace code blocks.
-;; ;; `mixed-pitch-mode` cooperates better with org-src overlays than
-;; ;; enabling `variable-pitch-mode` directly.
-
 ;; (load-theme 'ef-frost :no-confirm)
 (load-theme 'ef-reverie :no-confirm)
 ;; (load-theme 'ef-trio-light :no-confirm)
@@ -168,103 +156,102 @@
 ;; (load-theme 'catppuccin :no-confirm)
 ;; (setq catppuccin-flavor 'latte)
 ;; (catppuccin-reload)
-;; (load-theme 'doric-beach :no-confirm) ;; yellow bkg, i do not like
-;; (load-theme 'doric-beach :no-confirm) ;; few colors, black
-;; (load-theme 'modus-operandi :no-confirm) ;; few colors
-;; (load-theme 'doom-flatwhite :no-confirm) ;; no contrast
+;; (load-theme 'modus-operandi :no-confirm)
+;; (load-theme 'doom-flatwhite :no-confirm)
 
-
-(use-package writeroom-mode ;;; center texts
-  :hook (org-mode . writeroom-mode)
-  :custom
-  (writeroom-maximize-window nil)
-  (writeroom-mode-line t)
-  (writeroom-width 100)
-  (writeroom-global-effects '(writeroom-set-alpha
-			      writeroom-set-menu-bar-lines
-			      writeroom-set-tool-bar-lines
-			      writeroom-set-vertical-scroll-bars
-			      writeroom-set-bottom-divider-width))
-  (setq-local line-spacing 0.1))
 
 ;;; Dired
 (when *is-mac*
   (setq dired-use-ls-dired t
-        insert-directory-program "/opt/homebrew/bin/gls" ;; replace ls with gls
+        insert-directory-program "/opt/homebrew/bin/gls" ; GNU ls for --group-directories-first
         dired-listing-switches "-aBhl --group-directories-first"))
-;; Dirvish
+
+;;; Dirvish: file manager in Dired, plus a side panel
 (use-package dirvish
-  :bind ("C-x d" . dirvish)
+  :bind (("C-x d" . dirvish)
+         ("C-c l" . dirvish-side))
   :custom
+  (dirvish-attributes '(subtree-state nerd-icons collapse git-msg file-size))
+  (dirvish-subtree-state-style 'nerd)
+  (dirvish-side-width 32)
   (dirvish-quick-access-entries
    '(("h" "~/" "Home")
-     ("d" "~/Downloads" "Downloads")))
-  (dirvish-attributes '(subtree-state
-		        nerd-icons
-		        collapse
-			git-msg
-		        file-size))
+     ("d" "~/Downloads" "Downloads")
+     ("o" "~/org/" "Org")
+     ("r" "~/research/" "Research")))
   :config
-  (dirvish-override-dired-mode) ;; replace dired ui with dirvish
-  (dirvish-side-follow-mode))
-
-;; Treemacs
-(use-package treemacs
-  :bind (("C-c t" . treemacs)
-         ("M-0" . treemacs-select-window)
-         ("C-c T" . treemacs-add-and-display-current-project-exclusively))
-  :custom
-  (treemacs-width 32)
-  (treemacs-indentation 1)                  ;; more compact file tree
-  (treemacs-collapse-dirs 3)                ;; collapse single-child directories
-  (treemacs-sorting 'alphabetic-numeric-asc) ;; natural file name sorting
-  (treemacs-silent-refresh t)               ;; suppress refresh messages
-  :config
-  (treemacs-follow-mode 1)       ;; locate the current file in the tree
-  (treemacs-filewatch-mode 1)    ;; refresh when files change
-  (treemacs-git-mode 'deferred)  ;; show Git status asynchronously
-  (treemacs-fringe-indicator-mode 'always))
-
-(use-package treemacs-nerd-icons
-  :after treemacs
-  :demand t
-  :config
-  (treemacs-load-theme "nerd-icons"))
+  (dirvish-override-dired-mode)  ; the Dired UI and previews
+  (dirvish-side-follow-mode)
+)
 
 ;;; Ligature
-(let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-               (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-               (36 . ".\\(?:>\\)")
-               (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-               (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-               (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-               (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-               (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-               (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-               (48 . ".\\(?:x[a-zA-Z]\\)")
-               (58 . ".\\(?:::\\|[:=]\\)")
-               (59 . ".\\(?:;;\\|;\\)")
-               (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-               (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-               (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-               (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-               (91 . ".\\(?:]\\)")
-               (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-               (94 . ".\\(?:=\\)")
-               (119 . ".\\(?:ww\\)")
-               (123 . ".\\(?:-\\)")
-               (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-               (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)")
-               )
-             ))
-  (dolist (char-regexp alist)
-    (set-char-table-range composition-function-table (car char-regexp)
-                          `([,(cdr char-regexp) 0 font-shape-gstring]))))
+;; Maple Mono NF CN draws its ligatures through the `calt' feature; the
+;; sequences below are the font's own calt table (see its
+;; documentation/opentype-features.md).  Emacs cannot enable OpenType
+;; features, so anything gated behind ssXX/cvXX (>>=, -<<, ~=, =~, !~ ...)
+;; is deliberately absent.
+(defconst grant-ligatures
+  '("!==" "!!" "!="
+    "#######" "#_(" "#__" "#!" "#(" "#:" "#=" "#?" "#[" "#_" "#{"
+    "&&&" "&&"
+    "*/" "*>"
+    "+++" "++" "+>"
+    "-------" "--}}" "---" "--<" "-->" "--" "->" "-~"
+    "..." "..<" ".." ".=" ".?"
+    "/**" "///" "/*" "//" "/>"
+    ":::" ":<:" ":=:" ":>:" ":?>" "::" ":<" ":=" ":>" ":?"
+    ";;;" ";;"
+    "<!---->" "<!--" "<#--" "<-->" "<==>" "<|||" "<*>" "<+>" "<--" "<-<"
+    "<->" "<-|" "</>" "<:<" "<<<" "<=<" "<==" "<=>" "<=|" "<|>" "<||"
+    "<~>" "<~~" "<*" "<+" "<-" "</" "<:" "<<" "<=" "<>" "<|" "<~"
+    "=======" "=!=" "=/=" "=:=" "=<=" "===" "==>" "=>=" "=:" "==" "=>"
+    ">--" ">->" ">:>" ">=<" ">=>" ">>>" ">:" ">=" ">>"
+    "???" "?." "?:" "??"
+    "]#" "_|_" "__"
+    "{{!--" "{{--" "{{" "{|" "|}" "}}"
+    "|||>" "|->" "|=>" "||>" "|=" "|>" "|]" "||"
+    "~~~~~~~" "~~>" "~-" "~>" "~@" "~~")
+  "Fixed-length ligatures of Maple Mono NF CN, grouped by first character.")
+
+;; The font can draw - = # ~ and arrows at any length (`----->', `===='),
+;; so a regexp is cheaper than enumerating lengths.  The regexp describes
+;; what follows the first character, because the composition rule always
+;; starts by matching `.` against it.
+(defconst grant-ligature-regexps
+  '((?- . "-+\\(?:[<>]\\|}}\\|~\\)?")
+    (?= . "=+\\(?:[<>]=\\|[!/:]=\\|[<>:]\\)?")
+    (?# . "#+\\(?:_[(_]\\|[_(:?!=]\\|\\[\\|{\\)?")
+    (?~ . "~+\\(?:[>@-]\\)?")
+    (?< . "-+[<>|]?\\|=+[<>|]?\\||+>?\\|<+\\|/>?\\|!-+>?\\|#-+\\|:<?\\|~+>?\\|[+*]>?\\|>")
+    (?> . ">+\\(?:[-=:][-=<>]?\\)?\\|-+[<>]?\\|[-=:][-=<>]?"))
+  "Regexps for the leading character, covering ligatures of any length.
+They are tried before the fixed-length strings that share a first character.")
+
+(let ((groups nil))
+  (dolist (ligature grant-ligatures)
+    (let ((group (assq (aref ligature 0) groups)))
+      (if group
+          (setcdr group (cons (substring ligature 1) (cdr group)))
+        (push (cons (aref ligature 0) (list (substring ligature 1))) groups))))
+  (dolist (group groups)
+    ;; Regexp alternation takes the first match, so longer strings go first.
+    (let* ((char (car group))
+           (regexp (cdr (assq char grant-ligature-regexps)))
+           (rests (sort (cdr group)
+                        (lambda (a b)
+                          (or (> (length a) (length b))
+                              (and (= (length a) (length b)) (string< a b))))))
+           (alternatives (mapcar #'regexp-quote rests)))
+      (when regexp
+        (setq alternatives (cons regexp alternatives)))
+      (set-char-table-range composition-function-table char
+                            `([,(concat ".\\(?:" (mapconcat #'identity alternatives "\\|") "\\)")
+                               0 font-shape-gstring])))))
 
 ;;; Frame borders and window dividers
 (modify-all-frames-parameters
- '((right-divider-width . 5)
-   (internal-border-width . 5)))
+ '((right-divider-width . 1)
+   (internal-border-width . 1)))
 (dolist (face '(window-divider
                 window-divider-first-pixel
                 window-divider-last-pixel))

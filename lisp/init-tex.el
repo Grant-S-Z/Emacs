@@ -1,4 +1,4 @@
-;;; init-tex.el --- for tex  -*- lexical-binding: t; -*-
+;;; init-tex.el --- LaTeX setup  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;; TeX settings
@@ -7,7 +7,7 @@
   :config
   (setq TeX-auto-save t)
   (setq TeX-parse-self t)
-  (setq-default TeX-master t) ;; make emacs aware of multi-file projects
+  (setq-default TeX-master t) ; make emacs aware of multi-file projects
   (add-hook 'LaTeX-mode-hook (lambda ()
 			       (setq TeX-command-default "LatexMk")
 			       (setq TeX-show-compilation nil)
@@ -15,28 +15,26 @@
 			       (turn-on-reftex)
 			       (auctex-latexmk-setup)
 			       (outline-minor-mode)
-			       (outline-hide-body) ;; show title only
+			       (outline-hide-body) ; show title only
 			       )))
 
-;; pdf 预览
+;; PDF preview
 (setq TeX-PDF-mode t)
-(setq TeX-source-correlate-mode t) ;; 编译后开启正反向搜索
-(setq TeX-source-correlate-method 'syntax) ;; 搜索执行方式
+(setq TeX-source-correlate-mode t) ; forward/inverse search after compiling
+(setq TeX-source-correlate-method 'syntax)
 (setq TeX-source-correlate-start-server t)
 ;; (setq TeX-view-program-list '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
-;; (setq TeX-view-program-selection '((output-pdf "Skim")))
-;; 用 pdf-tools 作为 AUCTeX 的 PDF 查看器（否则 macOS 默认回退到 open → Skim）
-(setq TeX-view-program-selection '((output-pdf "PDF Tools")))
-(add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer) ;; refresh pdf after compilation
-(add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window) ;; auto fit width
+(setq TeX-view-program-selection '((output-pdf "Skim")))
+;; Use pdf-tools as the AUCTeX viewer; otherwise macOS falls back to open -> Skim.
+;; (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
+(add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer) ; refresh pdf after compiling
+(add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window) ; fit width
 
-;; Latexmk
 (use-package auctex-latexmk
   :after tex
   :config
   (setq auctex-latexmk-inherit-TeX-PDF-mode t))
 
-;; Cdlatex
 (use-package cdlatex
   :hook ((org-mode . org-cdlatex-mode)
 	 (tex-mode . cdlatex-mode))
@@ -44,13 +42,12 @@
   (add-to-list 'cdlatex-command-alist
 	       '(("qt" "Insert \\qty{}{}" "\\qty{?}{}" cdlatex-position-cursor nil t nil))))
 
-;; PDF tools
 (use-package pdf-tools
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :config (pdf-tools-install))
 
-;; PDF 演示模式（pdf-tools 之上）：全屏 + 整页适配 + 隐藏干扰元素
-;; 用法：在 PDF buffer 中按 P 或 M-x grant-pdf-present-mode；q 退出，m 反色
+;; PDF presentation mode on top of pdf-tools: full screen, page fit, no clutter.
+;; In a PDF buffer press P or M-x grant-pdf-present-mode; q quits, m inverts.
 (defvar-local grant-pdf-present--saved nil
   "State saved before entering `grant-pdf-present-mode'.")
 

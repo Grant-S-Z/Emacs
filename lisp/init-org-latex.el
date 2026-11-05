@@ -66,7 +66,7 @@ linkcolor=black
 ")
   (setq org-latex-prefer-user-labels t)
   (setq org-beamer-theme "metropolis")
-  ;; 导出的 PDF 用 Emacs（pdf-tools）打开，不走系统默认（Skim）
+  ;; Open exported PDFs in Emacs (pdf-tools) instead of the system default (Skim).
   (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
   (setq org-latex-pdf-process
 	'("latexmk --lualatex -shell-escape -interaction=nonstopmode -output-directory=%o %f"))
@@ -80,9 +80,9 @@ linkcolor=black
                         (grant/org-latex-template (format "org-%s.tex" class)))
                   grant/org-latex-section-structure))))
 
-;;; Org LaTeX preview（Org main 原生异步实现）
+;;; Org LaTeX preview (native async implementation in Org main)
 (use-package org-latex-preview
-  :ensure nil ;; 由 Org main 提供，不是独立 ELPA 包
+  :ensure nil ; provided by Org main, not a separate ELPA package
   :after org
   :hook (org-mode . org-latex-preview-mode)
   :custom
@@ -90,7 +90,7 @@ linkcolor=black
   (org-latex-preview-mode-display-live t)
   (org-latex-preview-mode-track-inserts t)
   (org-latex-preview-mode-update-delay 0.1)
-  ;; LuaLaTeX/XeLaTeX 不支持新预览的头文件预编译。
+  ;; LuaLaTeX/XeLaTeX cannot precompile the preview header.
   (org-latex-preview-process-precompile nil)
   (org-latex-preview-appearance-options
    '(:foreground auto :background "Transparent"

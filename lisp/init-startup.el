@@ -1,4 +1,4 @@
-;;; init-startup.el -- when starting  -*- lexical-binding: t; -*-
+;;; init-startup.el --- startup settings  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;; Basic
@@ -11,46 +11,42 @@
       kept-old-versions 2
       delete-old-versions t)
 (make-directory (expand-file-name ".cache/backups/" user-emacs-directory) t)
-(setq inhibit-startup-message t) ;; no startup message
-(setq frame-title-format "Emacs") ;; frame title
-(setq-default cursor-type 'bar) ;; set cursor type to hollow box
+(setq inhibit-startup-message t)
+(setq frame-title-format "Emacs")
+(setq-default cursor-type 'bar)
 
-(scroll-bar-mode -1) ;; no scroll bar
-(tool-bar-mode -1) ;; no tool bar
-(winner-mode 1) ;; undo window operation
-(delete-selection-mode 1) ;; replace the contents in selected region
-(global-auto-revert-mode 1) ;; auto refresh changed windows
+(winner-mode 1)
+(delete-selection-mode 1)
+(global-auto-revert-mode 1)
 (when *is-mac*
   (menu-bar-mode 1))
 (when *is-linux*
   (menu-bar-mode -1))
 
-(add-hook 'prog-mode-hook #'subword-mode) ;; operation on camel words
-(electric-pair-mode 1) ;; generate parens automatically
-(repeat-mode 1) ;; repeat compatible navigation commands
-(show-paren-mode 1) ;; 全局括号匹配高亮（show-paren-mode 是全局模式，不应挂进 prog-mode-hook）
-(add-hook 'prog-mode-hook #'hs-minor-mode) ;; hideshow
+(add-hook 'prog-mode-hook #'subword-mode) ; camelCase-aware motion
+(electric-pair-mode 1)
+(repeat-mode 1)
+(show-paren-mode 1) ; global mode, so it stays out of prog-mode-hook
+(add-hook 'prog-mode-hook #'hs-minor-mode)
 
-;; System locale to use for formatting time values.
-(setq system-time-locale "C") ;; in English
+;; Format time values in English.
+(setq system-time-locale "C")
 
-;; Avoid byte-compiled files that are older than their source files
+;; Prefer sources over stale byte-compiled files.
 (setq load-prefer-newer t)
 
-;; Prevent `so-long' from disabling font-lock in org files with long lines
-;; (e.g. long tables in journal.org).
+;; Keep `so-long' from taking over org files with long lines (e.g. long tables in journal.org).
 (with-eval-after-load 'so-long
-  (setq so-long-threshold 1000))
+  (setq so-long-threshold 20000))
 
-;; Scratch
 (setq initial-scratch-message nil)
 
-;;; Mac ligature and scroll
+;;; macOS modifier keys
 (when *is-mac*
-  (setq mac-option-modifier nil		;; for emacs-plus
-	mac-command-modifier 'meta))
+  (setq mac-option-modifier nil        ; for emacs-plus
+        mac-command-modifier 'meta))
 
-;;; Load the contents of load-file into custom.el
+;;; Custom file
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
   (load-file custom-file))

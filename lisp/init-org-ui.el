@@ -15,9 +15,12 @@
   (org-modern-priority t)
   (org-modern-star 'replace)
   :config
-  (setq org-modern-list '((43 . "◦")
-			  (45 . "•")
-			  (42 . "–")))
+  (setq org-modern-list '((43 . "•")
+			  ;; (45 . "☄")
+			  (45 . "✶")
+			  (42 . "◦")))
+  (setq org-modern-replace-stars "✺☽✦✧⋆")
+  ;; (setq org-modern-replace-stars "⬢⬡❖⟡⋄")
   (setq org-modern-block-name
 	'(("src" . ("λ" ""))
 	  ("quote" . ("❝" ""))
@@ -25,7 +28,7 @@
 	  (t . t)))
   (setq org-modern-keyword
 	'(("title"  . "𝒯")
-	  ("subtitle" . "")
+	  ("subtitle" . "𝒮")
 	  ("author" . "✍")
 	  ("date"   . "◷")
           ("name"   . "↪")
@@ -40,7 +43,7 @@
 		("CANCELED" :background "grey" :foreground "black")))))
 
 ;;; Source visibility and inline content
-;; 公式源码与图片的切换由 org-latex-preview-mode 负责。
+;; Toggling formula source against its image is handled by org-latex-preview-mode.
 (use-package org-appear
   :after org
   :hook (org-mode . org-appear-mode)
@@ -49,15 +52,19 @@
   (org-appear-autolinks t)
   (org-appear-autoentities t)
   (org-appear-autosubmarkers t)
-  (org-appear-autokeywords t))
+  (org-appear-autokeywords t)
+  (org-appear-inside-latex t))
 
 (use-package valign
   :hook (org-mode . valign-mode)
   :custom
-  (valign-fancy-bar t)
+  (valign-fancy-bar nil)
+  ;; Skip pixel alignment for very large tables: measuring cell widths
+  ;; synchronously can stall opening big org files.
+  (valign-max-table-size 2000)
   :config
   (defun grant/org-shrink-tables-with-cookies (beg end)
-    "收缩 BEG 和 END 之间所有带列宽标记的 Org 表格。"
+    "Shrink every Org table between BEG and END that carries width cookies."
     (save-excursion
       (goto-char beg)
       (while (re-search-forward "^[ \t]*|" end t)
@@ -74,7 +81,7 @@
           (end-of-line)))))
 
   (defun grant/valign-after-org-cycle (state)
-    "Org 展开内容后，收缩带列宽标记的表格并刷新 valign 对齐。"
+    "Shrink cookie-sized tables after Org reveals content, then refit valign."
     (when (bound-and-true-p valign-mode)
       (let ((region
              (pcase state

@@ -1,4 +1,4 @@
-;;; init-fun.el --- for functions  -*- lexical-binding: t; -*-
+;;; init-fun.el --- helper commands  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;; Open files and dirs
@@ -11,7 +11,7 @@
   "Open journal at today."
   (interactive)
   (find-file-other-window "~/org/journal.org")
-  (goto-char (point-max))) ; 移动至最后
+  (goto-char (point-max)))              ; move to the end
 
 (defun open-blog-dir ()
   "Open blog dir."
@@ -28,8 +28,8 @@
   "Open current file's directory in VSCode."
   (interactive)
   (let ((dir (if (buffer-file-name)
-		 (file-name-directory (buffer-file-name))
-	       default-directory)))
+                 (file-name-directory (buffer-file-name))
+               default-directory)))
     (start-process "vscode" nil "code" dir)))
 
 
@@ -49,7 +49,7 @@
   (unless (file-directory-p "/Applications/Présentation.app")
     (user-error "Présentation.app not found at /Applications/Présentation.app"))
   (start-process "open-presentation" nil
-		 "open" "-b" "fr.imag.iihm.blanch.osx-presentation" pdf))
+                 "open" "-b" "fr.imag.iihm.blanch.osx-presentation" pdf))
 
 
 (defun grant/find-file-make-directory-maybe (filename &optional _wildcards)
@@ -80,12 +80,12 @@
   "Rename both current buffer and file to NEW-NAME."
   (interactive "sNew name: ")
   (let ((name (buffer-name))
-	(filename (buffer-file-name)))
+        (filename (buffer-file-name)))
     (unless filename
       (error "Buffer '%s' is not visiting a file" name))
     (progn
       (when (file-exists-p filename)
-	(rename-file filename new-name 1))
+        (rename-file filename new-name 1))
       (set-visited-file-name new-name)
       (rename-buffer new-name))))
 
@@ -112,7 +112,7 @@ With prefix argument, strip file extension."
   "Count Chinese characters fastly."
   (interactive)
   (let ((count 0)
-        (chunk-size 100000))  ; 每次处理 100KB
+        (chunk-size 100000))            ; 100 KB per chunk
     (save-excursion
       (goto-char (point-min))
       (while (< (point) (point-max))
@@ -120,8 +120,8 @@ With prefix argument, strip file extension."
           (while (re-search-forward "[\u4e00-\u9fff]" end t)
             (setq count (1+ count)))
           (goto-char end)
-          (message "已统计: %d 字..." count)  ; 显示进度
-          (redisplay))))  ; 保持界面响应
+          (message "已统计: %d 字..." count) ; report progress
+          (redisplay))))                ; keep the UI responsive
     (message "中文字数总计: %d" count)))
 
 (provide 'init-fun)

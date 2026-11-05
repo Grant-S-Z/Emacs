@@ -1,8 +1,7 @@
-;;; Package -- summary  -*- lexical-binding: t; -*-
+;;; init-mail.el --- mail setup  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;; Basic settings
-;; Send mails
 (require 'auth-source)
 (setq auth-sources '("~/.authinfo"))
 
@@ -17,7 +16,7 @@
 (setq smtpmail-smtp-user "zhu-yt24@mails.tsinghua.edu.cn"
       smtpmail-smtp-server "mails.tsinghua.edu.cn")
 
-;;Debug
+;;; Debug
 (setq smtpmail-debug-info nil)
 (setq smtpmail-debug-verb nil)
 
@@ -43,13 +42,15 @@
 
   (mail-user-agent 'mu4e-user-agent)
 
+  (mu4e-search-threads t)
+
   :config
+  (add-hook 'mu4e-thread-mode-hook
+	    #'mu4e-thread-fold-all)
   (add-hook 'mu4e-compose-mode-hook
-          (lambda ()
-            (setq-local message-signature
-			(format "Best regards,\n\nYutao Zhu")
-			)))
-  )
+            (lambda ()
+              (setq-local message-signature
+                          (format "Best regards,\n\nYutao Zhu")))))
 
 (provide 'init-mail)
 ;;; init-mail.el ends here

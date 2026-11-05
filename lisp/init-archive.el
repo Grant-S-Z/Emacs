@@ -1,6 +1,54 @@
 ;;; init-archive.el --- Archived, inactive settings  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
+;;; Tabs
+(use-package tab-line
+  :ensure nil ;; built-in
+  :init
+  ;; Do not define any tab-line key bindings
+  (setq tab-line-define-keys nil)
+  (global-tab-line-mode t)
+  :custom
+  ;; Browser-like tabs: fixed set of buffers per window
+  (tab-line-tabs-function #'tab-line-tabs-fixed-window-buffers)
+  ;; Also drop excluded buffers (e.g. *scratch*) from other windows'
+  ;; tab lists, not just from their own tab line
+  (tab-line-tabs-window-buffers-filter-function #'tab-line-tabs-non-excluded)
+  (tab-line-new-button-show nil)
+  (tab-line-close-button-show nil)
+  ;; Hide the tab line in buffers that don't need it:
+  ;; terminals/shells and special buffers (*Messages*, *scratch*, ...)
+  (tab-line-exclude-buffers
+   '(or (derived-mode term-mode vterm-mode eshell-mode shell-mode)
+        "^\\*.*\\*$"))
+  :config
+  ;; No gap between tabs
+  (setq tab-line-separator "")
+
+  ;; Faces tuned to the ef-reverie palette (light cream + purple).
+  ;; tab-line has no "styles" like centaur-tabs; its look is all faces:
+  ;; flat line of tabs, the selected one is underlined with the theme
+  ;; magenta accent.
+  (set-face-attribute 'tab-line nil
+                      :background "#e5d6d4" :foreground "#6f6877"
+                      :height 0.95 :box nil)
+  (set-face-attribute 'tab-line-tab-current nil
+                      :background "#f3eddf" :foreground "#4f204f"
+                      :weight 'bold
+                      :underline (list :color "#9f4e74" :style 'line))
+  (set-face-attribute 'tab-line-tab nil
+                      :background "#f3eddf" :foreground "#6f6877"
+                      :underline (list :color "#9f4e74" :style 'line))
+  (set-face-attribute 'tab-line-tab-inactive nil
+                      :background "#e5d6d4" :foreground "#6f6877"
+                      :underline nil :box nil)
+  (set-face-attribute 'tab-line-highlight nil
+                      :background "#d9cac8")
+  (set-face-attribute 'tab-line-tab-modified nil
+                      :foreground "#ba2d2f")
+  (tab-line-force-update t))
+
+
 (use-package cape
   :ensure t
   :init
@@ -17,41 +65,55 @@
 	  (lambda ()
 	    (lsp-bridge-restart-process)))
 
+(use-package numpydoc ;; numpydoc to generate doc
+  :bind ("C-x C-n" . numpydoc-generate)
+  :config
+  (setq numpydoc-insert-examples-block nil)
+  (setq numpydoc-insert-return-without-typehint t))
+
 (use-package hdf5-viewer
   :mode ("\\.h5\\'" . hdf5-viewer-find-file-mode)
   :custom
   (hdf5-viewer-python-command "~/miniconda3/bin/python3"))
 
-(use-package auto-package-update ;; package 更新
+(use-package auto-package-update ;; package updates
   :config
   (setq auto-package-update-delete-old-versions t
 	auto-package-update-hide-results t))
 
-(use-package time ;; 显示时间
+(use-package time ;; display time
   :init
-  (setq display-time-24hr-format t ;; 显示时间
-	display-time-day-and-date t) ;; 显示日期
+  (setq display-time-24hr-format t ;; 24-hour clock
+	display-time-day-and-date t) ;; show day and date
   :config
   (display-time-mode t))
 
 (use-package dired-subtree)
 
-;;; Chatgpt
+;;; AI
+;; gptel-agent: agent mode (file access, bash, elisp, web, sub-agents)
+;; needs a one-off M-x package-install RET gptel-agent (MELPA)
+;; apply the gptel-agent preset from the gptel menu, or use @gptel-agent
+(use-package gptel-agent
+  :after gptel
+  :config (gptel-agent-update)))
+
+
 (use-package chatgpt
   :quelpa (chatgpt :fetcher github :repo "joshcho/ChatGPT.el")
   :bind ("C-c q" . chatgpt-query)
   :config
   (setq chatgpt-code-query-map
-      '(
-        ;; ChatGPT.el defaults, string for each shortcut
-        ("bug" . "There is a bug in the following, please help me fix it.")
-        ("doc" . "Please write the documentation for the following.")
-        ("improve" . "Please improve the following.")
-        ("understand" . "What is the following?")
-        ("refactor" . "Please refactor the following.")
-        ("suggest" . "Please make suggestions for the following.")
-        ;; your shortcut
-        ("prompt-name" . "My custom prompt."))))
+	'(
+          ;; ChatGPT.el defaults, string for each shortcut
+          ("bug" . "There is a bug in the following, please help me fix it.")
+          ("doc" . "Please write the documentation for the following.")
+          ("improve" . "Please improve the following.")
+          ("understand" . "What is the following?")
+          ("refactor" . "Please refactor the following.")
+          ("suggest" . "Please make suggestions for the following.")
+          ;; your shortcut
+          ("prompt-name" . "My custom prompt."))))
 
 ;;; Translate
 (use-package immersive-translate
@@ -66,7 +128,7 @@
   :init (org-popup-posframe-mode 1))
 
 (require 'quelpa)
-(require 'quelpa-use-package) ;; 结合 use-package 与 quelpa, 可直接使用 github 上的 package
+(require 'quelpa-use-package) ;; use-package + quelpa: install packages straight from GitHub
 
 ;;; Videos
 (use-package emms
@@ -89,23 +151,23 @@
 (setq bilibili-cookie-text "
 buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB-1C54-1BC5BAF9ECB047529-023031311-JaQAkcnf0ookmGnscWdytw%3D%3D; DedeUserID=317050365; DedeUserID__ckMd5=2cdbd574d6e7b861; rpdid=|(J|)ul~kYk~0J'uY~)Y~)|)R; buvid_fp_plain=undefined; i-wanna-go-back=-1; b_ut=5; LIVE_BUVID=AUTO3016832895494307; hit-new-style-dyn=1; header_theme_version=CLOSE; enable_web_push=DISABLE; CURRENT_BLACKGAP=0; CURRENT_FNVAL=4048; b_nut=100; _uuid=101010F1027E-8E43-71F9-10355-E6D12DF1B9A675516infoc; hit-dyn-v2=1; SESSDATA=fa52b9d1%2C1726573794%2C0f39f%2A32CjBMiT1hDLzSyaCbcRmKOgruqLBHTTVHLg9DAI0SoJozpKddLLJEyVwWq7WKUNIDFf0SVnZrMEE4ZnBhS0tPZHpBMnRBbFlOSl9xRF9rck5kUUlXc1RDSzNSckVFdU5vZXlHSXBGX3FHTnhjXzVIQjhIY1AwbmhqY2JFYmN0VW5RNjlFMjhmMFNRIIEC; bili_jct=4ef9a3296047201c763d45727a4371af; fingerprint=b82c30b3ed1bbdbf5702b88ef4707a8f; buvid_fp=b82c30b3ed1bbdbf5702b88ef4707a8f; FEED_LIVE_VERSION=V_WATCHLATER_PIP_WINDOW3; CURRENT_QUALITY=116; bp_video_offset_317050365=918446376503738373; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTI5NDM1MjcsImlhdCI6MTcxMjY4NDI2NywicGx0IjotMX0.vmWeZAqeBoz_ocBwUFw6nEtwps4EbXAZCdvajHkiJeo; bili_ticket_expires=1712943467; PVID=2; home_feed_column=4; b_lsid=110951052A_18EC96C6F4E; browser_resolution=165-779")
 
-(setq mouse-wheel-mode nil) ;; 滚轮
+(setq mouse-wheel-mode nil)
 (setq mac-mouse-wheel-mode nil)
-(setq pixel-scroll-mode nil) ;; 像素滚动，但在我这里不好用
+(setq pixel-scroll-mode nil) ;; pixel scrolling; janky here
 (setq pixel-scroll-precision-mode nil)
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
 (setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
 (setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
 (setq scroll-step 1) ;; keyboard scroll one line at a time
 
-(set-cursor-color "#8A2BE2") ;; 设置光标颜色 BlueViolet
+(set-cursor-color "#8A2BE2") ;; BlueViolet
 
-;; 忽略某些 message
+;; Ignore certain messages
 (let ((inhibit-message t))
   (message "Wrong type argument: number-or-marker-p, nil"))
 
-;;; 图片
-;; 复制
+;;; Images
+;; copy
 (use-package org-download
   :config
   (add-hook 'dired-mode-hook 'org-download-enable)
@@ -114,10 +176,10 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
 ;; graphviz
 (use-package graphviz-dot-mode)
 
-;;; 行号
-;(setq display-line-numbers-type 'relative)
+;;; Line numbers
+					;(setq display-line-numbers-type 'relative)
 (setq display-line-numbers nil)
-(setq display-line-numbers-width-start t) ;; 固定行号宽度
+(setq display-line-numbers-width-start t) ;; stable gutter width
 (global-display-line-numbers-mode nil)
 
 ;; Useless translate
@@ -131,7 +193,7 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
 	 :render
 	 (gts-buffer-render))))
 
-;; 经常误操作，比如删除当前界面的内容
+;; too easy to hit by accident, e.g. wiping the frame
 (use-package org-popup-posframe
   :load-path "~/.emacs.d/site-lisp/org-popup-posframe"
   :defer nil
@@ -147,8 +209,8 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
   (setq conda-anaconda-home (expand-file-name "~/miniconda3")
 	conda-env-home-directory (expand-file-name "~/miniconda3/envs/")))
 
-;;; 默认 ssh
-;(setq tramp-default-method "ssh")
+;;; Default ssh
+					;(setq tramp-default-method "ssh")
 
 ;; (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
 ;; 			 ("org" . "https://orgmode.org/elpa/")
@@ -156,15 +218,15 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
 ;; 			 ("melpa-stable" . "https://stable.melpa.org/packages/"))
 ;;       package-archive-priorities '(("melpa-stable" . 1)))
 
-(require 'use-package) ;; use-package 现已内置
+(require 'use-package) ;; built in since Emacs 29
 
 ;;; Set transparency
 (set-frame-parameter (selected-frame) 'alpha '(100 100))
 (add-to-list 'default-frame-alist '(alpha 100 100))
 
-(add-to-list 'org-capture-templates ;; 密码模板
+(add-to-list 'org-capture-templates ;; password template
              '("k" "Passwords" entry (file "~/passwords.org")
-             "* %U - %^{title} %^G\n\n  - 用户名: %^{用户名}\n  - 密码: %(get-or-create-password)"
+               "* %U - %^{title} %^G\n\n  - 用户名: %^{用户名}\n  - 密码: %(get-or-create-password)"
                :empty-lines 1 :kill-buffer t))
 
 (use-package geiser-mit
@@ -199,7 +261,7 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
   :init (amx-mode))
 
 ;; lsp
-(add-hook 'find-file-hook #'lsp-bridge-restart-process) ;; 每进入一次其他文件，重启 lsp
+(add-hook 'find-file-hook #'lsp-bridge-restart-process) ;; restart lsp on every new file
 
 ;;; LeetCode
 (use-package leetcode
@@ -235,12 +297,12 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
 (use-package company
   :init (global-company-mode)
   :config
-  (setq company-minimum-prefix-length 1) ; 1 个字母开始进行自动补全
+  (setq company-minimum-prefix-length 1) ; complete after one character
   (setq company-tooltip-align-annotations t)
   (setq company-idle-delay 0.0)
-  (setq company-show-numbers t) ;; 给选项编号 (按快捷键 M-1、M-2 等等来进行选择).
+  (setq company-show-numbers t) ;; number candidates; pick with M-1, M-2, ...
   (setq company-selection-wrap-around t)
-  (setq company-transformers '(company-sort-by-occurrence))) ; 根据选择的频率进行排序
+  (setq company-transformers '(company-sort-by-occurrence))) ; sort by selection frequency
 
 (use-package company-box
   :after company
@@ -302,21 +364,21 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
 (require 'use-package-hydra)
 
 ;; undo-tree
-(use-package undo-tree ;; 重量级使用体验，强烈不推荐
+(use-package undo-tree ;; heavyweight; not recommended
   :ensure t
   :init (global-undo-tree-mode)
   :after hydra
   :config
   (bind-key* "C-x u" #'hydra-undo-tree/body)
   :hydra (hydra-undo-tree (:hint nil)
-  "
+			  "
   _p_: undo  _n_: redo _s_: save _l_: load   "
-  ("p"   undo-tree-undo)
-  ("n"   undo-tree-redo)
-  ("s"   undo-tree-save-history)
-  ("l"   undo-tree-load-history)
-  ("u"   undo-tree-visualize "visualize" :color blue)
-  ("q"   nil "quit" :color blue)))
+			  ("p"   undo-tree-undo)
+			  ("n"   undo-tree-redo)
+			  ("s"   undo-tree-save-history)
+			  ("l"   undo-tree-load-history)
+			  ("u"   undo-tree-visualize "visualize" :color blue)
+			  ("q"   nil "quit" :color blue)))
 
 ;; org-modern-indent
 (add-to-list 'load-path "~/.emacs.d/lisp")
@@ -379,8 +441,8 @@ buvid3=750BFB06-7E42-7B48-5A1A-BDF7ED2EAE6146387infoc; buvid4=BF81C9F4-8987-AFFB
   (setopt ellama-language "English")
   (require 'llm-ollama)
   (setopt ellama-provider
-		  (make-llm-ollama
-		   :chat-model "zephyr" :embedding-model "zephyr"))
+	  (make-llm-ollama
+	   :chat-model "zephyr" :embedding-model "zephyr"))
   :bind (("C-c t" . ellama-translate)))
 
 (defun pdf-open (pdf-path)
@@ -394,6 +456,19 @@ Argument PDF-PATH The path to the PDF file."
 
 (require 'theme-changer)
 (change-theme 'doom-one-light 'doom-shades-of-purple)
+
+;; (use-package writeroom-mode ;;; center texts
+;;   :hook (org-mode . writeroom-mode)
+;;   :custom
+;;   (writeroom-maximize-window nil)
+;;   (writeroom-mode-line t)
+;;   (writeroom-width 100)
+;;   (writeroom-global-effects '(writeroom-set-alpha
+;; 			      writeroom-set-menu-bar-lines
+;; 			      writeroom-set-tool-bar-lines
+;; 			      writeroom-set-vertical-scroll-bars
+;; 			      writeroom-set-bottom-divider-width))
+;;   (setq-local line-spacing 0.1))
 
 (defun grant/disable-keycast-header-line-mode-in-writeroom ()
   "Disable keycast-header-line-mode when writeroom-mode is enabled."
@@ -429,18 +504,18 @@ Argument PDF-PATH The path to the PDF file."
 ;; (use-package company
 ;;   :init (global-company-mode)
 ;;   :config
-;;   (setq company-minimum-prefix-length 1) ; 1 个字母开始进行自动补全
+;;   (setq company-minimum-prefix-length 1) ; complete after one character
 ;;   (setq company-tooltip-align-annotations t)
 ;;   (setq company-idle-delay 0.0)
-;;   (setq company-show-numbers t) ;; 给选项编号 (按快捷键 M-1、M-2 等等来进行选择).
+;;   (setq company-show-numbers t) ;; number candidates; pick with M-1, M-2, ...
 ;;   (setq company-selection-wrap-around t)
-;;   (setq company-transformers '(company-sort-by-occurrence))) ; 根据选择的频率进行排序
+;;   (setq company-transformers '(company-sort-by-occurrence))) ; sort by selection frequency
 
 ;; (use-package company-box
 ;;   :after company
 ;;   :hook (company-mode . company-box-mode))
 
-(use-package emacs ;; 史前配置
+(use-package emacs ;; prehistoric config
   :init
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
   (defun crm-indicator (args)
@@ -467,13 +542,13 @@ Argument PDF-PATH The path to the PDF file."
 
   (defvar eh-space "  ")
 
-  ;; 设置 mode-line
-  ;; 在 mode-line 最后追加一个半角空格，一个全角空格，防止因为字体高度原因导致 mode-line 抖动。
+  ;; mode-line setup
+  ;; Pad the mode-line with a space so it does not jitter when font heights differ.
   (setq mode-line-end-spaces
 	'(:eval (if (display-graphic-p) eh-space "-%-")))
 
   (defun eh-tab-line-format (orig_func)
-    "在 tab-line 的最后添加一个全角空格，防止 tab-line 抖动。"
+    "Pad the tab-line with a full-width space to stop it jittering."
     (list (funcall orig_func) eh-space))
 
   (advice-add 'tab-line-format :around #'eh-tab-line-format)
@@ -489,7 +564,7 @@ Argument PDF-PATH The path to the PDF file."
   ;; 			charset (font-spec :family "LXGW WenKai Mono"))))
   )
 
-;; (use-package whitespace # 太繁复了
+;; (use-package whitespace ; too noisy
 ;;   :hook (after-init . global-whitespace-mode))
 
 ;; (use-package olivetti
@@ -503,7 +578,7 @@ Argument PDF-PATH The path to the PDF file."
 ;;     "Toggle olivetti mode according to window width."
 ;;     (if (and (eq (buffer-local-value 'major-mode (current-buffer)) 'org-mode)
 ;; 	     (or (eq (length (window-list nil nil nil)) 1)
-;; 		 (window-at-side-p (frame-first-window) 'right))) ;; frame-first-window 的 mode 是 org-mode 并且没有右边 window
+;; 		 (window-at-side-p (frame-first-window) 'right))) ;; frame-first-window is in org-mode with no window on the right
 ;; 	(olivetti-mode 1)
 ;;       (olivetti-mode 0)
 ;;       (when (eq (buffer-local-value 'major-mode (current-buffer)) 'org-mode)
@@ -535,8 +610,8 @@ Argument PDF-PATH The path to the PDF file."
 ;; (advice-add 'org--make-preview-overlay
 ;;             :after #'grant/org-latex-preview-advice)
 
-;; 全屏启动，且可使用状态栏与程序坞
-;(set-frame-parameter nil 'fullscreen 'fullboth)
+;; start full screen, keeping the menu bar and Dock usable
+					;(set-frame-parameter nil 'fullscreen 'fullboth)
 
 ;; Inhibit resizing Puremacs frame
 (setq frame-inhibit-implied-resize t)
@@ -553,7 +628,7 @@ Argument PDF-PATH The path to the PDF file."
 (define-advice startup--load-user-init-file (:after (&rest _) reset-inhibit-vars)
   (and init-file-had-error (reset-inhibit-vars)))
 
-;;; 位置
+;;; Position
 (setq calendar-location-name "Beijing, CN")
 (setq calendar-latitude 39.9042)
 (setq calendar-longitude 116.4074)
@@ -588,16 +663,16 @@ Argument PDF-PATH The path to the PDF file."
 	(when (and (string-prefix-p "*" (buffer-name)) (string-suffix-p "*" (buffer-name)))
 	  (kill-buffer buf))))))
 
-;;; 待办事项关键词
+;;; TODO keywords
 ;; (setq org-todo-keywords '((sequence "TODO" "DONE" "CANCELED")))
 ;; (setq org-todo-keyword-faces '(("TODO" . "red") ("DONE" . "green") ("CANCELED" . "blue")))
 
-;;; 表格
+;;; Tables
 (use-package valign
   :after org
   :hook (org-mode . valign-mode)
   :custom
-  (valign-fancy-bar nil)) ;; 确保性能
+  (valign-fancy-bar nil)) ;; for performance
 
 (setq package-native-compile t)
 
@@ -689,7 +764,7 @@ Argument PDF-PATH The path to the PDF file."
 ;; (setq flymake-start-on-flymake-mode nil)
 ;; (use-package flycheck
 ;;   :config
-;;   (setq truncate-lines nil) ; 如果单行信息很长会自动换行
+;;   (setq truncate-lines nil) ; long single-line content wraps automatically
 ;;   (setq flycheck-python-pycompile-executable "~/miniconda3/bin/python3")
 ;;   (setq flycheck-python-ruff-executable "~/.local/bin/ruff")
 ;;   :hook
@@ -1065,77 +1140,77 @@ to calculate the decent value of `:ascent'. "
 
 (plist-put org-format-latex-options :justify 'center)
 (defun eli/xenops-justify-fragment-overlay (element &rest _args)
-    (let* ((ov-beg (plist-get element :begin))
-           (ov-end (plist-get element :end))
-           (ov (car (overlays-at (/ (+ ov-beg ov-end) 2) t)))
-           (position (plist-get org-format-latex-options :justify))
-           (inline-p (eq 'inline-math (plist-get element :type)))
-           width offset)
-      (when (and ov
-                 (imagep (overlay-get ov 'display)))
-        (setq width (car (image-display-size (overlay-get ov 'display))))
-        (cond
-         ((and (eq 'center position)
-               (not inline-p))
-          (setq offset (floor (- (/ fill-column 2)
-                                 (/ width 2))))
-          (if (< offset 0)
-              (setq offset 0))
-          (overlay-put ov 'before-string (make-string offset ? )))
-         ((and (eq 'right position)
-               (not inline-p))
-          (setq offset (floor (- fill-column
-                                 width)))
-          (if (< offset 0)
-              (setq offset 0))
-          (overlay-put ov 'before-string (make-string offset ? )))))))
+  (let* ((ov-beg (plist-get element :begin))
+         (ov-end (plist-get element :end))
+         (ov (car (overlays-at (/ (+ ov-beg ov-end) 2) t)))
+         (position (plist-get org-format-latex-options :justify))
+         (inline-p (eq 'inline-math (plist-get element :type)))
+         width offset)
+    (when (and ov
+               (imagep (overlay-get ov 'display)))
+      (setq width (car (image-display-size (overlay-get ov 'display))))
+      (cond
+       ((and (eq 'center position)
+             (not inline-p))
+        (setq offset (floor (- (/ fill-column 2)
+                               (/ width 2))))
+        (if (< offset 0)
+            (setq offset 0))
+        (overlay-put ov 'before-string (make-string offset ? )))
+       ((and (eq 'right position)
+             (not inline-p))
+        (setq offset (floor (- fill-column
+                               width)))
+        (if (< offset 0)
+            (setq offset 0))
+        (overlay-put ov 'before-string (make-string offset ? )))))))
 (advice-add 'xenops-math-display-image :after
 	    #'eli/xenops-justify-fragment-overlay)
 
 (defun eli/xenops-renumber-environment (orig-func element latex colors
-                                                    cache-file display-image)
-    (let ((results '())
-          (counter -1)
-          (numberp))
-      (setq results (cl-loop for (begin .  env) in
-                             (org-element-map (org-element-parse-buffer)
-                                 'latex-environment
-                               (lambda (env)
-                                 (cons
-                                  (org-element-property :begin env)
-                                  (org-element-property :value env))))
-                             collect
-                             (cond
-                              ((and (string-match "\\\\begin{equation}" env)
-                                    (not (string-match "\\\\tag{" env)))
-                               (cl-incf counter)
-                               (cons begin counter))
-                              ((and (string-match "\\\\begin{align}" env)
-                                    (string-match "\\\\notag" env))
-                               (cl-incf counter)
-                               (cons begin counter))
-                              ((string-match "\\\\begin{align}" env)
-                               (prog2
-                                   (cl-incf counter)
-                                   (cons begin counter)
-                                 (with-temp-buffer
-                                   (insert env)
-                                   (goto-char (point-min))
-                                   ;; \\ is used for a new line. Each one leads
-                                   ;; to a number
-                                   (cl-incf counter (count-matches "\\\\$"))
-                                   ;; unless there are nonumbers.
-                                   (goto-char (point-min))
-                                   (cl-decf counter
-                                            (count-matches "\\nonumber")))))
-                              (t
-                               (cons begin nil)))))
-      (when (setq numberp (cdr (assoc (plist-get element :begin) results)))
-        (setq latex
-              (concat
-               (format "\\setcounter{equation}{%s}\n" numberp)
-               latex))))
-    (funcall orig-func element latex colors cache-file display-image))
+                                                  cache-file display-image)
+  (let ((results '())
+        (counter -1)
+        (numberp))
+    (setq results (cl-loop for (begin .  env) in
+                           (org-element-map (org-element-parse-buffer)
+                               'latex-environment
+                             (lambda (env)
+                               (cons
+                                (org-element-property :begin env)
+                                (org-element-property :value env))))
+                           collect
+                           (cond
+                            ((and (string-match "\\\\begin{equation}" env)
+                                  (not (string-match "\\\\tag{" env)))
+                             (cl-incf counter)
+                             (cons begin counter))
+                            ((and (string-match "\\\\begin{align}" env)
+                                  (string-match "\\\\notag" env))
+                             (cl-incf counter)
+                             (cons begin counter))
+                            ((string-match "\\\\begin{align}" env)
+                             (prog2
+                                 (cl-incf counter)
+                                 (cons begin counter)
+                               (with-temp-buffer
+                                 (insert env)
+                                 (goto-char (point-min))
+                                 ;; \\ is used for a new line. Each one leads
+                                 ;; to a number
+                                 (cl-incf counter (count-matches "\\\\$"))
+                                 ;; unless there are nonumbers.
+                                 (goto-char (point-min))
+                                 (cl-decf counter
+                                          (count-matches "\\nonumber")))))
+                            (t
+                             (cons begin nil)))))
+    (when (setq numberp (cdr (assoc (plist-get element :begin) results)))
+      (setq latex
+            (concat
+             (format "\\setcounter{equation}{%s}\n" numberp)
+             latex))))
+  (funcall orig-func element latex colors cache-file display-image))
 (advice-add 'xenops-math-latex-create-image :around #'eli/xenops-renumber-environment)
 
 ;; (use-package eldoc-box
@@ -1212,15 +1287,15 @@ to calculate the decent value of `:ascent'. "
   )
 
 ;; (use-package elysium ;; I don't like my codes modified by AI directly
-  ;;   :custom
-  ;;   ;; Below are the default values
-  ;;   (elysium-window-size 0.33) ; The elysium buffer will be 1/3 your screen
-  ;;   (elysium-window-style 'vertical)) ; Can be customized to horizontal
+;;   :custom
+;;   ;; Below are the default values
+;;   (elysium-window-size 0.33) ; The elysium buffer will be 1/3 your screen
+;;   (elysium-window-style 'vertical)) ; Can be customized to horizontal
 
-  ;; (use-package smerge-mode
-  ;;   :ensure nil
-  ;;   :hook
-  ;;   (prog-mode . smerge-mode))
+;; (use-package smerge-mode
+;;   :ensure nil
+;;   :hook
+;;   (prog-mode . smerge-mode))
 
 (use-package pandoc-mode
   :hook (org-mode . pandoc-mode))
@@ -1306,11 +1381,11 @@ Show the heading too, if it is currently invisible."
 \\usepackage{xcolor}
 "
 
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-("\\paragraph{%s}" . "\\paragraph*{%s}")
-("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+				  ("\\section{%s}" . "\\section*{%s}")
+				  ("\\subsection{%s}" . "\\subsection*{%s}")
+				  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+				  ("\\paragraph{%s}" . "\\paragraph*{%s}")
+				  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 (setq org-latex-classes '(("article" "
 \\documentclass[11pt]{article}
@@ -1342,11 +1417,11 @@ Show the heading too, if it is currently invisible."
 \\newcommand{\\ms}[1]{\\mathscr{#1}}
 "
 
-  ("\\section{%s}" . "\\section*{%s}")
-  ("\\subsection{%s}" . "\\subsection*{%s}")
-  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-  ("\\paragraph{%s}" . "\\paragraph*{%s}")
-  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+			   ("\\section{%s}" . "\\section*{%s}")
+			   ("\\subsection{%s}" . "\\subsection*{%s}")
+			   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+			   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+			   ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
 ;; beamer
 (add-to-list 'org-latex-classes '("beamer" "
@@ -1379,11 +1454,11 @@ Show the heading too, if it is currently invisible."
 \\newcommand{\\ms}[1]{\\mathscr{#1}}
 "
 
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-("\\paragraph{%s}" . "\\paragraph*{%s}")
-("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+				  ("\\section{%s}" . "\\section*{%s}")
+				  ("\\subsection{%s}" . "\\subsection*{%s}")
+				  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+				  ("\\paragraph{%s}" . "\\paragraph*{%s}")
+				  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 ;; Matlab
 (use-package matlab-mode)
@@ -1392,7 +1467,7 @@ Show the heading too, if it is currently invisible."
 
 ;;; ============================================================
 ;;; Neomacs (Rust Emacs fork) workarounds -- archived, not loaded
-;;; 原 lisp/init-neomacs.el，供将来尝试 Neomacs 时参考
+;;; Former lisp/init-neomacs.el, kept for a future Neomacs experiment
 ;;; ============================================================
 
 ;; 1. Fix cnfonts: Neomacs' `list-fonts' always returns nil (font listing is
@@ -1401,7 +1476,7 @@ Show the heading too, if it is currently invisible."
 ;;    `find-font' works fine, so validate with it instead.
 (with-eval-after-load 'cnfonts
   (defun cnfonts--fontspec-valid-p (fontspec)
-    "检查 FONTSPEC 是否有效 (Neomacs: 用 find-font 替代失效的 list-fonts)."
+    "Check whether FONTSPEC is usable (Neomacs: find-font replaces the broken list-fonts)."
     (and fontspec (find-font fontspec))))
 
 ;; 2. Nerd icons: Neomacs' automatic per-character font fallback often fails
@@ -1596,7 +1671,7 @@ Show the heading too, if it is currently invisible."
 ;;; From init-org.el
 ;; MathJax previews; entering a formula reveals its source.
 ;; (use-package org-appear-mathjax
-;;   :ensure nil ;; 本地包，从 site-lisp 加载
+;;   :ensure nil ;; local package, loaded from site-lisp
 ;;   :load-path "~/.emacs.d/site-lisp/org-appear-mathjax"
 ;;   :after org
 ;;   :hook (org-mode . org-appear-mathjax-mode)
@@ -1778,9 +1853,9 @@ Show the heading too, if it is currently invisible."
 ;;                    :image-output-type "svg"
 ;;                    :image-size-adjust (1.7 . 1.5)
 ;;                    :latex-compiler ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
-;;                    ;; -e: 用精确字形轮廓计算边界框（默认按字体度量值，
-;;                    ;; 会裁掉 f/j 等斜体字符右侧伸出的笔画）；
-;;                    ;; -b 0.5: 精确边界框外加 0.5pt 内边距防锯齿裁切。
+;;                    ;; -e: use exact glyph outlines for the bounding box (the default
+;;                    ;; clips the parts of f/j etc. that stick out to the right);
+;;                    ;; -b 0.5: add 0.5pt padding so antialiasing is not clipped.
 ;;                    :image-converter ("dvisvgm %f -n -e -b 0.5 -c %S -o %O"))))
 
 ;;   (defun grant/xenops-display-math-p (element)
@@ -1910,28 +1985,28 @@ Show the heading too, if it is currently invisible."
 ;;   :init
 ;;   (defvar grip-theme 'auto)
 
-  ;; ;; Compatibility patch: mdopen 0.5.x doesn't support `--theme=...`, while
-  ;; ;; some grip-mode versions still pass it.
-  ;; (defun my/grip--filter-mdopen-start-process-args (args)
-  ;;   "Remove unsupported `--theme=' arg when launching mdopen."
-  ;;   (let* ((program (nth 2 args))
-  ;;          (is-mdopen (and (stringp program)
-  ;;                          (string= (file-name-nondirectory program) "mdopen"))))
-  ;;     (if (not is-mdopen)
-  ;;         args
-  ;;       (let ((prefix (seq-take args 3))
-  ;;             (rest (nthcdr 3 args))
-  ;;             (filtered nil))
-  ;;         (dolist (arg rest)
-  ;;           (unless (and (stringp arg)
-  ;;                        (string-prefix-p "--theme=" arg))
-  ;;             (push arg filtered)))
-  ;;         (append prefix (nreverse filtered))))))
-  ;; :custom
-  ;; (grip-command 'mdopen)
-  ;; (grip-preview-in-webkit nil)
-  ;; :config
-  ;; (advice-add 'start-process :filter-args #'my/grip--filter-mdopen-start-process-args))
+;; ;; Compatibility patch: mdopen 0.5.x doesn't support `--theme=...`, while
+;; ;; some grip-mode versions still pass it.
+;; (defun my/grip--filter-mdopen-start-process-args (args)
+;;   "Remove unsupported `--theme=' arg when launching mdopen."
+;;   (let* ((program (nth 2 args))
+;;          (is-mdopen (and (stringp program)
+;;                          (string= (file-name-nondirectory program) "mdopen"))))
+;;     (if (not is-mdopen)
+;;         args
+;;       (let ((prefix (seq-take args 3))
+;;             (rest (nthcdr 3 args))
+;;             (filtered nil))
+;;         (dolist (arg rest)
+;;           (unless (and (stringp arg)
+;;                        (string-prefix-p "--theme=" arg))
+;;             (push arg filtered)))
+;;         (append prefix (nreverse filtered))))))
+;; :custom
+;; (grip-command 'mdopen)
+;; (grip-preview-in-webkit nil)
+;; :config
+;; (advice-add 'start-process :filter-args #'my/grip--filter-mdopen-start-process-args))
 
 ;; Lisp
 ;; (use-package geiser

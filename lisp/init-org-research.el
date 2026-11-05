@@ -10,24 +10,24 @@
 	 ("C-c v r" . org-drill-resume)
 	 ("C-c v D" . org-drill-directory))
   :custom
-  (org-drill-save-buffers-after-drill-sessions-p nil) ; 复习完不自动保存所有 buffer
-  (org-drill-maximum-items-per-session 30)            ; 每次最多 30 张卡
-  (org-drill-maximum-duration 20)                     ; 每次最多 20 分钟
-  (org-drill-learn-fraction 0.5)                      ; SM2 间隔缩放因子
-  (org-drill-leech-method 'warn))                     ; 总是记不住的卡给警告
+  (org-drill-save-buffers-after-drill-sessions-p nil) ; don't save every buffer afterwards
+  (org-drill-maximum-items-per-session 30)            ; at most 30 cards per session
+  (org-drill-maximum-duration 20)                     ; at most 20 minutes per session
+  (org-drill-learn-fraction 0.5)                      ; SM2 interval scaling factor
+  (org-drill-leech-method 'warn))                     ; warn about cards that never stick
 
 (use-package org-fc
-  :ensure nil ;; 不在 MELPA，从 site-lisp 手动加载
+  :ensure nil ; not on MELPA, loaded from site-lisp
   :load-path "~/.emacs.d/site-lisp/org-fc"
   :after org
   :commands (org-fc-review org-fc-dashboard)
   :bind (("C-c v f" . org-fc-review)
 	 ("C-c v F" . org-fc-review-all))
   :custom
-  (org-fc-directories '("~/org/fc/")) ; 只索引词库目录，不扫 roam 笔记
+  (org-fc-directories '("~/org/fc/")) ; index only the vocabulary dir, not roam notes
   :config
   (require 'org-fc-hydra)
-  (org-fc-cache-mode 1)) ; 缓存索引，千级卡片秒开
+  (org-fc-cache-mode 1)) ; cache the index so thousands of cards load fast
 
 ;;; Notes and literature
 (use-package org-roam
@@ -55,7 +55,11 @@
   (org-cite-insert-processor 'citar)
   (org-cite-follow-processor 'citar)
   (org-cite-activate-processor 'citar)
-  (citar-bibliography org-cite-global-bibliography)
+  ;; Keep this a literal list, not `org-cite-global-bibliography': Custom
+  ;; stores the value as a form and evaluates it when citar is loaded,
+  ;; which can happen before Org (and thus `oc') is, giving
+  ;; "void-variable org-cite-global-bibliography" during mode setup.
+  (citar-bibliography '("~/Nutstore Files/zotero/My Library.bib"))
   (citar-notes-paths '("~/org/roam-notes/citar-notes/"))
   :config
   (defvar citar-indicator-notes-icons

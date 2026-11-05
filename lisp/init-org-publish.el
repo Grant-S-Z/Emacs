@@ -3,7 +3,7 @@
 ;;; Code:
 
 (use-package easy-hugo
-  :bind ("C-c h" . easy-hugo) ;; 原 C-c b 与 open-blog-dir 冲突，改绑 C-c h
+  :bind ("C-c h" . easy-hugo) ; C-c b clashes with open-blog-dir, hence C-c h
   :config
   (setq easy-hugo-basedir "~/research/code/Grant/")
   (setq easy-hugo-postdir "content/org/")
