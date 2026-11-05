@@ -2,6 +2,9 @@
 ;;; Commentary:
 ;;; Code:
 ;;; Tabs
+(use-package benchmark-init
+  :init (benchmark-init/activate))
+
 (use-package tab-line
   :ensure nil ;; built-in
   :init
@@ -91,6 +94,28 @@
 (use-package dired-subtree)
 
 ;;; AI
+
+;;; gptel & gptel-agent
+(when *is-mac*
+  (defun osx-get-keychain-password (account-name)
+    "Gets ACCOUNT-NAME keychain password from OS X Keychain."
+    (let ((cmd (concat "security 2>&1 >/dev/null find-generic-password -ga '" account-name "'")))
+      (let ((passwd (shell-command-to-string cmd)))
+	(when (string-match (rx "\"" (group (0+ (or (1+ (not (any "\"" "\\"))) (seq "\\" anything)))) "\"") passwd)
+	  (match-string 1 passwd)))))
+  (use-package gptel
+    :bind
+    (("C-c q" . gptel)
+     ("C-c d" . gptel-add-file)
+     ("C-c p" . gptel-add))
+    :config
+    (setq gptel-default-mode 'org-mode)
+    (setq gptel-model 'deepseek-flash
+	  gptel-backend (gptel-make-deepseek "DeepSeek"
+			  :stream t
+			  :models '(deepseek-flash)
+			  :key (lambda () (osx-get-keychain-password "deepseek key"))))))
+
 ;; gptel-agent: agent mode (file access, bash, elisp, web, sub-agents)
 ;; needs a one-off M-x package-install RET gptel-agent (MELPA)
 ;; apply the gptel-agent preset from the gptel menu, or use @gptel-agent
@@ -1669,6 +1694,65 @@ Show the heading too, if it is currently invisible."
 ;;                "open" "-a" "/Applications/Présentation.app" pdf)
 
 ;;; From init-org.el
+
+;; Presentations
+(use-package org-tree-slide
+  :after org
+  :commands (+org-slide-start +org-slide-stop)
+  :config
+  (defun +hide-tab-bar ()
+    "Hide the tab bar (used when starting a presentation)."
+    (when (bound-and-true-p tab-bar-mode)
+      (tab-bar-mode -1)))
+
+  (defun +show-tab-bar ()
+    "Show the tab bar again (used when stopping a presentation)."
+    (unless (bound-and-true-p tab-bar-mode)
+      (tab-bar-mode 1)))
+
+  (defun +org-slide-start ()
+    (interactive)
+    (when (eq major-mode 'org-mode)
+      (setq org-hide-emphasis-markers t)
+      (org-mode-restart)
+
+      (set-face-attribute 'org-meta-line nil :foreground (face-attribute 'default :background))
+      (set-face-attribute 'org-tree-slide-header-overlay-face nil :foreground (face-attribute 'default :background))
+      (set-face-attribute 'org-block-begin-line nil :background (face-attribute 'default :background))
+      (set-face-attribute 'org-block-end-line nil :background (face-attribute 'default :background))
+      (set-face-attribute 'org-block-begin-line nil :foreground (face-attribute 'default :background))
+      (set-face-attribute 'org-block-end-line nil :foreground (face-attribute 'default :background))
+      (set-face-attribute 'org-quote nil :foreground (face-attribute 'default :foreground))
+
+      (setq-local header-line-format nil
+                  mode-line-format nil
+                  line-spacing 10)
+      (+hide-tab-bar)
+      (text-scale-increase 3)
+      (visual-line-mode)
+      (show-paren-local-mode -1)
+      (hl-line-mode -1)
+      (org-tree-slide-mode)))
+
+  (defun +org-slide-stop ()
+    (interactive)
+    (when (eq major-mode 'org-mode)
+      (setq org-hide-emphasis-markers nil)
+      (set-face-attribute 'org-meta-line nil :foreground nil)
+      (set-face-attribute 'org-tree-slide-header-overlay-face nil :foreground nil)
+      (set-face-attribute 'org-block-begin-line nil :background nil)
+      (set-face-attribute 'org-block-end-line nil :background nil)
+      (set-face-attribute 'org-block-begin-line nil :foreground nil)
+      (set-face-attribute 'org-block-end-line nil :foreground nil)
+      (set-face-attribute 'org-quote nil :foreground nil)
+      (+show-tab-bar)
+      (org-tree-slide-mode -1)
+      (org-mode-restart)))
+
+  (setq org-tree-slide-heading-emphasis t
+        org-tree-slide-content-margin-top 1
+        org-tree-slide-slide-in-effect nil))
+
 ;; MathJax previews; entering a formula reveals its source.
 ;; (use-package org-appear-mathjax
 ;;   :ensure nil ;; local package, loaded from site-lisp

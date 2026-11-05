@@ -24,7 +24,8 @@
 (setq TeX-source-correlate-method 'syntax)
 (setq TeX-source-correlate-start-server t)
 ;; (setq TeX-view-program-list '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
-(setq TeX-view-program-selection '((output-pdf "Skim")))
+(setq TeX-view-program-selection
+      (if *is-mac* '((output-pdf "Skim")) '((output-pdf "PDF Tools"))))
 ;; Use pdf-tools as the AUCTeX viewer; otherwise macOS falls back to open -> Skim.
 ;; (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
 (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer) ; refresh pdf after compiling

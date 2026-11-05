@@ -3,18 +3,6 @@
 ;;; Code:
 
 ;;; Spaced repetition
-(use-package org-drill
-  :after org
-  :commands (org-drill org-drill-directory org-drill-resume org-drill-cram)
-  :bind (("C-c v d" . org-drill)
-	 ("C-c v r" . org-drill-resume)
-	 ("C-c v D" . org-drill-directory))
-  :custom
-  (org-drill-save-buffers-after-drill-sessions-p nil) ; don't save every buffer afterwards
-  (org-drill-maximum-items-per-session 30)            ; at most 30 cards per session
-  (org-drill-maximum-duration 20)                     ; at most 20 minutes per session
-  (org-drill-learn-fraction 0.5)                      ; SM2 interval scaling factor
-  (org-drill-leech-method 'warn))                     ; warn about cards that never stick
 
 (use-package org-fc
   :ensure nil ; not on MELPA, loaded from site-lisp
@@ -109,8 +97,6 @@
    ("C-c n l" . org-roam-buffer-toggle))
   :config
   (org-roam-db-autosync-mode))
-
-(use-package org-roam-ui)
 
 (use-package citar
   :hook

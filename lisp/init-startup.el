@@ -11,6 +11,9 @@
       kept-old-versions 2
       delete-old-versions t)
 (make-directory (expand-file-name ".cache/backups/" user-emacs-directory) t)
+;; Read subprocess output in 1 MB chunks; the 4 KB default throttles LSP
+;; servers such as clangd and pyright.
+(setq read-process-output-max (* 1024 1024))
 (setq inhibit-startup-message t)
 (setq frame-title-format "Emacs")
 (setq-default cursor-type 'bar)

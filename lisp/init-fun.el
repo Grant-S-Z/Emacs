@@ -19,10 +19,23 @@
   (find-file-other-window "~/research/code/Grant/content/post/"))
 
 (defun grant/open-in-finder ()
-  "Show the current file in finder."
+  "Show the current file in Finder, Explorer or the desktop file manager."
   (interactive)
-  (let ((path (or (buffer-file-name) default-directory)))
-    (shell-command (concat "open -R " (shell-quote-argument path)))))
+  (let ((path (expand-file-name (or (buffer-file-name) default-directory))))
+    (cond
+     (*is-mac*
+      (shell-command (concat "open -R " (shell-quote-argument path))))
+     (*is-wsl*
+      (let ((win-path
+             (string-trim
+              (shell-command-to-string
+               (concat "wslpath -w " (shell-quote-argument path))))))
+        (if (file-directory-p path)
+            (start-process "explorer" nil "explorer.exe" win-path)
+          (start-process "explorer" nil "explorer.exe" (concat "/select," win-path)))))
+     (t
+      (start-process "xdg-open" nil "xdg-open"
+                     (if (file-directory-p path) path (file-name-directory path)))))))
 
 (defun grant/open-directory-in-vscode ()
   "Open current file's directory in VSCode."
@@ -34,22 +47,23 @@
 
 
 
-(defun grant/open-pdf-with-presentation (pdf)
-  "Open PDF with Présentation.app."
-  (interactive
-   (list
-    (read-file-name
-     "Choose PDF: " default-directory nil t nil
-     (lambda (f)
-       (or (file-directory-p f)
-           (string-match-p "\\.pdf\\'" (downcase f)))))))
-  (setq pdf (expand-file-name pdf))
-  (unless (file-exists-p pdf)
-    (user-error "File does not exist: %s" pdf))
-  (unless (file-directory-p "/Applications/Présentation.app")
-    (user-error "Présentation.app not found at /Applications/Présentation.app"))
-  (start-process "open-presentation" nil
-                 "open" "-b" "fr.imag.iihm.blanch.osx-presentation" pdf))
+(when *is-mac*
+  (defun grant/open-pdf-with-presentation (pdf)
+    "Open PDF with Présentation.app."
+    (interactive
+     (list
+      (read-file-name
+       "Choose PDF: " default-directory nil t nil
+       (lambda (f)
+         (or (file-directory-p f)
+             (string-match-p "\\.pdf\\'" (downcase f)))))))
+    (setq pdf (expand-file-name pdf))
+    (unless (file-exists-p pdf)
+      (user-error "File does not exist: %s" pdf))
+    (unless (file-directory-p "/Applications/Présentation.app")
+      (user-error "Présentation.app not found at /Applications/Présentation.app"))
+    (start-process "open-presentation" nil
+                   "open" "-b" "fr.imag.iihm.blanch.osx-presentation" pdf)))
 
 
 (defun grant/find-file-make-directory-maybe (filename &optional _wildcards)

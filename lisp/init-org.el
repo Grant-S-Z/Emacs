@@ -4,7 +4,7 @@
 
 ;;; Org-specific functions
 (defun org-insert-image ()
-  "Insert a image from clipboard."
+  "Insert an image from the system clipboard."
   (interactive)
   (let* ((path (concat default-directory "./img/"))
 	 ;; Remove the file extension from the buffer name
@@ -15,17 +15,43 @@
 		      (format-time-string "_%Y%m%d%H%M%S.png"))))
     (if (not (file-exists-p path))
 	(mkdir path))
-    (do-applescript (concat
-		     "set the_path to \"" image-file "\" \n"
-		     "set png_data to the clipboard as «class PNGf» \n"
-		     "set the_file to open for access (POSIX file the_path as string) with write permission \n"
-		     "write png_data to the_file \n"
-		     "close access the_file"))
+    (cond
+     (*is-mac*
+      (do-applescript (concat
+		       "set the_path to \"" image-file "\" \n"
+		       "set png_data to the clipboard as «class PNGf» \n"
+		       "set the_file to open for access (POSIX file the_path as string) with write permission \n"
+		       "write png_data to the_file \n"
+		       "close access the_file")))
+     (*is-wsl*
+      (grant/org-insert-image-wsl image-file))
+     ((executable-find "wl-paste")
+      (unless (zerop (call-process "wl-paste" nil image-file nil "--type" "image/png"))
+	(user-error "Clipboard does not contain an image")))
+     (t
+      (user-error "No clipboard image support on this system")))
     (org-insert-link nil
 		     (concat
 		      "file:" image-file)
 		     "")
     (message "%s" image-file)))
+
+(defun grant/org-insert-image-wsl (image-file)
+  "Save the Windows clipboard image to IMAGE-FILE (WSL only)."
+  (let* ((win-file
+          (string-trim
+           (shell-command-to-string
+            (concat "wslpath -w " (shell-quote-argument image-file)))))
+         (script
+          (format (concat "Add-Type -AssemblyName System.Windows.Forms; "
+                          "Add-Type -AssemblyName System.Drawing; "
+                          "$img=[System.Windows.Forms.Clipboard]::GetImage(); "
+                          "if ($img -eq $null) { exit 2 }; "
+                          "$img.Save('%s',[System.Drawing.Imaging.ImageFormat]::Png);")
+                  (replace-regexp-in-string "'" "''" win-file))))
+    (unless (zerop (call-process "powershell.exe" nil nil nil
+                                 "-NoProfile" "-NonInteractive" "-STA" "-Command" script))
+      (user-error "Clipboard does not contain an image"))))
 
 ;;; LaTeX delimiter completion
 (defun grant/org-electric-latex-pairs ()
@@ -128,12 +154,6 @@
   (add-to-list 'org-capture-templates
 	       '("j" "Journal" entry (file "~/org/journal.org")
 		 "* %U - Journal\n  %?"))
-  (add-to-list 'org-capture-templates
-	       '("w" "Word (org-drill)" entry
-		 (file+headline "~/org/vocabulary.org" "New Words")
-		 ;; Keep the heading neutral: org-drill shows it during review, so
-			 ;; putting the word there would spoil the answer.
-		 "* Word :drill:\n:PROPERTIES:\n:DRILL_CARD_TYPE: twosided\n:END:\n\n** English\n%^{Word}\n\n** 中文释义\n%^{中文释义}\n\n** 例句\n%?\n"))
   (add-to-list 'org-capture-templates
 	       '("e" "Event" entry (file "~/org/event.org")
 		 "* TODO %^{Eventname}\n  %?"))

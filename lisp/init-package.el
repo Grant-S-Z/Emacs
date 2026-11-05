@@ -4,9 +4,6 @@
 ;;; Basic
 (which-key-mode 1) ; built-in
 
-(use-package benchmark-init
-  :init (benchmark-init/activate))
-
 (use-package restart-emacs
   :bind (("C-c r" . restart-emacs)))
 
@@ -18,9 +15,20 @@
   :bind ("C-." . embark-act))
 
 (use-package consult
-  :bind (("C-s" . consult-line)))
+  :bind (("C-s" . consult-line)
+         ("C-x b" . consult-buffer)
+         ("C-c f" . consult-ripgrep)))
 
 (use-package embark-consult)
+
+(use-package wgrep
+  :commands (wgrep-change-to-wgrep-mode))
+
+(use-package consult-dir
+  :bind (("C-x C-d" . consult-dir)
+         :map minibuffer-local-completion-map
+         ("C-x C-d" . consult-dir)
+         ("C-x C-j" . consult-dir-jump-file)))
 
 (use-package crux
   :bind (("C-a" . crux-move-beginning-of-line)
@@ -60,7 +68,7 @@
   :bind (("M-o" . 'ace-window)))
 
 (use-package expand-region
-  :bind ("C-c e" . er/expand-region))
+  :bind ("M-=" . er/expand-region))
 
 (use-package diff-hl
   :hook ((prog-mode . diff-hl-mode)

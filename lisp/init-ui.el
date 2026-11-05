@@ -111,6 +111,22 @@
 (use-package hl-todo
   :init (global-hl-todo-mode))
 
+;;; Spell checking
+;; The dictionary is English-only, so non-ASCII words are skipped: without
+;; that, every Chinese word in notes and mail would be underlined.
+(use-package jinx
+  :hook ((org-mode . jinx-mode)
+         (LaTeX-mode . jinx-mode)
+         (message-mode . jinx-mode))
+  :bind (:map jinx-mode-map
+              ("M-$" . jinx-correct))
+  :custom
+  (jinx-languages "en_US")
+  :config
+  (let ((cell (assq t jinx-exclude-regexps)))
+    (when cell
+      (setcdr cell (cons "[^[:ascii:]]" (cdr cell))))))
+
 ;;; Fonts and input method
 ;; Use one font family for Latin, CJK, code and proportional text.
 (defun grant-setup-fonts (&optional frame)
@@ -134,9 +150,9 @@
 (use-package rime
   :custom
   (default-input-method "rime")
-  (rime-librime-root "~/.emacs.d/librime/dist")
-  (rime-emacs-module-header-root "")
-  (rime-share-data-dir "~/Library/Rime")
+  (rime-librime-root (if *is-mac* "~/.emacs.d/librime/dist" nil))
+  (rime-emacs-module-header-root (if *is-mac* "" nil))
+  (rime-share-data-dir (if *is-mac* "~/Library/Rime" "/usr/share/rime-data"))
   (rime-user-data-dir "~/.emacs.d/rime")
   (rime-cursor ".")
   (rime-show-candidate 'posframe)

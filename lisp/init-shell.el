@@ -10,7 +10,14 @@
   ;; this avoids loading Oh My Zsh, Powerlevel10k and the conda hook.
   (setq exec-path-from-shell-shell-name "/bin/zsh"
         exec-path-from-shell-arguments '("-l"))
-  (exec-path-from-shell-initialize))
+  ;; A broken shell profile should not abort startup; fall back to the
+  ;; PATH Emacs inherited from the launcher.
+  (condition-case err
+      (progn
+        (exec-path-from-shell-initialize)
+        (setq exec-path (delete-dups exec-path))
+        (setenv "PATH" (mapconcat #'identity exec-path ":")))
+    (error (message "exec-path-from-shell failed: %S" err))))
 
 ;;; Shell vterm
 ;; Use the macOS system compiler for native modules.
