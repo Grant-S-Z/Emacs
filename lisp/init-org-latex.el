@@ -17,10 +17,18 @@
   (grant/org-latex-read-template "org-math-macros.tex"))
 
 (defun grant/org-latex-template (filename)
-  "Read template FILENAME and expand the shared mathematics macros."
-  (replace-regexp-in-string
-   "%%ORG-MATH-MACROS%%" grant/org-latex-math-macros
-   (grant/org-latex-read-template filename) t t))
+  "Read template FILENAME and expand the shared mathematics macros.
+On WSL, use the WSL-specific beamer templates."
+  (let ((filename
+         (if *is-wsl*
+             (pcase filename
+               ("org-beamer.tex" "org-beamer-wsl.tex")
+               ("org-beamer-en.tex" "org-beamer-en-wsl.tex")
+               (_ filename))
+           filename)))
+    (replace-regexp-in-string
+     "%%ORG-MATH-MACROS%%" grant/org-latex-math-macros
+     (grant/org-latex-read-template filename) t t)))
 
 (defconst grant/org-latex-section-structure
   '(("\\section{%s}" . "\\section*{%s}")
@@ -65,8 +73,8 @@ linkcolor=black
 }
 ")
   (setq org-latex-prefer-user-labels t)
-  (setq org-beamer-theme "metropolis")
-  ;; Open exported PDFs in Emacs (pdf-tools) instead of the system default (Skim).
+  (setq org-beamer-theme (if *is-wsl* "THU" "metropolis"))
+  ;; 导出的 PDF 用 Emacs（pdf-tools）打开，不走系统默认（Skim）
   (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
   (setq org-latex-pdf-process
 	'("latexmk --lualatex -shell-escape -interaction=nonstopmode -output-directory=%o %f"))

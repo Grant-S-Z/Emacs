@@ -20,9 +20,13 @@
     (error (message "exec-path-from-shell failed: %S" err))))
 
 ;;; Shell vterm
-;; Use the macOS system compiler for native modules.
-(setenv "CC" "/usr/bin/clang")
-(setenv "CXX" "/usr/bin/clang++")
+;; Compiler for native modules: clang on macOS, gcc on Linux/WSL.
+(if *is-wsl*
+    (progn
+      (setenv "CC" "/usr/bin/gcc")
+      (setenv "CXX" "/usr/bin/g++"))
+  (setenv "CC" "/usr/bin/clang")
+  (setenv "CXX" "/usr/bin/clang++"))
 
 (use-package vterm
   :init (setq vterm-shell "zsh"))

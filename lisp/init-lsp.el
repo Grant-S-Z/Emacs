@@ -5,6 +5,47 @@
 ;; Enable available Tree-sitter major modes.
 (setq treesit-enabled-modes t)
 
+(when *is-wsl*
+  ;; WSL explicit remaps; only add when the grammar is installed.
+  (require 'treesit)
+(require 'subr-x)
+(setq treesit-font-lock-level 4)
+
+(defun grant/treesit-language-for-mode (mode)
+  "Return the tree-sitter language symbol for MODE."
+  (pcase mode
+    ('c++-ts-mode 'cpp)
+    ('js-ts-mode 'javascript)
+    ('tsx-ts-mode 'tsx)
+    (_ (intern (string-remove-suffix "-ts-mode" (symbol-name mode))))))
+
+(defvar grant/treesit-mode-remaps
+  '((python-mode . python-ts-mode)
+    (sh-mode . bash-ts-mode)
+    (c-mode . c-ts-mode)
+    (c++-mode . c++-ts-mode)
+    (cmake-mode . cmake-ts-mode)
+    (yaml-mode . yaml-ts-mode)
+    (lua-mode . lua-ts-mode)
+    (json-mode . json-ts-mode)
+    (js-mode . js-ts-mode)
+    (typescript-mode . typescript-ts-mode)
+    (css-mode . css-ts-mode)
+    (html-mode . html-ts-mode)
+    (java-mode . java-ts-mode)
+    (go-mode . go-ts-mode)
+    (rust-mode . rust-ts-mode)
+    (ruby-mode . ruby-ts-mode)
+    (dockerfile-mode . dockerfile-ts-mode))
+  "Classic major modes remapped to tree-sitter modes.")
+
+(dolist (pair grant/treesit-mode-remaps)
+  (let ((lang (grant/treesit-language-for-mode (cdr pair))))
+    (when (and (fboundp (cdr pair))
+               (treesit-language-available-p lang))
+      (add-to-list 'major-mode-remap-alist pair)))))
+
+
 
 ;;; Format
 (use-package format-all
@@ -57,7 +98,10 @@
   ;; `python-shell-interpreter'.  Without it Pyright picks one from PATH and
   ;; may land on the Homebrew Python.
   (setq-default eglot-workspace-configuration
-                '(:python (:pythonPath "/Users/grant/miniconda3/bin/python3")))
+                (list :python (list :pythonPath
+                                    (if *is-wsl*
+                                        (expand-file-name "~/miniconda3/bin/python3")
+                                      "/Users/grant/miniconda3/bin/python3"))))
   (add-to-list 'eglot-server-programs
                (list '(python-ts-mode python-mode)
                      (expand-file-name "~/miniconda3/bin/pyright-langserver") "--stdio"))
@@ -80,14 +124,21 @@
   (setq python-shell-completion-native-enable t))
 
 ;; Markdown
-(use-package markdown-ts-mode
-  :mode (("README\\.md\\'" . markdown-ts-mode)
-         ("\\.md\\'" . markdown-ts-mode)))
-(use-package markdown-ts-appear
-  :hook ((markdown-ts-mode . markdown-ts-appear-mode)
-         (markdown-ts-mode . markdown-ts-appear-mathjax-mode))
-  :custom
-  (markdown-ts-appear-mathjax-scale 0.9))
+;; Emacs 31 has built-in markdown-ts-mode; the external package rejects 31+.
+(if (and *is-wsl* (version<= "31" emacs-version))
+    (progn
+      (load (expand-file-name "textmodes/markdown-ts-mode.elc" lisp-directory))
+      (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-ts-mode)))
+  (use-package markdown-ts-mode
+    :mode (("README\\.md\\'" . markdown-ts-mode)
+           ("\\.md\\'" . markdown-ts-mode))))
+(when (version<= "31.1" emacs-version)
+  (use-package markdown-ts-appear
+    :after markdown-ts-mode
+    :hook ((markdown-ts-mode . markdown-ts-appear-mode)
+           (markdown-ts-mode . markdown-ts-appear-mathjax-mode))
+    :custom
+    (markdown-ts-appear-mathjax-scale 0.9)))
 
 ;; CMake
 (use-package cmake-mode)
