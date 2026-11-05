@@ -1,10 +1,23 @@
 ;;; init-ai.el --- LLM clients and AI agents  -*- lexical-binding: t; -*-
 ;;; Commentary:
-;; gptel / gptel-agent / agent-shell / agent-shell-math-renderer
+;; agent-shell / agent-shell-math-renderer
 ;;; Code:
 
 ;;; agent-shell: a CLI coding agent over ACP, inside Emacs
 (use-package agent-shell
+  :bind (("C-c k" . agent-shell)
+         ("C-c K" . agent-shell-toggle))
+  :custom
+  ;; Open the shell in a right side window instead of replacing the buffer
+  ;; you are reading.
+  (agent-shell-display-action
+   '((display-buffer-in-side-window)
+     (side . right) (slot . 0) (window-width . 0.45)))
+  ;; Files the agent opens must not take over the shell window.
+  (agent-shell-file-display-action
+   '((display-buffer-reuse-window display-buffer-pop-up-window)
+     (inhibit-same-window . t)))
+  (agent-shell-kimi-default-model-id "DeepSeek/deepseek-flash")
   :config
   ;; (setq agent-shell-preferred-agent-config 'pi)
   ;; (setq agent-shell-preferred-agent-config 'omp)

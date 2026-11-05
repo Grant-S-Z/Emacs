@@ -40,8 +40,9 @@
   )
 
 (use-package yasnippet
-  :init (yas-global-mode t)
-  :hook (prog-mode . yas-minor-mode))
+  ;; Loading yasnippet costs ~100 ms, so enable it on the first idle moment
+  ;; instead of blocking startup; it still turns on in every existing buffer.
+  :init (run-with-idle-timer 1 nil #'yas-global-mode))
 
 (use-package yasnippet-snippets
   :after yasnippet)

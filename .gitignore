@@ -41,3 +41,4 @@ fc-backtrace*.txt
 org-fc-reviews.tsv
 /english-wordlists/
 /cache
+package-quickstart.el*

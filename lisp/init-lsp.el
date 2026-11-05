@@ -15,8 +15,7 @@
 (use-package cape
   :init
   (add-hook 'completion-at-point-functions #'cape-elisp-block) ; elisp in org babel
-  (add-hook 'completion-at-point-functions #'cape-file)
-  )
+  (add-hook 'completion-at-point-functions #'cape-file))
 
 (use-package corfu
   :hook ((emacs-lisp-mode . corfu-mode)
@@ -39,8 +38,7 @@
   (dotimes (i 10) ; M-<num> selects entry <num>
     (define-key corfu-mode-map
                 (kbd (format "M-%s" i))
-                (kbd (format "C-%s <tab>" i))))
-  )
+                (kbd (format "C-%s <tab>" i)))))
 
 (use-package nerd-icons-corfu
   :after corfu
@@ -66,13 +64,13 @@
   (add-to-list 'eglot-server-programs
                '((c-mode c-ts-mode c++-mode c++-ts-mode) . ("clangd"))))
 
+
 ;;; Languages
 ;; Python
 (use-package python
   :init (defvar python-path "~/miniconda3/bin/python3")
   :mode ("\\.py\\'" . python-ts-mode)
-  :hook ((python-ts-mode . eglot-ensure)
-         (python-mode . eglot-ensure))
+  :hook (python-ts-mode . eglot-ensure)
   :config
   (setq python-interpreter python-path)
   (setq python-shell-interpreter python-path)
@@ -95,9 +93,7 @@
 (use-package cmake-mode)
 
 ;; C/C++
-(add-hook 'c-mode-hook #'eglot-ensure)
 (add-hook 'c-ts-mode-hook #'eglot-ensure)
-(add-hook 'c++-mode-hook #'eglot-ensure)
 (add-hook 'c++-ts-mode-hook #'eglot-ensure)
 
 ;; CSV
@@ -105,6 +101,7 @@
 
 ;; YAML
 (use-package yaml-mode)
+
 
 (provide 'init-lsp)
 ;;; init-lsp.el ends here

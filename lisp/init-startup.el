@@ -14,6 +14,13 @@
 ;; Read subprocess output in 1 MB chunks; the 4 KB default throttles LSP
 ;; servers such as clangd and pyright.
 (setq read-process-output-max (* 1024 1024))
+
+;; Log native-compilation warnings instead of popping up *Warnings* after
+;; every package upgrade.
+(setq native-comp-async-report-warnings-errors 'silent)
+
+;; Skip re-compacting font caches; the pause is noticeable on macOS.
+(setq inhibit-compacting-font-caches t)
 (setq inhibit-startup-message t)
 (setq frame-title-format "Emacs")
 (setq-default cursor-type 'bar)

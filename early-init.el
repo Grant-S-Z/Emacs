@@ -11,8 +11,11 @@
   (add-to-list 'initial-frame-alist '(undecorated-round . t)))
 
 ;; Leave package activation to init-elpa, so its load-path ordering happens
-;; before any package is put on `load-path'.
-(setq package-enable-at-startup nil)
+;; before any package is put on `load-path'.  `package-initialize' there will
+;; load `package-quickstart-file', which skips re-reading every autoload file;
+;; the flag also keeps that cache refreshed after package installs.
+(setq package-enable-at-startup nil
+      package-quickstart t)
 
 ;; Turn these off before the first frame is drawn; doing it in init.el lets
 ;; the initial frame flash with a toolbar and scroll bars.
