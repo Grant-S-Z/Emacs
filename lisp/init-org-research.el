@@ -5,8 +5,7 @@
 ;;; Spaced repetition
 
 (use-package org-fc
-  :ensure nil ; not on MELPA, loaded from site-lisp
-  :load-path "~/.emacs.d/site-lisp/org-fc"
+  :vc (:url "https://git.sr.ht/~l3kn/org-fc")
   :after org
   :commands (org-fc-review org-fc-dashboard)
   :bind (("C-c v f" . org-fc-review)

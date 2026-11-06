@@ -113,6 +113,15 @@
 (use-package nov
   :mode ("\\.epub\\'" . nov-mode))
 
+;; Appine: native macOS apps (WebKit, PDFKit, Quick Look) inside Emacs.
+(when *is-mac*
+  (use-package appine
+    :vc (:url "https://github.com/chaoswork/appine")
+    :commands (appine appine-open-url appine-open-file)
+    :bind (("C-c A a" . appine)
+           ("C-c A u" . appine-open-url)
+           ("C-c A o" . appine-open-file))))
+
 ;; Translator
 (use-package gt
   :bind ("C-c g" . gt-translate)

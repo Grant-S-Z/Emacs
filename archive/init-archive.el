@@ -2207,4 +2207,10 @@ Show the heading too, if it is currently invisible."
 ;; Optional ligature
 ;; (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
 
+;;; Org MathJax previews (archived; not loaded)
+(use-package org-appear-mathjax
+  :vc (:url "ssh://git@github.com/Grant-S-Z/org-appear-mathjax.git"
+            :vc-backend Git)
+  :defer t)
+
 ;;; init-archive.el ends here

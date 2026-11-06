@@ -74,8 +74,12 @@ linkcolor=black
 ")
   (setq org-latex-prefer-user-labels t)
   (setq org-beamer-theme (if *is-wsl* "THU" "metropolis"))
-  ;; 导出的 PDF 用 Emacs（pdf-tools）打开，不走系统默认（Skim）
-  (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
+  ;; Open PDF links with Appine on macOS, pdf-tools elsewhere.
+  (add-to-list 'org-file-apps
+               (cons "\\.pdf\\'"
+                     (if *is-mac*
+                         (lambda (file _link) (appine-open-file file))
+                       'emacs)))
   (setq org-latex-pdf-process
 	'("latexmk --lualatex -shell-escape -interaction=nonstopmode -output-directory=%o %f"))
 

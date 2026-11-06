@@ -24,12 +24,40 @@
 (setq TeX-source-correlate-method 'syntax)
 (setq TeX-source-correlate-start-server t)
 ;; (setq TeX-view-program-list '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
+
+;; Appine is the macOS PDF viewer; other platforms keep pdf-tools.
+(declare-function appine-open-file "appine" (path))
+(defun grant-tex-view-appine ()
+  "Open the current AUCTeX output PDF in Appine."
+  (appine-open-file (TeX-active-master (TeX-output-extension))))
+
 (setq TeX-view-program-selection
-      (if *is-mac* '((output-pdf "Skim")) '((output-pdf "PDF Tools"))))
-;; Use pdf-tools as the AUCTeX viewer; otherwise macOS falls back to open -> Skim.
-;; (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
+      (if *is-mac* '((output-pdf "Appine")) '((output-pdf "PDF Tools"))))
+(with-eval-after-load 'tex
+  (when *is-mac*
+    (add-to-list 'TeX-view-program-list '("Appine" grant-tex-view-appine))))
+
+;; On macOS, `find-file' on a local PDF opens it in Appine instead of
+;; pdf-tools; other files and platforms keep the normal behavior.
+(defun grant/pdf-file-p (filename)
+  "Return non-nil if FILENAME is a local regular PDF file."
+  (let ((case-fold-search t))
+    (and (string-match-p "\\.pdf\\'" filename)
+         (not (file-remote-p filename))
+         (file-regular-p filename))))
+
+(defun grant/find-file (orig filename &optional wildcards)
+  "Open local PDFs in Appine on macOS, otherwise call ORIG."
+  (if (and *is-mac* (not wildcards) (grant/pdf-file-p filename))
+      (progn
+        (appine-open-file filename)
+        (current-buffer))
+    (funcall orig filename wildcards)))
+
+(when *is-mac*
+  (dolist (command '(find-file find-file-other-window))
+    (advice-add command :around #'grant/find-file)))
 (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer) ; refresh pdf after compiling
-(add-hook 'pdf-view-mode-hook 'pdf-view-fit-width-to-window) ; fit width
 
 (use-package auctex-latexmk
   :after tex
@@ -43,12 +71,17 @@
   (add-to-list 'cdlatex-command-alist
 	       '(("qt" "Insert \\qty{}{}" "\\qty{?}{}" cdlatex-position-cursor nil t nil))))
 
-(use-package pdf-tools
-  :mode ("\\.pdf\\'" . pdf-view-mode)
-  :config (pdf-tools-install))
+;; pdf-tools is only used on WSL; macOS opens PDFs in Appine.
+(when *is-wsl*
+  (add-hook 'pdf-view-mode-hook #'pdf-view-fit-width-to-window)
+  (add-hook 'pdf-view-mode-hook #'pdf-view-roll-minor-mode) ; continuous scroll
+  (use-package pdf-tools
+    :mode ("\\.pdf\\'" . pdf-view-mode)
+    :config (pdf-tools-install)))
 
-;; PDF presentation mode on top of pdf-tools: full screen, page fit, no clutter.
-;; In a PDF buffer press P or M-x grant-pdf-present-mode; q quits, m inverts.
+;; PDF presentation mode on top of pdf-tools (WSL only): full screen, page
+;; fit, no clutter.  In a PDF buffer press P or M-x grant-pdf-present-mode;
+;; q quits, m inverts.
 (defvar-local grant-pdf-present--saved nil
   "State saved before entering `grant-pdf-present-mode'.")
 
@@ -100,8 +133,9 @@
                   cursor-type (plist-get state :cursor)))
     (setq grant-pdf-present--saved nil)))
 
-(with-eval-after-load 'pdf-view
-  (define-key pdf-view-mode-map (kbd "P") #'grant-pdf-present-mode))
+(when *is-wsl*
+  (with-eval-after-load 'pdf-view
+    (define-key pdf-view-mode-map (kbd "P") #'grant-pdf-present-mode)))
 
 (provide 'init-tex)
 ;;; init-tex.el ends here
