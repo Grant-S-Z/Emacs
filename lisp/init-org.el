@@ -16,6 +16,9 @@
     (if (not (file-exists-p path))
 	(mkdir path))
     (cond
+     ((executable-find "pngpaste")
+      (unless (zerop (call-process "pngpaste" nil nil nil image-file))
+        (user-error "Clipboard does not contain an image")))
      (*is-mac*
       (do-applescript (concat
 		       "set the_path to \"" image-file "\" \n"

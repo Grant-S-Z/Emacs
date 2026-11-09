@@ -1,7 +1,21 @@
 ;;; init-archive.el --- Archived, inactive settings  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
-;;; Tabs
+
+;; `M-o' is plain `other-window': it cycles in window-tree order and already
+;; skips windows with `no-other-window' (dirvish-side sets it).  `C-c W'
+;; keeps ace-window for labeled selection, including across frames.
+;; (use-package ace-window
+;;   :bind (("C-c W" . 'ace-window))
+;;   :config
+;;   ;; `aw-ignored-p' only honours `no-other-window' for `ace-select-window',
+;;   ;; not for the dispatcher, so the dirvish side window still shows up.
+;;   ;; Follow the parameter the way `other-window' does.
+;;   (advice-add 'aw-ignored-p :around
+;;               (lambda (orig window)
+;;                 (or (funcall orig window)
+;;                     (window-parameter window 'no-other-window)))))
+
 (use-package benchmark-init
   :init (benchmark-init/activate))
 
@@ -2212,5 +2226,22 @@ Show the heading too, if it is currently invisible."
   :vc (:url "ssh://git@github.com/Grant-S-Z/org-appear-mathjax.git"
             :vc-backend Git)
   :defer t)
+
+;;; Rime input method (archived; system input method used for now)
+(use-package rime
+  :custom
+  (default-input-method "rime")
+  (rime-librime-root (if *is-mac* "~/.emacs.d/librime/dist" nil))
+  (rime-emacs-module-header-root (if *is-mac* "" nil))
+  (rime-share-data-dir (if *is-mac* "~/Library/Rime" "/usr/share/rime-data"))
+  (rime-user-data-dir "~/.emacs.d/rime")
+  (rime-cursor ".")
+  (rime-show-candidate 'posframe)
+  (rime-commit1-forall t)
+  (rime-posframe-properties
+   (list :internal-border-width 1))
+  (rime-posframe-style 'vertical)
+  (mode-line-mule-info '((:eval (rime-lighter))))
+  (rime-deactivate-when-exit-minibuffer t))
 
 ;;; init-archive.el ends here

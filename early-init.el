@@ -29,4 +29,12 @@
 (add-hook 'emacs-startup-hook
           (lambda () (setq gc-cons-threshold (* 32 1024 1024))))
 
+;; Init files use `use-package' macros whose expansion depends on init-elpa;
+;; native-comp's async process does not load init-elpa, so keep it away from
+;; these files.
+(defvar native-comp-jit-compilation-deny-list nil)
+(add-to-list 'native-comp-jit-compilation-deny-list
+             (concat (regexp-quote (expand-file-name "lisp/init-" user-emacs-directory))
+                     ".*\\.elc?\\'"))
+
 (provide 'early-init)

@@ -1,0 +1,232 @@
+# -*- mode: org -*-
+# ============================================================================
+# WORK-FOCUSED CONFERENCE TALK (English) --- full-featured frame template.
+#
+# How to use: copy this file, tick the frames this talk needs in the MENU
+# below, delete the rest, then fill each kept frame. Lines starting with "# "
+# are Org comments: they are guidance and do NOT export --- delete or keep, your
+# choice. Run scripts/lint_org.py when done.
+#
+# Default shape: a formal talk, but the audience is here for the WORK, so keep
+# background to the minimum needed to read the results and spend your slides on
+# Approach + Results. Rough budget for a 12-18 min talk ~ 12-16 frames.
+#
+# FRAME MENU --- tick what you need:
+#   [ ] 1. Motivation        1 frame     light background: why + the gap
+#   [ ] 2. Background        0-1 frame   ONLY what's needed to read the body
+#   [ ] 3. Body              the bulk    structure follows the source --- see below
+#   [ ] 4. Summary & outlook 1 frame     conclusions as claims, then next steps
+#   [ ] (backup)             Q&A         after \appendix; uncounted
+#
+# HOW TO STRUCTURE THE BODY --- don't force a fixed "Method -> Results" split; let
+# the structure follow the source:
+#   - Converting a paper: follow the paper's section order (usually the analysis
+#     steps / the individual results).
+#   - A routine progress report: follow the work items or a timeline (what got
+#     done this period).
+#   The three frame shapes below are only samples (figure / two-column / TikZ
+#   diagram); copy and rename them to match your real structure.
+#
+# THREE RULES that matter more than any lint fix (the linter can't check these):
+#   - Conclusion-style titles. The title states the takeaway, not the topic.
+#       bad:  ** Signal model     good:  ** Solar HNL yield is dominated by X
+#   - One message per slide. Ask "what should they remember from this slide?"
+#     If you can't answer in one sentence, split it.
+#   - Figure-first. A large plot + one-line takeaway beats ten bullets and a
+#     thumbnail. State units, and state the exposure / CL / dataset on the plot.
+#     Caption with #+caption: (never a hand-typed centered line); add it when
+#     there's room, drop it when tight --- but be consistent across the deck.
+#     Side-by-side: figure LEFT, text RIGHT, and keep the text side uncrowded.
+#
+# ORG MATH SYNTAX:
+#   - Inline math: \(...\)
+#   - Unnumbered display math: \[...\]
+#   - Never use $...$ or $$...$$ in Org prose.
+# ============================================================================
+
+#+OPTIONS: H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+LATEX_COMPILER: lualatex
+#+LATEX_CLASS: beamer
+#+LATEX_HEADER: \usepackage{booktabs}
+#+LATEX_HEADER: \usepackage{appendixnumberbeamer}
+#+LATEX_HEADER: \useoutertheme{infolines}
+#+LATEX_HEADER: \useinnertheme{default}
+#+LATEX_HEADER: \setbeamertemplate{blocks}[rounded][shadow=false]
+#+LATEX_HEADER: \setbeamertemplate{items}[circle]
+#+LATEX_HEADER: \setbeamertemplate{sections/subsections in toc}[sections numbered]
+#+LATEX_HEADER: \setbeamertemplate{headline}[default]
+#+LATEX_HEADER: %\setbeamertemplate{frame numbering}[none]
+#+LATEX_HEADER: \usetikzlibrary{arrows.meta, positioning, angles, quotes}
+#+TITLE: Talk title
+#+BEAMER_HEADER: \AtBeginDocument{\title[Short title]{Talk title}}
+#+SUBTITLE: Conference / occasion
+#+AUTHOR: Presenter Name
+#+DATE: \today
+#+BEAMER_HEADER: \institute[Short affiliation]{Full affiliation \and \href{mailto:name@example.org}{\texttt{name@example.org}}}
+
+# --- Optional domain packages (uncomment only when needed) ---
+# #+LATEX_HEADER: \usepackage{siunitx}
+# #+LATEX_HEADER: \usepackage[version=4]{mhchem}
+
+# --- Citation support (uncomment and configure if the deck cites papers) ---
+# #+bibliography: ./references.bib
+# #+cite_export: biblatex
+# #+BEAMER_HEADER: \setbeamertemplate{bibliography item}[text]
+# #+LATEX_HEADER: \AtBeginDocument{\AtEveryBibitem{\clearfield{url}\clearfield{urldate}\clearfield{urlyear}\clearfield{urlmonth}\clearfield{urlday}}\renewbibmacro*{url+urldate}{}}
+
+# --- Title page logo overlay (uncomment for conference talks with logos) ---
+# #+BEAMER_HEADER: \addtobeamertemplate{title page}{}{%
+# #+BEAMER_HEADER: \begin{tikzpicture}[remember picture,overlay]
+# #+BEAMER_HEADER: \node[anchor=north east, xshift=-0.3cm, yshift=-0.3cm] at (current page.north east)
+# #+BEAMER_HEADER: {\includegraphics[height=1.2cm]{./assets/institution-logo.pdf}\hspace{0.3cm}\includegraphics[height=1.2cm]{./assets/project-logo.png}};
+# #+BEAMER_HEADER: \node[anchor=south west, xshift=0.3cm, yshift=0.3cm, font=\footnotesize, text=black!50] at (current page.south west)
+# #+BEAMER_HEADER: {\href{https://arxiv.org/abs/XXXX.XXXXX}{\textcolor{black!50}{\texttt{arXiv:XXXX.XXXXX}}}};
+# #+BEAMER_HEADER: \end{tikzpicture}}
+
+# ---------------------------------------------------------------------------
+* Introduction
+# Keep this section to ONE slide. Background is a runway, not the talk.
+
+** In one line: why this problem is worth solving
+# One message: the gap. End with the question THIS work answers.
+- State of the art / known: ...
+- Gap / open issue: ...
+- The question this work answers: ...
+
+*** Speaker Notes :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+- Context: ...
+- Why this matters: ...
+- What we did: ...
+
+# ---------------------------------------------------------------------------
+* Body
+# Organize this section freely by your source: rename "* Body" to fit the content
+# (paper -> paper sections; progress report -> work items) and open as many
+# sections as you need. The three frames below are just common shape samples, NOT
+# a fixed "Method + Results" structure --- copy and rename them.
+# >2 display equations in one frame is flagged as too dense (move algebra to backup).
+
+** Shape sample A: put the conclusion in the title (figure-first: one plot + takeaway)
+# One message. Lead with the figure; the bullet is the takeaway, not a caption.
+#+attr_latex: :width 0.75\textwidth
+#+caption: axis labels + units; annotate exposure / CL / dataset on the plot
+[[file:./figures/example.pdf]]
+- Takeaway: the one-sentence conclusion this plot tells the audience.
+
+*** Speaker Notes :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+- What to say while this slide is up.
+- Transition to next slide.
+
+** Shape sample B: two columns, figure LEFT, text RIGHT (keep the text side airy)
+*** L :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.58
+:END:
+#+attr_latex: :width \linewidth
+#+caption: caption (only if there's room; if you caption, caption every figure)
+[[file:./figures/example.pdf]]
+
+*** R :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.42
+:END:
+- key point: ...
+- key point: ...
+
+*** Speaker Notes :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+- Walk through the figure left-to-right.
+- Emphasize the key takeaway on the right.
+
+** Shape sample C: TikZ schematic diagram (e.g. workflow, architecture, concept map)
+#+begin_export latex
+\begin{center}
+\begin{tikzpicture}[
+    line/.style={draw, -stealth},
+    step/.style={draw, rounded corners, fill=blue!8, minimum width=2.2cm, minimum height=0.9cm},
+  ]
+  \node[step] (input) {Input};
+  \node[step, right=1.5cm of input] (process) {Process};
+  \node[step, right=1.5cm of process] (result) {Result};
+  \draw[line] (input) -- (process);
+  \draw[line] (process) -- (result);
+\end{tikzpicture}
+\end{center}
+#+end_export
+
+- One-line takeaway from the diagram.
+
+*** Speaker Notes :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+- Explain the diagram step by step.
+- Explain the steps and their relationship from left to right.
+
+# ---------------------------------------------------------------------------
+* Summary
+** Summary and outlook
+# Takeaways as CLAIMS the audience leaves with, then concrete next steps.
+- Conclusion 1: ...
+- Conclusion 2: ...
+- Next steps: ...
+
+*** Speaker Notes :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+- Recap the key message.
+- Thanks + open for questions.
+
+# ---------------------------------------------------------------------------
+# THANK YOU --- \appendix goes HERE so backup slides don't count toward the total.
+* Thank you :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+\appendix
+**
+:PROPERTIES:
+:BEAMER_opt: plain,c
+:END:
+#+begin_export latex
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[black!5] (current page.south west) rectangle (current page.north east);
+\end{tikzpicture}
+\centering
+{\usebeamercolor[fg]{structure}\Huge\bfseries Thank you}
+
+\vspace{0.8cm}
+{\Large Any questions?}
+#+end_export
+
+# ---------------------------------------------------------------------------
+# REFERENCES --- uncomment if the deck has citations.
+# * References :B_ignoreheading:
+# :PROPERTIES:
+# :BEAMER_env: ignoreheading
+# :END:
+# ** Ref
+# :PROPERTIES:
+# :BEAMER_env: frame
+# :BEAMER_opt: allowframebreaks
+# :END:
+# #+print_bibliography: :heading none
+
+# ---------------------------------------------------------------------------
+# BACKUP --- slides for Q&A, shown only if asked.
+* Backup :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+** Backup: details / derivation / systematics
+- Material to expand on only if asked.

@@ -1,0 +1,226 @@
+# -*- mode: org -*-
+# ============================================================================
+# WORK-FOCUSED CONFERENCE TALK (Chinese) --- full-featured frame template.
+#
+# How to use: copy this file, tick the frames this talk needs in the MENU
+# below, delete the rest, then fill each kept frame. Lines starting with "# "
+# are Org comments: they are guidance and do NOT export --- delete or keep, your
+# choice. Run scripts/lint_org.py when done.
+#
+# Default shape: a formal talk, but the audience is here for the WORK, so keep
+# background to the minimum needed to read the results and spend your slides on
+# Approach + Results. Rough budget for a 12-18 min talk ~ 12-16 frames.
+#
+# FRAME MENU --- tick what you need:
+#   [ ] 1. Motivation        1 frame    弱背景:为什么值得做 + 缺口
+#   [ ] 2. Background        0-1 frame  只放读懂主体所必需的
+#   [ ] 3. 工作主体 (Body)    主体       结构跟随来源 ------ 见下方说明,别套死模板
+#   [ ] 4. Summary & outlook 1 frame    结论(写成 claim)+ 下一步
+#   [ ] (backup)             Q&A        放在 \appendix 后,不计入页数
+#
+# HOW TO STRUCTURE THE BODY --- 不要硬套"方法 -> 结果"两节,让结构跟着来源走:
+#   - 从论文转 beamer:跟论文的章节顺序走(通常就是各分析步骤 / 各结果).
+#   - 日常工作汇报:按工作项或时间线走(这一阶段做了哪几件事).
+#   下面三种 frame 形态只是样例(带图 / 两栏 / TikZ 示意图),复制并改名以匹配你的真实结构.
+#
+# THREE RULES that matter more than any lint fix (the linter can't check these):
+#   - Conclusion-style titles. The title states the takeaway, not the topic.
+#       bad:  ** 信号模型        good:  ** 太阳 HNL 产额由 X 主导
+#   - One message per slide. Ask "what should they remember from this slide?"
+#     If you can't answer in one sentence, split it.
+#   - Figure-first. A large plot + one-line takeaway beats ten bullets and a
+#     thumbnail. State units, and state the exposure / CL / dataset on the plot.
+#     Caption with #+caption: (never a hand-typed centered line); add it when
+#     there's room, drop it when tight --- but be consistent across the deck.
+#     Side-by-side: figure LEFT, text RIGHT, and keep the text side uncrowded.
+#
+# ORG MATH SYNTAX:
+#   - Inline math: \(...\)
+#   - Unnumbered display math: \[...\]
+#   - Never use $...$ or $$...$$ in Org prose.
+# ============================================================================
+
+#+OPTIONS: H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+LATEX_COMPILER: lualatex
+#+LATEX_CLASS: beamer
+#+LATEX_HEADER: \usepackage{booktabs}
+#+LATEX_HEADER: \usepackage{appendixnumberbeamer}
+#+LATEX_HEADER: \useoutertheme{infolines}
+#+LATEX_HEADER: \useinnertheme{default}
+#+LATEX_HEADER: \setbeamertemplate{blocks}[rounded][shadow=false]
+#+LATEX_HEADER: \setbeamertemplate{items}[circle]
+#+LATEX_HEADER: \setbeamertemplate{sections/subsections in toc}[sections numbered]
+#+LATEX_HEADER: \setbeamertemplate{headline}[default]
+#+LATEX_HEADER: %\setbeamertemplate{frame numbering}[none]
+#+LATEX_HEADER: \usetikzlibrary{arrows.meta, positioning, angles, quotes}
+#+TITLE: 报告标题
+#+BEAMER_HEADER: \AtBeginDocument{\title[短标题]{报告标题}}
+#+SUBTITLE: 会议名称 / 场合
+#+AUTHOR: 报告人姓名
+#+DATE: \today
+#+BEAMER_HEADER: \institute[单位简称]{单位全称 \and \href{mailto:name@example.org}{\texttt{name@example.org}}}
+
+# --- Optional domain packages (uncomment only when needed) ---
+# #+LATEX_HEADER: \usepackage{siunitx}
+# #+LATEX_HEADER: \usepackage[version=4]{mhchem}
+
+# --- Citation support (uncomment and configure if the deck cites papers) ---
+# #+bibliography: ./references.bib
+# #+cite_export: biblatex
+# #+BEAMER_HEADER: \setbeamertemplate{bibliography item}[text]
+# #+LATEX_HEADER: \AtBeginDocument{\AtEveryBibitem{\clearfield{url}\clearfield{urldate}\clearfield{urlyear}\clearfield{urlmonth}\clearfield{urlday}}\renewbibmacro*{url+urldate}{}}
+
+# --- Title page logo overlay (uncomment for conference talks with logos) ---
+# #+BEAMER_HEADER: \addtobeamertemplate{title page}{}{%
+# #+BEAMER_HEADER: \begin{tikzpicture}[remember picture,overlay]
+# #+BEAMER_HEADER: \node[anchor=north east, xshift=-0.3cm, yshift=-0.3cm] at (current page.north east)
+# #+BEAMER_HEADER: {\includegraphics[height=1.2cm]{./assets/institution-logo.pdf}\hspace{0.3cm}\includegraphics[height=1.2cm]{./assets/project-logo.png}};
+# #+BEAMER_HEADER: \node[anchor=south west, xshift=0.3cm, yshift=0.3cm, font=\footnotesize, text=black!50] at (current page.south west)
+# #+BEAMER_HEADER: {\href{https://arxiv.org/abs/XXXX.XXXXX}{\textcolor{black!50}{\texttt{arXiv:XXXX.XXXXX}}}};
+# #+BEAMER_HEADER: \end{tikzpicture}}
+
+# ---------------------------------------------------------------------------
+* 引言
+# Keep this section to ONE slide. Background is a runway, not the talk.
+
+** 一句话说清:为什么这个问题值得做
+# One message: the gap. End with the question THIS work answers.
+- 现状 / 已知:...
+- 缺口 / 未解决:...
+- 本工作的问题:...
+
+*** Speaker Notes :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+- 背景语境:...
+- 为什么重要:...
+- 我们做了什么:...
+
+# ---------------------------------------------------------------------------
+* 工作主体
+# 这一节按你的来源自由组织:把下面这个 "* 工作主体" 换成贴合内容的分节名
+# (论文转 -> 论文章节;日常汇报 -> 各工作项),需要几节就开几节.下面三种
+# frame 形态只是常用样例,不是固定的"方法 + 结果"结构 --- 复制改名即可.
+# 主体里 >2 个 display 公式会被 linter 标为过密(把推导挪到备份页).
+
+** 样例形态 A:把结论写进标题(figure-first,单图 + 一句话要点)
+# One message. 先放图,bullet 是结论而不是图注.
+#+attr_latex: :width 0.75\textwidth
+#+caption: 轴标 + 单位;图上标注 exposure / CL / 数据集
+[[file:./figures/example.pdf]]
+- 要点:这张图告诉听众的一句话结论.
+
+*** Speaker Notes :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+- 本页讲什么.
+- 过渡到下一页.
+
+** 样例形态 B:左图右文(图在左,文字在右;文字侧别太挤,留白)
+*** L :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.58
+:END:
+#+attr_latex: :width \linewidth
+#+caption: 图注(空间够才放;要放就全 deck 的图都放,别只给一两张)
+[[file:./figures/example.pdf]]
+
+*** R :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.42
+:END:
+- 要点:...
+- 要点:...
+
+*** Speaker Notes :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+- 从左到右解读图.
+- 强调右侧的要点.
+
+** 样例形态 C:TikZ 示意图(流程 / 架构 / 概念关系)
+#+begin_export latex
+\begin{center}
+\begin{tikzpicture}[
+    line/.style={draw, -stealth},
+    step/.style={draw, rounded corners, fill=blue!8, minimum width=2.2cm, minimum height=0.9cm},
+  ]
+  \node[step] (input) {输入};
+  \node[step, right=1.5cm of input] (process) {处理};
+  \node[step, right=1.5cm of process] (result) {结果};
+  \draw[line] (input) -- (process);
+  \draw[line] (process) -- (result);
+\end{tikzpicture}
+\end{center}
+#+end_export
+
+- 从示意图得出的一句话结论.
+
+*** Speaker Notes :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+- 从左到右解释每个步骤及其关系.
+
+# ---------------------------------------------------------------------------
+* 总结
+** 总结与展望
+# Takeaways as CLAIMS the audience leaves with, then concrete next steps.
+- 结论一:...
+- 结论二:...
+- 下一步:...
+
+*** Speaker Notes :B_note:
+:PROPERTIES:
+:BEAMER_env: note
+:END:
+- 回顾关键信息.
+- 致谢 + 开放提问.
+
+# ---------------------------------------------------------------------------
+# THANK YOU --- \appendix 放在这里,备份页不计入总页数.
+* Thank you :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+\appendix
+**
+:PROPERTIES:
+:BEAMER_opt: plain,c
+:END:
+#+begin_export latex
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[black!5] (current page.south west) rectangle (current page.north east);
+\end{tikzpicture}
+\centering
+{\usebeamercolor[fg]{structure}\Huge\bfseries 谢谢}
+
+\vspace{0.8cm}
+{\Large 请提问}
+#+end_export
+
+# ---------------------------------------------------------------------------
+# REFERENCES --- uncomment if the deck has citations.
+# * 参考文献 :B_ignoreheading:
+# :PROPERTIES:
+# :BEAMER_env: ignoreheading
+# :END:
+# ** Ref
+# :PROPERTIES:
+# :BEAMER_env: frame
+# :BEAMER_opt: allowframebreaks
+# :END:
+# #+print_bibliography: :heading none
+
+# ---------------------------------------------------------------------------
+# BACKUP --- 留给提问时再展开的内容.
+* 备份 :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+** 备份:细节 / 推导 / 系统误差
+- 留给提问时再展开的内容.

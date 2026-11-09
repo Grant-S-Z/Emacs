@@ -1,4 +1,4 @@
-;;; init-org-ui.el --- Org appearance and presentation  -*- lexical-binding: t; -*-
+;;; init-org-ui.el --- Org appearance  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 

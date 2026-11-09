@@ -36,8 +36,7 @@
 	 ("C-S-d" . crux-duplicate-current-line-or-region)
 	 ("C-S-k" . crux-smart-kill-line)
 	 ("C-c C-k" . crux-kill-other-buffers)
-	 ("C-c C-d" . crux-delete-file-and-buffer))
-  )
+	 ("C-c C-d" . crux-delete-file-and-buffer)))
 
 (use-package yasnippet
   ;; Loading yasnippet costs ~100 ms, so enable it on the first idle moment
@@ -65,16 +64,9 @@
 	'(("overleaf\\.com" . latex-mode))))
 
 ;;; UI operation
-(use-package ace-window
-  :bind (("M-o" . 'ace-window))
-  :config
-  ;; `aw-ignored-p' only honours `no-other-window' for `ace-select-window',
-  ;; not for the dispatcher bound to M-o, so the dirvish side window still
-  ;; shows up.  Follow the parameter the way `other-window' does.
-  (advice-add 'aw-ignored-p :around
-              (lambda (orig window)
-                (or (funcall orig window)
-                    (window-parameter window 'no-other-window)))))
+;; Switch window
+(global-set-key (kbd "M-o") #'other-window)
+(global-set-key (kbd "M-O") #'other-window-backward)
 
 (use-package expand-region
   :bind ("M-=" . er/expand-region))
@@ -113,14 +105,14 @@
 (use-package nov
   :mode ("\\.epub\\'" . nov-mode))
 
-;; Appine: native macOS apps (WebKit, PDFKit, Quick Look) inside Emacs.
-(when *is-mac*
-  (use-package appine
-    :vc (:url "https://github.com/chaoswork/appine")
-    :commands (appine appine-open-url appine-open-file)
-    :bind (("C-c A a" . appine)
-           ("C-c A u" . appine-open-url)
-           ("C-c A o" . appine-open-file))))
+;; Appine is disabled for now; PDFs use pdf-tools instead.
+;; (when *is-mac*
+;;   (use-package appine
+;;     :vc (:url "https://github.com/chaoswork/appine")
+;;     :commands (appine appine-open-url appine-open-file)
+;;     :bind (("C-c A a" . appine)
+;;            ("C-c A u" . appine-open-url)
+;;            ("C-c A o" . appine-open-file))))
 
 ;; Translator
 (use-package gt

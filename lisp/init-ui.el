@@ -12,7 +12,6 @@
   "Enable line numbers except in specific modes."
   (unless (or (derived-mode-p 'org-mode)
               (derived-mode-p 'latex-mode)
-              (derived-mode-p 'pdf-view-mode)
               (derived-mode-p 'doc-view-mode))
     (display-line-numbers-mode 1)))
 (add-hook 'prog-mode-hook 'grant/enable-line-numbers)
@@ -55,6 +54,15 @@
   (setq doom-modeline--eglot t)
   (setq doom-modeline-enable-word-count nil)
   (setq doom-modeline-env-python-executable "~/miniconda3/bin/python3"))
+
+;;; Subtle fun and orientation
+;; Nyan Cat in the mode line; it also shows the position in the buffer.
+(use-package nyan-mode
+  :init (nyan-mode 1)
+  :config
+  (setq nyan-animate-nyancat t
+        nyan-animation-frame-interval 0.3
+        nyan-bar-length 20))
 
 ;;; Minibuffer
 (use-package vertico
@@ -145,24 +153,22 @@
 (global-set-key (kbd "C--") #'text-scale-decrease)
 (global-set-key (kbd "C-=") #'text-scale-increase)
 
-(use-package posframe)
+;; (use-package posframe)
 
-(use-package rime
-  :custom
-  (default-input-method "rime")
-  (rime-librime-root (if *is-mac* "~/.emacs.d/librime/dist" nil))
-  (rime-emacs-module-header-root (if *is-mac* "" nil))
-  (rime-share-data-dir (if *is-mac* "~/Library/Rime" "/usr/share/rime-data"))
-  (rime-user-data-dir "~/.emacs.d/rime")
-  (rime-cursor ".")
-  (rime-show-candidate 'posframe)
-  (rime-commit1-forall t)
-  (rime-posframe-properties
-   (list :internal-border-width 1))
-  (rime-posframe-style 'vertical)
-  (mode-line-mule-info '((:eval (rime-lighter))))
-  (rime-deactivate-when-exit-minibuffer t)
-  )
+;; Rime is archived for now; the system input method is used instead.
+;; See archive/init-archive.el if it needs to be restored.
+
+;; macOS input source switching: English in the minibuffer and for prefix
+;; keys, then restore the buffer's input source.  Requires `macism'.
+(use-package sis
+  :if *is-mac*
+  :hook (after-init . sis-global-respect-mode)
+  :config
+  (sis-ism-lazyman-config
+   "com.apple.keylayout.ABC"
+   "com.tencent.inputmethod.wetype.pinyin")
+  ;; Do not change the input source just because Emacs starts.
+  (setq sis-respect-start nil))
 
 ;;; Themes
 ;; (load-theme 'ef-frost :no-confirm)
@@ -299,6 +305,10 @@ They are tried before the fixed-length strings that share a first character.")
   (face-spec-reset-face face)
   (set-face-foreground face (face-attribute 'default :background)))
 (set-face-background 'fringe (face-attribute 'default :background))
+
+;; Appine is disabled; the frame appearance follows macOS again.
+;; (when (and *is-mac* (display-graphic-p))
+;;   (set-frame-parameter nil 'ns-appearance 'light))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

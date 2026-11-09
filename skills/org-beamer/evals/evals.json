@@ -1,0 +1,17 @@
+{
+  "skill_name": "org-beamer",
+  "evals": [
+    {
+      "id": 0,
+      "name": "convert-cn-notes-to-beamer",
+      "prompt": "把提供的 raft-notes.md 中文笔记整理成一个 org-mode 的 beamer 演讲稿，输出成 .org 文件。要有标题页、分节、每节一帧，关键性质那部分做成一张对比表。中文正文统一使用英文标点，并在中文与 Org emphasis 标记之间留空格。公式使用 \\(...\\) 和 \\[...\\]，不要使用 dollar delimiters。",
+      "files": ["files/raft-notes.md"]
+    },
+    {
+      "id": 1,
+      "name": "new-cn-deck-with-comparison-table",
+      "prompt": "帮我写一个 org beamer 的汇报（.org 文件），主题是 TCP 和 UDP 的区别。要包含：一页讲两者的定位，一张特性对比表（是否可靠、是否有连接、是否保证顺序、典型应用），一页讲各自适用场景，重点术语要加粗强调。中文正文统一使用英文标点，并在中文与 Org emphasis 标记之间留空格。公式使用 \\(...\\) 和 \\[...\\]，不要使用 dollar delimiters。",
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Org Mode"
+  short_description: "Safely author and lint portable Org-mode files"
+  default_prompt: "Use $org to create or edit this Org-mode file and lint it for export safety."

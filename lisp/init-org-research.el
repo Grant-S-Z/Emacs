@@ -162,5 +162,49 @@
                               "#+title: ${author} - ${title}\n#+filetags: :article:\n\n* Abstract\n\n%?\n\n* Notes\n")
            :unnarrowed t))))
 
+;;; Literature export
+(with-eval-after-load 'org
+  (defun grant/literature-export (&optional file)
+    "Export PDF paths referenced by the current Org file.
+Write the result to papers.json in the same directory."
+    (interactive)
+    (let ((source (or file (buffer-file-name))))
+      (unless source (user-error "Buffer is not visiting a file"))
+      (require 'org-element)
+      (require 'json)
+      (with-current-buffer (find-file-noselect source)
+        (let* ((keys
+                (delete-dups
+                 (delq nil
+                       (org-element-map (org-element-parse-buffer)
+                           'citation-reference
+                         (lambda (ref)
+                           (org-element-property :key ref))))))
+               (citar-library-file-extensions '("pdf"))
+               (files (progn (require 'citar)
+                             (citar-get-files keys)))
+               (result (make-hash-table :test 'equal))
+               (output (expand-file-name
+                        "papers.json"
+                        (file-name-directory source))))
+          (dolist (key keys)
+            (puthash key
+                     (or (and files (gethash key files)) [])
+                     result))
+          (with-temp-file output
+            (insert (json-encode result) "\n"))
+          (message "Exported %d references to %s"
+                   (length keys) output)))))
+
+  (defun grant/literature-auto-export ()
+    "Update the paper manifest when literature.org is saved."
+    (when (and buffer-file-name
+               (derived-mode-p 'org-mode)
+               (equal (file-name-nondirectory buffer-file-name)
+                      "literature.org"))
+      (grant/literature-export buffer-file-name)))
+
+  (add-hook 'after-save-hook #'grant/literature-auto-export))
+
 (provide 'init-org-research)
 ;;; init-org-research.el ends here
