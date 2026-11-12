@@ -165,7 +165,7 @@
 ;;; Literature export
 (with-eval-after-load 'org
   (defun grant/literature-export (&optional file)
-    "Export PDF paths referenced by the current Org file.
+    "Export PDF paths referenced by the current Org buffer or FILE.
 Write the result to papers.json in the same directory."
     (interactive)
     (let ((source (or file (buffer-file-name))))
@@ -173,6 +173,8 @@ Write the result to papers.json in the same directory."
       (require 'org-element)
       (require 'json)
       (with-current-buffer (find-file-noselect source)
+        (unless (derived-mode-p 'org-mode)
+          (user-error "Not an Org buffer: %s" source))
         (let* ((keys
                 (delete-dups
                  (delq nil
@@ -194,8 +196,9 @@ Write the result to papers.json in the same directory."
           (with-temp-file output
             (insert (json-encode result) "\n"))
           (message "Exported %d references to %s"
-                   (length keys) output)))))
+                   (length keys) output))))))
 
+(with-eval-after-load 'org
   (defun grant/literature-auto-export ()
     "Update the paper manifest when literature.org is saved."
     (when (and buffer-file-name

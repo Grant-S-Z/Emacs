@@ -21,9 +21,6 @@
 
 (use-package embark-consult)
 
-(use-package wgrep
-  :commands (wgrep-change-to-wgrep-mode))
-
 (use-package consult-dir
   :bind (("C-x C-d" . consult-dir)
          :map minibuffer-local-completion-map
@@ -121,6 +118,15 @@
   (setq gt-langs '(en zh))
   (setq gt-default-translator (gt-translator :engines (gt-youdao-dict-engine)))
   (setq gt-taker-pick 'paragraph))
+
+;;; Music
+(use-package empv
+  :custom
+  (empv-action-handler 'completing-read)
+  (empv-audio-dir '("~/music/free/"))
+  :config
+  (with-eval-after-load 'embark
+    (empv-embark-initialize-extra-actions)))
 
 ;;; MaiMemo (open API; the token is shared with the official CLI
 ;;; through ~/.config/memo-api.json)

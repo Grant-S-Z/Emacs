@@ -19,7 +19,7 @@
         (setenv "PATH" (mapconcat #'identity exec-path ":")))
     (error (message "exec-path-from-shell failed: %S" err))))
 
-;;; Shell vterm
+;;; Ghostel terminal
 ;; Compiler for native modules: clang on macOS, gcc on Linux/WSL.
 (if *is-wsl*
     (progn
@@ -28,23 +28,51 @@
   (setenv "CC" "/usr/bin/clang")
   (setenv "CXX" "/usr/bin/clang++"))
 
-(use-package vterm
-  :init (setq vterm-shell "zsh"))
+(defun grant/ghostel-toggle ()
+  "Toggle a Ghostel terminal in a bottom window."
+  (interactive)
+  (let* ((buffer (seq-find
+                  (lambda (buf)
+                    (with-current-buffer buf
+                      (derived-mode-p 'ghostel-mode)))
+                  (buffer-list)))
+         (window (and buffer (get-buffer-window buffer t))))
+    (cond
+     (window
+      (condition-case nil
+          (delete-window window)
+        (error (bury-buffer buffer))))
+     ((and buffer (buffer-local-value 'ghostel--term buffer))
+      (pop-to-buffer buffer))
+     (buffer
+      (kill-buffer buffer)
+      (ghostel))
+     (t
+      (ghostel)))))
 
-(use-package vterm-toggle
-  :bind ("C-c s" . vterm-toggle)
-  :config (setq vterm-toggle-fullscreen-p nil)
+(use-package ghostel
+  :ensure t
+  :init
+  ;; Keep the native module outside the package tree so upgrades do not
+  ;; remove or overwrite it.
+  (setq ghostel-module-directory (expand-file-name "~/.cache/ghostel/"))
+  :bind ("C-c s" . grant/ghostel-toggle)
+  :config
+  (setq ghostel-shell "zsh")
   (add-to-list
    'display-buffer-alist
    '((lambda (buffer-or-name _)
        (let ((buffer (get-buffer buffer-or-name)))
-         (with-current-buffer buffer
-           (or (equal major-mode 'vterm-mode)
-               (string-prefix-p
-                vterm-buffer-name (buffer-name buffer))))))
+         (and buffer
+              (with-current-buffer buffer
+                (derived-mode-p 'ghostel-mode)))))
      (display-buffer-reuse-window display-buffer-at-bottom)
      (reusable-frames . visible)
      (window-height . 0.3))))
+
+;;; SSH
+(with-eval-after-load 'tramp
+  (setq tramp-completion-use-cache nil))
 
 (provide 'init-shell)
 ;;; init-shell.el ends here
