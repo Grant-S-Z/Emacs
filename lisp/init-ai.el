@@ -14,72 +14,11 @@
            (file-name-directory (expand-file-name buffer-file-name)))
       default-directory))
 
-;;; agent-shell: a CLI coding agent over ACP, inside Emacs
-(use-package agent-shell
-  :bind (("C-c k" . grant/agent-shell-dwim)
-         ("C-c K" . agent-shell-toggle))
-  :custom
-  ;; Open the shell in a right side window instead of replacing the buffer
-  ;; you are reading.
-  (agent-shell-display-action
-   '((display-buffer-in-side-window)
-     (side . right) (slot . 0) (window-width . 0.45)))
-  ;; Files the agent opens must not take over the shell window.
-  (agent-shell-file-display-action
-   '((display-buffer-reuse-window display-buffer-pop-up-window)
-     (inhibit-same-window . t)))
-  ;; Kimi matches model IDs case-sensitively against ~/.kimi-code/config.toml.
-  ;; The WSL config spells this model in lower case; the mac config uses the
-  ;; capitalized key.
-  (agent-shell-kimi-default-model-id
-   (if *is-wsl* "deepseek/deepseek-flash" "DeepSeek/deepseek-flash"))
-  ;; WSL has no logind session, so the D-Bus inhibit call is denied; disable
-  ;; it there.  macOS can still block idle sleep through native APIs.
-  (agent-shell-inhibit-system-sleep (not *is-wsl*))
-  :config
-  ;; (setq agent-shell-preferred-agent-config 'pi)
-  ;; (setq agent-shell-preferred-agent-config 'omp)
-  (setq agent-shell-preferred-agent-config 'deepseek)
-  ;; An alist of (OPTION . VALUE), applied in order at session start.  The
-  ;; DeepSeek model value is the ACP route pair the agent advertises, not the
-  ;; bare model id; `M-x agent-shell-config-options' lists the valid values.
-  (setq agent-shell-deepseek-default-config-options
-        '(("model" . "[\"deepseek-official\",\"deepseek-flash\"]")
-          ("reasoning_effort" . "max")))
-  ;; xclip exists on macOS but needs X11; drop it so text yanks fall through
-  ;; to the normal `yank' instead of starting XQuartz.
-  (when *is-mac*
-    (setq agent-shell-clipboard-image-handlers
-          (seq-filter (lambda (handler)
-                        (not (equal (map-elt handler :command) "xclip")))
-                      agent-shell-clipboard-image-handlers)))
-  ;; GUI Emacs does not inherit the terminal PATH; use an absolute path.
-  (setq agent-shell-kimi-acp-command
-        (if *is-mac*
-            '("/opt/homebrew/bin/kimi" "acp")
-          '("~/.kimi-code/bin/kimi" "acp")))
-  ;; Same PATH caveat for the DeepSeek Harness launcher installed by npm.
-  (when *is-mac*
-    (setq agent-shell-deepseek-acp-command
-          '("/opt/homebrew/bin/dsh" "--profile" "acp")))
-  (setq agent-shell-kimi-default-session-mode-id "auto")
-  ;; Replay the whole history when restoring a session via session/load.
-  ;; The default 'minimal shows only the session title; last / first-last / full
-  ;; are also available.
-  (setq agent-shell-session-restore-verbosity 'last)
-  ;; Ask whether to restore a session or start a new one.
-  (setq agent-shell-session-strategy 'prompt)
-  ;; M-x grant/agent-shell-here starts in the current buffer's directory and
-  ;; leaves the global cwd detection alone.
-  (defun grant/agent-shell-here (dir)
-    "Start agent-shell in DIR without resolving the project root.
-Interactive use defaults to the current buffer's directory."
-    (interactive
-     (list (read-directory-name "agent-shell 工作目录: "
-                                (grant/agent-shell-file-directory))))
-    (let ((agent-shell-cwd-function (lambda () dir)))
-      (agent-shell))))
+;; Declared special so the `let' below can bind them before agent-shell loads.
+(defvar agent-shell-cwd-function)
+(defvar agent-shell-session-strategy)
 
+;; Define before `use-package': its `:bind' would autoload this local command.
 (defun grant/agent-shell-dwim (&optional arg)
   "Start or reuse an agent shell.
 With one prefix argument, force a new shell in the current file's
@@ -100,6 +39,63 @@ shell.  With three, force a new shell in the project root as plain
       (agent-shell '(4))))
    (t
     (agent-shell))))
+
+;;; agent-shell: a CLI coding agent over ACP, inside Emacs
+(use-package agent-shell
+  :bind (("C-c k" . grant/agent-shell-dwim)
+         ("C-c K" . agent-shell-toggle))
+  :custom
+  ;; Open the shell in a side window, not over the buffer you are reading.
+  (agent-shell-display-action
+   '((display-buffer-in-side-window)
+     (side . right) (slot . 0) (window-width . 0.45)))
+  ;; Files the agent opens must not take over the shell window.
+  (agent-shell-file-display-action
+   '((display-buffer-reuse-window display-buffer-pop-up-window)
+     (inhibit-same-window . t)))
+  ;; Kimi matches model IDs case-sensitively: WSL uses a lower-case provider
+  ;; prefix, macOS a capitalized one (see ~/.kimi-code/config.toml).
+  (agent-shell-kimi-default-model-id
+   (if *is-wsl* "deepseek/deepseek-flash" "DeepSeek/deepseek-flash"))
+  ;; WSL has no logind session, so disable the D-Bus sleep inhibitor there.
+  (agent-shell-inhibit-system-sleep (not *is-wsl*))
+  :config
+  (setq agent-shell-preferred-agent-config 'deepseek)
+  ;; (OPTION . VALUE) pairs applied at session start.  Model values are ACP
+  ;; route pairs, not bare ids (see `M-x agent-shell-config-options').
+  (setq agent-shell-deepseek-default-config-options
+        '(("model" . "[\"deepseek-official\",\"deepseek-flash\"]")
+          ("reasoning_effort" . "max")))
+  ;; Drop xclip on macOS: it needs X11 and starts XQuartz on yank.
+  (when *is-mac*
+    (setq agent-shell-clipboard-image-handlers
+          (seq-filter (lambda (handler)
+                        (not (equal (map-elt handler :command) "xclip")))
+                      agent-shell-clipboard-image-handlers)))
+  ;; GUI Emacs does not inherit the terminal PATH; use an absolute path.
+  (setq agent-shell-kimi-acp-command
+        (if *is-mac*
+            '("/opt/homebrew/bin/kimi" "acp")
+          '("~/.kimi-code/bin/kimi" "acp")))
+  ;; Same PATH caveat for the DeepSeek Harness launcher installed by npm.
+  (when *is-mac*
+    (setq agent-shell-deepseek-acp-command
+          '("/opt/homebrew/bin/dsh" "--profile" "acp")))
+  (setq agent-shell-kimi-default-session-mode-id "auto")
+  ;; Restore only the last prompt turn when reopening a session; `minimal'
+  ;; shows just the title, while `first-last' and `full' replay more.
+  (setq agent-shell-session-restore-verbosity 'last)
+  ;; Ask whether to restore a session or start a new one.
+  (setq agent-shell-session-strategy 'prompt)
+  ;; M-x grant/agent-shell-here uses the current buffer's directory.
+  (defun grant/agent-shell-here (dir)
+    "Start agent-shell in DIR without resolving the project root.
+Interactive use defaults to the current buffer's directory."
+    (interactive
+     (list (read-directory-name "agent-shell 工作目录: "
+                                (grant/agent-shell-file-directory))))
+    (let ((agent-shell-cwd-function (lambda () dir)))
+      (agent-shell))))
 
 (defun grant/agent-shell-project-name ()
   "Return the shell's cwd relative to its project.

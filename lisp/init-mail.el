@@ -2,10 +2,12 @@
 ;;; Commentary:
 ;;; Code:
 ;;; Basic settings
-(when *is-wsl*
-  ;; Debian's mu4e is outside the load-path of a locally built Emacs.
-  (let ((dir (car (file-expand-wildcards "/usr/share/emacs/site-lisp/elpa/mu4e-*"))))
-    (when (and dir (not (locate-library "mu4e")))
+;; Homebrew and Debian install mu4e outside the default `load-path'.
+(when (or *is-mac* *is-wsl*)
+  (let ((dir (if *is-mac*
+                 "/opt/homebrew/share/emacs/site-lisp/mu/mu4e"
+               (car (file-expand-wildcards "/usr/share/emacs/site-lisp/elpa/mu4e-*")))))
+    (when (and dir (file-directory-p dir) (not (locate-library "mu4e")))
       (add-to-list 'load-path dir)
       (load (expand-file-name "mu4e-autoloads.el" dir) nil t))))
 
@@ -28,20 +30,18 @@
 (setq smtpmail-debug-verb nil)
 
 ;;; Mu4e
+;; Mail client for the local Maildir synced by mbsync.
 (use-package mu4e
   :ensure nil
   :commands (mu4e)
   :custom
-  (mu4e-maildir "~/thumail")
+  ;; The Maildir root comes from the mu server configuration.
   (mu4e-get-mail-command "mbsync -a")
   (mu4e-update-interval 300)
 
   (mu4e-sent-folder "/Sent Items")
   (mu4e-drafts-folder "/Drafts")
   (mu4e-trash-folder "/Trash")
-
-  (mu4e-view-show-images t)
-  (mu4e-html2text-command "w3m -T text/html")
 
   (mu4e-attachment-dir "~/Downloads/")
   (mail-user-agent 'mu4e-user-agent)

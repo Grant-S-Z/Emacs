@@ -89,7 +89,7 @@ linkcolor=black
   (setq org-latex-pdf-process
 	'("latexmk --lualatex -shell-escape -interaction=nonstopmode -output-directory=%o %f"))
 
-  ;; Keep the previous effective class order: beamer-en, beamer, ctexart, article.
+  ;; `add-to-list' prepends, so add classes in reverse of the desired order.
   (setq org-latex-classes nil)
   (dolist (class '("article" "ctexart" "beamer" "beamer-en"))
     (add-to-list 'org-latex-classes

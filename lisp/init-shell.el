@@ -2,16 +2,15 @@
 ;;; Commentary:
 ;;; Code:
 ;;; Shell environment
+;; Import PATH and exec-path from the login shell.
 (use-package exec-path-from-shell
   :demand t
   :if (memq window-system '(mac ns x neo))
   :config
-  ;; Run a non-interactive login zsh so that only ~/.zprofile is read;
-  ;; this avoids loading Oh My Zsh, Powerlevel10k and the conda hook.
+  ;; Use a non-interactive login zsh: ~/.zprofile sets PATH, ~/.zshrc is skipped.
   (setq exec-path-from-shell-shell-name "/bin/zsh"
         exec-path-from-shell-arguments '("-l"))
-  ;; A broken shell profile should not abort startup; fall back to the
-  ;; PATH Emacs inherited from the launcher.
+  ;; A broken shell profile falls back to the inherited PATH.
   (condition-case err
       (progn
         (exec-path-from-shell-initialize)
@@ -50,11 +49,11 @@
      (t
       (ghostel)))))
 
+;; GPU-accelerated terminal based on Ghostty.
 (use-package ghostel
   :ensure t
   :init
-  ;; Keep the native module outside the package tree so upgrades do not
-  ;; remove or overwrite it.
+  ;; Keep the native module outside the package tree so upgrades preserve it.
   (setq ghostel-module-directory (expand-file-name "~/.cache/ghostel/"))
   :bind ("C-c s" . grant/ghostel-toggle)
   :config

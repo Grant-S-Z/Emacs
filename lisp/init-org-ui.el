@@ -3,6 +3,7 @@
 ;;; Code:
 
 ;;; Org Modern
+;; Unicode bullets, tags, and keyword faces.
 (use-package org-modern
   :after org
   :hook (org-mode . org-modern-mode)
@@ -16,11 +17,9 @@
   (org-modern-star 'replace)
   :config
   (setq org-modern-list '((43 . "•")
-			  ;; (45 . "☄")
 			  (45 . "✶")
 			  (42 . "◦")))
   (setq org-modern-replace-stars "✺☽✦✧⋆")
-  ;; (setq org-modern-replace-stars "⬢⬡❖⟡⋄")
   (setq org-modern-block-name
 	'(("src" . ("λ" ""))
 	  ("quote" . ("❝" ""))
@@ -43,7 +42,8 @@
 		("CANCELED" :background "grey" :foreground "black")))))
 
 ;;; Source visibility and inline content
-;; Toggling formula source against its image is handled by org-latex-preview-mode.
+;; Reveal Org markup only at point; formula previews are handled by
+;; `org-latex-preview-mode'.
 (use-package org-appear
   :after org
   :hook (org-mode . org-appear-mode)
@@ -55,45 +55,43 @@
   (org-appear-autokeywords t)
   (org-appear-inside-latex t))
 
+;; Skip valign in table-heavy buffers; measuring 1500+ tables in jit-lock
+;; stalls words.org.  Define this before valign loads, not in its :config.
+(defcustom grant/valign-max-tables 100
+  "Turn off `valign-mode' in Org buffers with more tables than this.
+Table separator lines are counted, one per table.  Nil disables the check."
+  :type '(choice (const :tag "No limit" nil) integer)
+  :group 'valign)
+
+(defun grant/valign--too-many-tables-p (limit)
+  "Return non-nil when the current buffer has more than LIMIT Org tables."
+  (save-excursion
+    (goto-char (point-min))
+    (let ((count 0))
+      (while (and (<= count limit)
+                  (re-search-forward "^[ \t]*|[-+]" nil t))
+        (setq count (1+ count)))
+      (> count limit))))
+
+(defun grant/valign-disable-in-table-heavy-buffer ()
+  "Disable `valign-mode' when the current buffer has too many tables.
+The threshold is `grant/valign-max-tables'."
+  (when (and (bound-and-true-p valign-mode)
+             grant/valign-max-tables
+             (grant/valign--too-many-tables-p grant/valign-max-tables))
+    (valign-mode -1)))
+
+;; Appended so this runs after `valign-mode', which `:hook' prepends.
+(add-hook 'org-mode-hook #'grant/valign-disable-in-table-heavy-buffer 'append)
+
+;; Pixel-align Org table columns.
 (use-package valign
   :hook (org-mode . valign-mode)
   :custom
   (valign-fancy-bar nil)
-  ;; Skip pixel alignment for very large tables: measuring cell widths
-  ;; synchronously can stall opening big org files.
+  ;; Skip pixel alignment for very large tables; measuring cells can stall.
   (valign-max-table-size 2000)
   :config
-  ;; `valign-max-table-size' only skips individual large tables.  A deck with
-  ;; many small tables (words.org has 1500+) still makes jit-lock measure every
-  ;; one of them on each refontification, which stalls opening the file.
-  ;; Disable the mode wholesale once a buffer holds more tables than this.
-  (defcustom grant/valign-max-tables 100
-    "Turn off `valign-mode' in Org buffers with more tables than this.
-Table separator lines are counted, one per table.  Nil disables the check."
-    :type '(choice (const :tag "No limit" nil) integer)
-    :group 'valign)
-
-  (defun grant/valign--too-many-tables-p (limit)
-    "Return non-nil when the current buffer has more than LIMIT Org tables."
-    (save-excursion
-      (goto-char (point-min))
-      (let ((count 0))
-        (while (and (<= count limit)
-                    (re-search-forward "^[ \t]*|[-+]" nil t))
-          (setq count (1+ count)))
-        (> count limit))))
-
-  (defun grant/valign-disable-in-table-heavy-buffer ()
-    "Disable `valign-mode' when the current buffer has too many tables.
-The threshold is `grant/valign-max-tables'."
-    (when (and (bound-and-true-p valign-mode)
-               grant/valign-max-tables
-               (grant/valign--too-many-tables-p grant/valign-max-tables))
-      (valign-mode -1)))
-
-  ;; Append so this runs after the `valign-mode' enable added by :hook.
-  (add-hook 'org-mode-hook #'grant/valign-disable-in-table-heavy-buffer 'append)
-
   (defun grant/org-shrink-tables-with-cookies (beg end)
     "Shrink every Org table between BEG and END that carries width cookies."
     (save-excursion
@@ -130,6 +128,7 @@ The threshold is `grant/valign-max-tables'."
 
   (add-hook 'org-cycle-hook #'grant/valign-after-org-cycle))
 
+;; Preview PDF links inline in Org buffers.
 (use-package org-inline-pdf
   :after org
   :hook (org-mode . org-inline-pdf-mode))

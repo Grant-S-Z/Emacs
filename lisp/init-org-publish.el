@@ -2,6 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
+;; Write and preview Hugo posts from Org.
 (use-package easy-hugo
   :bind ("C-c h" . easy-hugo) ; C-c b clashes with open-blog-dir, hence C-c h
   :config
@@ -12,6 +13,7 @@
   (setq easy-hugo-previewtime "300")
   (setq easy-hugo-default-ext ".md"))
 
+;; Export Org subtrees to Hugo Markdown.
 (use-package ox-hugo
   :config
   (setq org-hugo-base-dir "~/research/code/Grant/")

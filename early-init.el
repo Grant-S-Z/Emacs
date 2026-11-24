@@ -3,38 +3,29 @@
 ;;; Code:
 (setq window-resize-pixelwise t
       frame-resize-pixelwise t)
-;; Keep the borderless style on the main frame only: `default-frame-alist'
-;; also applies to the tiny child frames made by corfu/posframe, and an
-;; undecorated window there confuses macOS's window/Space handling.  The
-;; parameter itself is NS-only, so skip it elsewhere.
+;; Keep the borderless style on the main frame only; undecorated child frames
+;; (corfu, posframe) confuse macOS's window handling.  The parameter is NS-only.
 (when (eq system-type 'darwin)
   (add-to-list 'initial-frame-alist '(undecorated-round . t)))
 
-;; Leave package activation to init-elpa, so its load-path ordering happens
-;; before any package is put on `load-path'.  `package-initialize' there will
-;; load `package-quickstart-file', which skips re-reading every autoload file;
-;; the flag also keeps that cache refreshed after package installs.
+;; Let init-elpa activate packages after it fixes `load-path';
+;; `package-quickstart' avoids re-reading every autoload file.
 (setq package-enable-at-startup nil
       package-quickstart t)
 
-;; Turn these off before the first frame is drawn; doing it in init.el lets
-;; the initial frame flash with a toolbar and scroll bars.
+;; Hide these before the first frame is drawn.
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 
-;; Postpone GC while loading init files; after startup use a 32 MB
-;; threshold and collect once the heap has grown by 10%.  Leaving the
-;; percentage at its default 1.0 lets a large heap grow by ~100% before
-;; the next collection.
+;; Postpone GC during init, then collect at 32 MB / 10% heap growth.
 (setq gc-cons-threshold most-positive-fixnum)
 (add-hook 'after-init-hook
           (lambda ()
             (setq gc-cons-threshold (* 32 1024 1024)
                   gc-cons-percentage 0.1)))
 
-;; Init files use `use-package' macros whose expansion depends on init-elpa;
-;; native-comp's async process does not load init-elpa, so keep it away from
-;; these files.
+;; Keep native-comp's async process away from these use-package files: it does
+;; not load init-elpa, so the macros would not expand.
 (defvar native-comp-jit-compilation-deny-list nil)
 (add-to-list 'native-comp-jit-compilation-deny-list
              (concat (regexp-quote (expand-file-name "lisp/init-" user-emacs-directory))

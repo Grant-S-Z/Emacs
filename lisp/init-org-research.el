@@ -4,6 +4,7 @@
 
 ;;; Spaced repetition
 
+;; Flashcards with review scheduling in Org files.
 (use-package org-fc
   :vc (:url "https://git.sr.ht/~l3kn/org-fc")
   :after org
@@ -11,11 +12,10 @@
   :bind (("C-c v f" . org-fc-review)
 	 ("C-c v F" . org-fc-review-all))
   :custom
-  (org-fc-directories '("~/org/English/")) ; the vocab deck lives next to the notes
+  ;; The vocabulary deck lives under ~/org/.
+  (org-fc-directories '("~/org/English/"))
   :config
-  ;; No `org-fc-cache-mode': its incremental update calls the indexer with an
-  ;; empty file list when nothing changed, and the resulting bare `find -L'
-  ;; makes the BSD find on macOS error out. Re-indexing takes about a second.
+  ;; No `org-fc-cache-mode': its empty-file `find -L' call breaks BSD find.
   ;; The bundled checkout ships `org-fc-type-vocab.el' but never loads it.
   (require 'org-fc-type-vocab)
   (require 'org-fc-hydra)
@@ -23,9 +23,8 @@
   (dolist (map '(org-fc-review-flip-mode-map org-fc-review-rate-mode-map))
     (define-key (symbol-value map) (kbd "k") #'grant/org-fc-mark-known)))
 
-;; `suspended' is the only state org-fc honours when building the queue; there
-;; is no "known" state.  Keep `:known:' as the human-readable label and retire
-;; the card in one action, so the tag and the scheduling agree.
+;; org-fc has no "known" state, only `suspended'; keep `:known:' as the label
+;; and retire the card so tag and scheduling agree.
 (defun grant/org-fc-mark-known ()
   "Tag the card at point as known and stop scheduling it."
   (interactive)
@@ -41,9 +40,8 @@
    (org-toggle-tag "known" 'off)
    (org-toggle-tag org-fc-suspended-tag 'off)))
 
-;; org-fc only puts "Flip" / "Rate" / "Edit" in the header line.  Show the keys
-;; for the state that is active instead, so the review buffer is self-explanatory.
-;; Each entry is a `(mode-variable . string)' pair, re-evaluated on redisplay.
+;; Replace org-fc's terse header with the keys for the active state; each
+;; entry is a (mode-variable . string) pair re-evaluated on redisplay.
 (defun grant/org-fc-review-header-line ()
   "Set the review header line to the keys of the current state."
   (let* ((session org-fc-review--session)
@@ -63,30 +61,8 @@
                   ,(format " (%d) " remaining)
                   ,title))))
 
-;; The deck is one 30k-line file with more than 1500 `:REVIEW_DATA:' tables.
-;; `valign-mode' measures every table cell inside jit-lock (and again on each
-;; fold, through its `org-flag-region' advice), which makes opening and
-;; reviewing it crawl.  Keep it off there; the tables are metadata, not
-;; something worth pixel-aligning.
-(defun grant/org-fc-deck-buffer-p ()
-  "Non-nil when the current buffer visits the vocabulary deck."
-  (and buffer-file-name
-       ;; Compare case-insensitively: the deck lives in ~/org/english, but
-       ;; macOS and the WSL checkout disagree about the directory's case.
-       (string-prefix-p (downcase (expand-file-name "~/org/english/"))
-                        (downcase (expand-file-name buffer-file-name)))))
-
-(defun grant/org-fc-deck-disable-valign ()
-  "Turn off `valign-mode' in the vocabulary deck."
-  (when (and (fboundp 'valign-mode)
-             (grant/org-fc-deck-buffer-p)
-             (bound-and-true-p valign-mode))
-    (valign-mode -1)))
-
-(add-hook 'find-file-hook #'grant/org-fc-deck-disable-valign)
-(add-hook 'org-fc-before-setup-hook #'grant/org-fc-deck-disable-valign)
-
 ;;; Notes and literature
+;; Zettelkasten notes with backlinks and a database.
 (use-package org-roam
   :after org
   :custom
@@ -99,6 +75,7 @@
   :config
   (org-roam-db-autosync-mode))
 
+;; Citation completion and notes for Org and LaTeX.
 (use-package citar
   :hook
   (LaTeX-mode . citar-capf-setup)
@@ -110,10 +87,8 @@
   (org-cite-insert-processor 'citar)
   (org-cite-follow-processor 'citar)
   (org-cite-activate-processor 'citar)
-  ;; Keep this a literal list, not `org-cite-global-bibliography': Custom
-  ;; stores the value as a form and evaluates it when citar is loaded,
-  ;; which can happen before Org (and thus `oc') is, giving
-  ;; "void-variable org-cite-global-bibliography" during mode setup.
+  ;; Keep a literal list, not `org-cite-global-bibliography': Custom evaluates
+  ;; that form when citar loads, possibly before Org (and `oc') exists.
   (citar-bibliography '("~/Nutstore Files/zotero/My Library.bib"))
   (citar-notes-paths '("~/org/roam-notes/citar-notes/"))
   :config
@@ -152,6 +127,7 @@
 	      citar-indicator-links-icons
               citar-indicator-notes-icons)))
 
+;; Create Org-roam notes from Citar citations.
 (use-package citar-org-roam
   :ensure t
   :after (citar org-roam)

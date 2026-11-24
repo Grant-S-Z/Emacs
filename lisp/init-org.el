@@ -67,19 +67,6 @@
   (electric-pair-local-mode 1))
 (add-hook 'org-mode-hook #'grant/org-electric-latex-pairs)
 
-;; (defun grant/org-return-between-display-math (orig &optional indent)
-;;   "Open an empty display-math pair, or call ORIG with INDENT."
-;;   (interactive "P")
-;;   (if (and (>= (- (point) (point-min)) 2)
-;;            (string= (buffer-substring-no-properties (- (point) 2) (point)) "\\[")
-;;            (looking-at-p (regexp-quote "\\]")))
-;;       (progn
-;;         (newline)
-;;         (save-excursion (newline)))
-;;     (funcall orig indent)))
-;; (with-eval-after-load 'org
-;;   (advice-add 'org-return :around #'grant/org-return-between-display-math))
-
 ;;; Org global keys
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c c") 'org-capture)
@@ -88,12 +75,13 @@
 (global-set-key (kbd "C-c b") 'open-blog-dir)
 
 ;;; Org core
+;; Folding, Babel, agenda, capture, and LaTeX preview.
 (use-package org
   :bind
   (("C-x C-y" . org-insert-image)
    ("C-/" . org-latex-preview))
   :config
-  ;; Fold and inline images
+  ;; Folding and inline image display.
   (setq org-startup-folded 'content)
   (setq org-image-actual-width 500)
 
@@ -105,14 +93,13 @@
 	org-insert-heading-respect-content t
 	org-hide-emphasis-markers t
 	org-ellipsis "…")
-  (setq org-todo-keywords '((sequence "TODO" "DONE" "CANCELED")))
+  (setq org-todo-keywords '((sequence "TODO" "|" "DONE" "CANCELED")))
   (add-hook 'org-mode-hook (lambda ()
 			     (setq truncate-lines nil)))
 
   ;; Babel
   (setq org-confirm-babel-evaluate nil)
   (setq org-babel-python-command "~/miniconda3/bin/python3")
-  ;; (setq org-plantuml-jar-path "~/Code/plantuml/plantuml-1.2024.3.jar")
   (require 'ob-C)
   (require 'ob-shell)
   (require 'ob-mermaid)
@@ -121,8 +108,6 @@
    'org-babel-load-languages
    '((python . t)
      (emacs-lisp . t)
-     ;; (plantuml . t)
-     ;; (scheme . t)
      (C . t)
      (shell . t)
      (latex . t)))
@@ -163,9 +148,8 @@
                                 "-----------------------------------------------------"))))
 
 ;;; Preload one-time heavy modes during idle time
-;; org and AUCTeX are deferred by use-package; without preloading, the
-;; first org/LaTeX file open pays the full load cost up front (and org
-;; src blocks containing LaTeX load AUCTeX mid-fontification).
+;; Preload deferred Org and AUCTeX after startup so the first file open does
+;; not pay the full load cost.
 (run-with-idle-timer
  3 nil
  (lambda ()

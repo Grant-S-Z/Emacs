@@ -4,29 +4,36 @@
 ;;; Basic
 (which-key-mode 1) ; built-in
 
+;; Restart Emacs from inside Emacs.
 (use-package restart-emacs
   :bind (("C-c r" . restart-emacs)))
 
+;; Drag lines and regions with M-p and M-n.
 (use-package drag-stuff
   :bind (("M-p" . drag-stuff-up)
 	 ("M-n" . drag-stuff-down)))
 
+;; Context actions on minibuffer candidates and other targets.
 (use-package embark
   :bind ("C-." . embark-act))
 
+;; Search and navigation commands built on completion.
 (use-package consult
   :bind (("C-s" . consult-line)
          ("C-x b" . consult-buffer)
          ("C-c f" . consult-ripgrep)))
 
+;; Embark actions for Consult results.
 (use-package embark-consult)
 
+;; Jump to directories and files from the minibuffer.
 (use-package consult-dir
   :bind (("C-x C-d" . consult-dir)
          :map minibuffer-local-completion-map
          ("C-x C-d" . consult-dir)
          ("C-x C-j" . consult-dir-jump-file)))
 
+;; Small editing, file, and buffer commands.
 (use-package crux
   :bind (("C-a" . crux-move-beginning-of-line)
 	 ("C-x ," . crux-find-user-init-file)
@@ -35,24 +42,29 @@
 	 ("C-c C-k" . crux-kill-other-buffers)
 	 ("C-c C-d" . crux-delete-file-and-buffer)))
 
+;; Snippet expansion engine.
 (use-package yasnippet
-  ;; Loading yasnippet costs ~100 ms, so enable it on the first idle moment
-  ;; instead of blocking startup; it still turns on in every existing buffer.
+  ;; Load yasnippet on idle instead of blocking startup.
   :init (run-with-idle-timer 1 nil #'yas-global-mode))
 
+;; Ready-made snippets for many major modes.
 (use-package yasnippet-snippets
   :after yasnippet)
 
+;; Jump to a character or word by typing a key.
 (use-package avy
   :bind
   (("C-;" . avy-goto-char-timer)))
 
+;; Restore point when revisiting a file.
 (use-package saveplace
   :hook (after-init . save-place-mode))
 
+;; Git porcelain inside Emacs.
 (use-package magit
   :bind ("C-x g" . magit))
 
+;; Edit browser text fields in Emacs.
 (use-package atomic-chrome
   :config
   (atomic-chrome-start-server)
@@ -65,27 +77,32 @@
 (global-set-key (kbd "M-o") #'other-window)
 (global-set-key (kbd "M-O") #'other-window-backward)
 
+;; Expand the region semantically.
 (use-package expand-region
   :bind ("M-=" . er/expand-region))
 
+;; Show VCS changes in the fringe.
 (use-package diff-hl
   :hook ((prog-mode . diff-hl-mode)
          (LaTeX-mode . diff-hl-mode)
          (org-mode . diff-hl-mode)))
 
+;; Trim trailing whitespace only on edited lines.
 (use-package ws-butler
   :hook (prog-mode . ws-butler-mode))
 
-;; super-save was dropped in favour of the built-in auto-save-visited-mode.
+;; Save visited buffers automatically after a short idle interval.
 (setq auto-save-visited-interval 5
       save-silently t)
 (auto-save-visited-mode 1)
 
-(use-package pangu-spacing ; spacing between CJK and Latin
+;; Insert spaces between CJK and Latin text.
+(use-package pangu-spacing
   :init (global-pangu-spacing-mode 1)
   :config
   (setq pangu-spacing-real-insert-separtor t))
 
+;; More informative help buffers.
 (use-package helpful
   :bind
   ([remap describe-function] . #'helpful-callable)
@@ -93,25 +110,17 @@
 
 
 ;;; Daily packages
-;; Calibre
+;; Browse and read a Calibre e-book library.
 (use-package calibredb
   :config
   (setq calibredb-root-dir "~/org/books/")
   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir)))
 
+;; Read EPUB files in Emacs.
 (use-package nov
   :mode ("\\.epub\\'" . nov-mode))
 
-;; Appine is disabled for now; PDFs use pdf-tools instead.
-;; (when *is-mac*
-;;   (use-package appine
-;;     :vc (:url "https://github.com/chaoswork/appine")
-;;     :commands (appine appine-open-url appine-open-file)
-;;     :bind (("C-c A a" . appine)
-;;            ("C-c A u" . appine-open-url)
-;;            ("C-c A o" . appine-open-file))))
-
-;; Translator
+;; Translate text through online engines.
 (use-package gt
   :bind ("C-c g" . gt-translate)
   :config
@@ -120,6 +129,7 @@
   (setq gt-taker-pick 'paragraph))
 
 ;;; Music
+;; Play music and media with mpv.
 (use-package empv
   :custom
   (empv-action-handler 'completing-read)
@@ -128,8 +138,7 @@
   (with-eval-after-load 'embark
     (empv-embark-initialize-extra-actions)))
 
-;;; MaiMemo (open API; the token is shared with the official CLI
-;;; through ~/.config/memo-api.json)
+;; MaiMemo vocabulary service (token in ~/.config/memo-api.json).
 (use-package maimemo
   :ensure nil                            ; not on MELPA, loaded from site-lisp
   :load-path "~/.emacs.d/site-lisp/maimemo"

@@ -2,6 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 ;;; TeX settings
+;; AUCTeX: edit, compile, and preview LaTeX.
 (use-package tex
   :ensure auctex
   :config
@@ -23,17 +24,18 @@
 (setq TeX-source-correlate-mode t) ; forward/inverse search after compiling
 (setq TeX-source-correlate-method 'syntax)
 (setq TeX-source-correlate-start-server t)
-;; (setq TeX-view-program-list '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")))
 
 ;; AUCTeX View uses pdf-tools on both macOS and WSL.
 (setq TeX-view-program-selection '((output-pdf "PDF Tools")))
 (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer) ; refresh pdf after compiling
 
+;; Use latexmk as the AUCTeX build command.
 (use-package auctex-latexmk
   :after tex
   :config
   (setq auctex-latexmk-inherit-TeX-PDF-mode t))
 
+;; Fast LaTeX math entry.
 (use-package cdlatex
   :hook ((org-mode . org-cdlatex-mode)
 	 (tex-mode . cdlatex-mode))
@@ -46,12 +48,12 @@
 (add-hook 'pdf-view-mode-hook #'pdf-view-fit-width-to-window)
 (add-hook 'pdf-view-mode-hook #'pdf-view-roll-minor-mode) ; continuous scroll
 
+;; View and annotate PDFs inside Emacs.
 (use-package pdf-tools
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :config (pdf-tools-install))
 
-;; pdf-view-roll-minor-mode remaps the standard scroll commands to one-line
-;; steps.  Use multi-line, screenful, and multi-column steps instead.
+;; Use multi-line/screenful scrolling instead of pdf-roll's one-line steps.
 (defvar grant/pdf-scroll-lines 3
   "Lines to scroll per pdf-view line command.")
 (defvar grant/pdf-hscroll-columns 5
@@ -110,9 +112,7 @@
   (define-key pdf-view-mode-map (kbd "<left>") #'grant/pdf-hscroll-left)
   (define-key pdf-view-mode-map (kbd "<right>") #'grant/pdf-hscroll-right))
 
-;; PDF presentation mode on top of pdf-tools: full screen, page fit, no
-;; clutter.  In a PDF buffer press P or M-x grant-pdf-present-mode; q quits,
-;; m inverts.
+;; Full-screen PDF presentation: P toggles, q quits, m inverts.
 (defvar-local grant-pdf-present--saved nil
   "State saved before entering `grant-pdf-present-mode'.")
 
@@ -174,8 +174,7 @@
   (define-key pdf-view-mode-map (kbd "C-s") #'isearch-forward)
   (define-key pdf-view-mode-map (kbd "P") #'grant-pdf-present-mode))
 
-;; Single-key annotation commands in PDF buffers.  Displaced commands keep
-;; working on their upper-case counterparts.
+;; Single-key PDF annotations; upper-case keys keep the displaced commands.
 (with-eval-after-load 'pdf-annot
   (let ((slice-map (lookup-key pdf-view-mode-map (kbd "s"))))
     (when (keymapp slice-map)

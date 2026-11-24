@@ -11,12 +11,10 @@
       kept-old-versions 2
       delete-old-versions t)
 (make-directory (expand-file-name ".cache/backups/" user-emacs-directory) t)
-;; Read subprocess output in 1 MB chunks; the 4 KB default throttles LSP
-;; servers such as clangd and pyright.
+;; Read subprocess output in 1 MB chunks; 4 KB throttles clangd/pyright.
 (setq read-process-output-max (* 1024 1024))
 
-;; Log native-compilation warnings instead of popping up *Warnings* after
-;; every package upgrade.
+;; Log native-compilation warnings instead of popping up *Warnings*.
 (setq native-comp-async-report-warnings-errors 'silent)
 
 ;; Skip re-compacting font caches; the pause is noticeable on macOS.
@@ -24,6 +22,8 @@
 (setq inhibit-startup-message t)
 (setq frame-title-format "Emacs")
 (setq-default cursor-type 'bar)
+;; Prefer tabs for indentation; major modes may still override this locally.
+(setq-default indent-tabs-mode t)
 
 (winner-mode 1)
 (delete-selection-mode 1)
@@ -45,7 +45,7 @@
 ;; Prefer sources over stale byte-compiled files.
 (setq load-prefer-newer t)
 
-;; Keep `so-long' from taking over org files with long lines (e.g. long tables in journal.org).
+;; Keep `so-long' from taking over Org files with very long lines.
 (with-eval-after-load 'so-long
   (setq so-long-threshold 20000))
 

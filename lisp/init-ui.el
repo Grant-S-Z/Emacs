@@ -17,6 +17,7 @@
 (add-hook 'prog-mode-hook 'grant/enable-line-numbers)
 
 ;;; Dashboard
+;; Recent files and a banner on the startup screen.
 (use-package dashboard
   :init
   (add-hook 'after-init-hook 'dashboard-open)
@@ -36,11 +37,10 @@
   (dashboard-footer-messages '
    ("True mastery of any skill takes a lifetime."))
   (dashboard-set-heading-icons t)
-  (dashboard-set-file-icons t)
-  (dashboard-set-init-info t)
-  (dashboard-set-navigator t))
+  (dashboard-set-file-icons t))
 
 ;;; Modeline
+;; Doom-style mode line.
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :config
@@ -51,12 +51,11 @@
   (setq doom-modeline-github nil)
   (setq doom-modeline-battery nil)
   (setq doom-modeline-buffer-file-name-style 'buffer-name)
-  (setq doom-modeline--eglot t)
   (setq doom-modeline-enable-word-count nil)
   (setq doom-modeline-env-python-executable "~/miniconda3/bin/python3"))
 
 ;;; Subtle fun and orientation
-;; Nyan Cat in the mode line; it also shows the position in the buffer.
+;; Nyan Cat progress indicator in the mode line.
 (use-package nyan-mode
   :init (nyan-mode 1)
   :config
@@ -65,14 +64,17 @@
         nyan-bar-length 20))
 
 ;;; Minibuffer
+;; Vertical completion UI in the minibuffer.
 (use-package vertico
   :init (vertico-mode)
   :custom
   (vertico-count 15))
 
-(use-package savehist ; persist history across restarts; vertico sorts by it
+;; Persist minibuffer history across restarts.
+(use-package savehist
   :init (savehist-mode 1))
 
+;; Space-separated, order-independent completion matching.
 (use-package orderless
   :init
   (setq completion-styles '(orderless basic)
@@ -80,10 +82,12 @@
         completion-category-overrides '((file (styles basic partial-completion))))
   )
 
+;; Show docs and metadata beside completion candidates.
 (use-package marginalia
   :init (marginalia-mode 1))
 
 ;;; Buffer management
+;; Manage buffers in a tabulated list.
 (use-package ibuffer
   :ensure nil
   :bind ("C-x C-b" . ibuffer)
@@ -91,11 +95,13 @@
   :config
   (setq ibuffer-show-empty-filter-groups nil))
 
+;; Clean up old buffers periodically.
 (use-package midnight
   :ensure nil
   :init (midnight-mode 1))
 
 ;;; Useful highlights and colors
+;; Highlight matching parentheses.
 (use-package paren
   :config
   (setq show-paren-when-point-inside-paren t
@@ -104,9 +110,11 @@
         show-paren-delay 0.1)
   )
 
+;; Color nested delimiters by depth.
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
+;; Highlight the current line.
 (use-package hl-line
   :hook (after-init . global-hl-line-mode)
   :config
@@ -116,24 +124,25 @@
 						(line-beginning-position 2))))
   )
 
+;; Draw indentation guides with characters.
 (use-package indent-bars
   :init
-  (setq indent-tabs-mode t
-	indent-bars-no-descend-lists t
+  (setq indent-bars-no-descend-lists t
 	indent-bars-prefer-character t)
   :hook (prog-mode . indent-bars-mode))
 
-;; Outli: org-style folding in code buffers
+;; Outli: org-style folding in code buffers.
 (use-package outli
   :vc (:url "https://github.com/jdtsmith/outli")
   :hook (prog-mode . outli-mode))
 
+;; Highlight TODO, FIXME, and similar keywords.
 (use-package hl-todo
   :init (global-hl-todo-mode))
 
 ;;; Spell checking
-;; The dictionary is English-only, so non-ASCII words are skipped: without
-;; that, every Chinese word in notes and mail would be underlined.
+;; Spell checking through Jinx/enchant; skip non-ASCII words because the
+;; dictionary is English-only.
 (use-package jinx
   :hook ((org-mode . jinx-mode)
          (LaTeX-mode . jinx-mode)
@@ -165,13 +174,9 @@
 (global-set-key (kbd "C--") #'text-scale-decrease)
 (global-set-key (kbd "C-=") #'text-scale-increase)
 
-;; (use-package posframe)
+;; Rime is disabled; the system input method is used (see archive/).
 
-;; Rime is archived for now; the system input method is used instead.
-;; See archive/init-archive.el if it needs to be restored.
-
-;; macOS input source switching: English in the minibuffer and for prefix
-;; keys, then restore the buffer's input source.  Requires `macism'.
+;; Switch macOS input sources around minibuffer/prefix use (needs macism).
 (use-package sis
   :if *is-mac*
   :hook (after-init . sis-global-respect-mode)
@@ -183,16 +188,7 @@
   (setq sis-respect-start nil))
 
 ;;; Themes
-;; (load-theme 'ef-frost :no-confirm)
 (load-theme 'ef-reverie :no-confirm)
-;; (load-theme 'ef-trio-light :no-confirm)
-;; (load-theme 'doom-nord-light :no-confirm)
-;; (load-theme 'catppuccin :no-confirm)
-;; (setq catppuccin-flavor 'latte)
-;; (catppuccin-reload)
-;; (load-theme 'modus-operandi :no-confirm)
-;; (load-theme 'doom-flatwhite :no-confirm)
-
 
 ;;; Dired
 (when *is-mac*
@@ -230,8 +226,7 @@
   ;; Keep preview/thumbnail caches out of the config directory.
   (dirvish-cache-dir (expand-file-name "dirvish/"
                                        (expand-file-name ".cache" user-emacs-directory)))
-  ;; No epub dispatcher: it needs `epub-thumbnailer', which is not installed.
-  ;; .epub files open in nov instead (see init-package.el).
+  ;; No epub preview (`epub-thumbnailer' is missing); .epub opens in nov.
   (dirvish-preview-dispatchers '(video image gif audio archive font pdf))
   (dirvish-quick-access-entries
    '(("h" "~/" "Home")
@@ -244,11 +239,8 @@
 )
 
 ;;; Ligature
-;; Maple Mono NF CN draws its ligatures through the `calt' feature; the
-;; sequences below are the font's own calt table (see its
-;; documentation/opentype-features.md).  Emacs cannot enable OpenType
-;; features, so anything gated behind ssXX/cvXX (>>=, -<<, ~=, =~, !~ ...)
-;; is deliberately absent.
+;; Maple Mono NF CN's `calt' ligature table.  ssXX/cvXX forms (>>=, -<<, ~=,
+;; =~, !~ ...) need OpenType features Emacs cannot enable, so they are absent.
 (defconst grant-ligatures
   '("!==" "!!" "!="
     "#######" "#_(" "#__" "#!" "#(" "#:" "#=" "#?" "#[" "#_" "#{"
@@ -272,10 +264,8 @@
     "~~~~~~~" "~~>" "~-" "~>" "~@" "~~")
   "Fixed-length ligatures of Maple Mono NF CN, grouped by first character.")
 
-;; The font can draw - = # ~ and arrows at any length (`----->', `===='),
-;; so a regexp is cheaper than enumerating lengths.  The regexp describes
-;; what follows the first character, because the composition rule always
-;; starts by matching `.` against it.
+;; Match - = # ~ and arrows at any length with a regexp rather than
+;; enumerating; the regexp starts after the first char (the rule matches `.`).
 (defconst grant-ligature-regexps
   '((?- . "-+\\(?:[<>]\\|}}\\|~\\)?")
     (?= . "=+\\(?:[<>]=\\|[!/:]=\\|[<>:]\\)?")
@@ -317,10 +307,6 @@ They are tried before the fixed-length strings that share a first character.")
   (face-spec-reset-face face)
   (set-face-foreground face (face-attribute 'default :background)))
 (set-face-background 'fringe (face-attribute 'default :background))
-
-;; Appine is disabled; the frame appearance follows macOS again.
-;; (when (and *is-mac* (display-graphic-p))
-;;   (set-frame-parameter nil 'ns-appearance 'light))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

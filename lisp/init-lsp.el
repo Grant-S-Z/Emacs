@@ -2,10 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 ;;; TS
-;; Emacs 31 knows which classic modes have a tree-sitter counterpart:
-;; `treesit-major-mode-remap-alist' is pre-populated, and setting
-;; `treesit-enabled-modes' through Custom (hence `setopt', not `setq')
-;; copies those pairs into `major-mode-remap-alist'.
+;; Emacs 31 remaps classic modes to tree-sitter when `treesit-enabled-modes'
+;; is set through Custom (hence `setopt', not `setq').
 (require 'treesit)
 ;; `init-org', `init-tex' and `init-fun' use `string-trim' / `when-let*'.
 (require 'subr-x)
@@ -14,16 +12,19 @@
   (setopt treesit-enabled-modes t))
 
 ;;; Format
+;; Format buffers with external formatters.
 (use-package format-all
   :bind ("C-c C-<return>" . format-all-buffer))
 
 
 ;;; Corfu
+;; Extra completion-at-point backends (files, Elisp in Org).
 (use-package cape
   :init
   (add-hook 'completion-at-point-functions #'cape-elisp-block) ; elisp in org babel
   (add-hook 'completion-at-point-functions #'cape-file))
 
+;; Popup completion UI for in-buffer completion.
 (use-package corfu
   :hook ((emacs-lisp-mode . corfu-mode)
          (lisp-interaction-mode . corfu-mode)
@@ -47,6 +48,7 @@
                 (kbd (format "M-%s" i))
                 (kbd (format "C-%s <tab>" i)))))
 
+;; Nerd icons in the Corfu completion margin.
 (use-package nerd-icons-corfu
   :after corfu
   :init (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
@@ -54,15 +56,14 @@
 
 ;;; Eglot
 (with-eval-after-load 'eglot
-  ;; Ignore dynamic LSP file-watch registration; `eglot-ignored-server-capabilities'
-  ;; does not intercept this path on macOS, where recursive watchers can exhaust kqueue.
+  ;; Skip dynamic file-watch registration; `eglot-ignored-server-capabilities'
+  ;; cannot block it, and recursive watchers exhaust kqueue on macOS.
   (cl-defmethod eglot-register-capability :around
-      (_server (method (eql workspace/didChangeWatchedFiles)) _id &rest _params)
+      (_server (_method (eql workspace/didChangeWatchedFiles)) _id &rest _params)
     "Disable recursive LSP file watchers to preserve file descriptors."
     nil)
-  ;; Interpreter used by Pyright, kept separate from Emacs'
-  ;; `python-shell-interpreter'.  Without it Pyright picks one from PATH and
-  ;; may land on the Homebrew Python.
+  ;; Give Pyright its own interpreter; otherwise it picks one from PATH and may
+  ;; land on the Homebrew Python.
   (setq-default eglot-workspace-configuration
                 (list :python (list :pythonPath
                                     (if *is-wsl*
@@ -76,7 +77,7 @@
 
 
 ;;; Languages
-;; Python
+;; Python mode with the Miniconda interpreter and Eglot.
 (use-package python
   :init (defvar python-path "~/miniconda3/bin/python3")
   :mode ("\\.py\\'" . python-ts-mode)
@@ -89,10 +90,11 @@
   (setq python-indent-guess-indent-offset-verbose nil)
   (setq python-shell-completion-native-enable t))
 
-;; Markdown
+;; Tree-sitter major mode for Markdown.
 (use-package markdown-ts-mode
   :mode (("README\\.md\\'" . markdown-ts-mode)
          ("\\.md\\'" . markdown-ts-mode)))
+;; Reveal Markdown markup and math only at point.
 (use-package markdown-ts-appear
   :hook ((markdown-ts-mode . markdown-ts-appear-mode)
          (markdown-ts-mode . markdown-ts-appear-mathjax-mode))
@@ -103,7 +105,7 @@
 (add-hook 'c-ts-mode-hook #'eglot-ensure)
 (add-hook 'c++-ts-mode-hook #'eglot-ensure)
 
-;; CSV
+;; Major mode for editing CSV files.
 (use-package csv-mode)
 
 (provide 'init-lsp)
