@@ -128,29 +128,8 @@
      (latex . t)))
 
   ;; Agenda files and capture templates
-  (setq org-agenda-files '("~/org/class.org" "~/org/task.org" "~/org/journal.org"))
+  (setq org-agenda-files '("~/org/journal.org" "~/org/orgtd/gtd.org"))
   (setq org-capture-templates nil)
-  (add-to-list 'org-capture-templates '("t" "Tasks"))
-  (add-to-list 'org-capture-templates
-	       '("tw" "Work" entry
-		 (file+headline "~/org/task.org" "Work")
-		 "* TODO %^{Workname}\n%u\n"))
-  (add-to-list 'org-capture-templates
-	       '("th" "Homework" entry
-		 (file+headline "~/org/task.org" "Homework")
-		 "* TODO %^{Homeworkname}\n%u\n"))
-  (add-to-list 'org-capture-templates
-	       '("tl" "Long Task" entry
-		 (file+headline "~/org/task.org" "Long Task")
-		 "* TODO %^{Longtaskname}\n%u\n"))
-  (add-to-list 'org-capture-templates
-	       '("tq" "Questions" entry
-		 (file+headline "~/org/task.org" "Questions")
-		 "* TODO %^{Questionname}\n%u\n"))
-  (add-to-list 'org-capture-templates
-	       '("c" "Class" entry
-		 (file "~/org/class.org")
-		 "* TODO %^{Coursename}\n%u\n"))
   (add-to-list 'org-capture-templates
 	       '("i" "Inbox" entry (file "~/org/inbox.org")
 		 "* %U - %^{Inboxname}\n%?"))
@@ -158,16 +137,9 @@
 	       '("j" "Journal" entry (file "~/org/journal.org")
 		 "* %U - Journal\n  %?"))
   (add-to-list 'org-capture-templates
-	       '("e" "Event" entry (file "~/org/event.org")
-		 "* TODO %^{Eventname}\n  %?"))
-  (add-to-list 'org-capture-templates
-	       `("s" "Sketch"
-		 plain
-		 (file (lambda ()
-			 (let ((title (read-string "Title: ")))
-			   (setq my/sketch-title title)
-			   (format "~/org/sketch/%s.org" title))))
-		 "#+title: %(capitalize my/sketch-title)\n#+author: Grant\n#+date: %t\n-----\n"))
+	       '("g" "GTD" entry
+		 (file "~/org/orgtd/gtd.org")
+		 "* TODO %^{GTD}\n"))
 
   :custom
   ;; Prettify

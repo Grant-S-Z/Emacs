@@ -83,6 +83,18 @@
 (use-package marginalia
   :init (marginalia-mode 1))
 
+;;; Buffer management
+(use-package ibuffer
+  :ensure nil
+  :bind ("C-x C-b" . ibuffer)
+  :hook (ibuffer-mode . ibuffer-auto-mode)
+  :config
+  (setq ibuffer-show-empty-filter-groups nil))
+
+(use-package midnight
+  :ensure nil
+  :init (midnight-mode 1))
+
 ;;; Useful highlights and colors
 (use-package paren
   :config

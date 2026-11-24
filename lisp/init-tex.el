@@ -50,6 +50,66 @@
   :mode ("\\.pdf\\'" . pdf-view-mode)
   :config (pdf-tools-install))
 
+;; pdf-view-roll-minor-mode remaps the standard scroll commands to one-line
+;; steps.  Use multi-line, screenful, and multi-column steps instead.
+(defvar grant/pdf-scroll-lines 3
+  "Lines to scroll per pdf-view line command.")
+(defvar grant/pdf-hscroll-columns 5
+  "Columns to scroll per pdf-view horizontal command.")
+
+(defun grant/pdf-scroll-down (&optional arg)
+  "Scroll the PDF down ARG times `grant/pdf-scroll-lines'."
+  (interactive "p")
+  (let ((n (* (or arg 1) grant/pdf-scroll-lines)))
+    (if (bound-and-true-p pdf-view-roll-minor-mode)
+        (pdf-roll-scroll-forward n)
+      (pdf-view-next-line-or-next-page n))))
+
+(defun grant/pdf-scroll-up (&optional arg)
+  "Scroll the PDF up ARG times `grant/pdf-scroll-lines'."
+  (interactive "p")
+  (let ((n (* (or arg 1) grant/pdf-scroll-lines)))
+    (if (bound-and-true-p pdf-view-roll-minor-mode)
+        (pdf-roll-scroll-backward n)
+      (pdf-view-previous-line-or-previous-page n))))
+
+(defun grant/pdf-scroll-screen-down (&optional arg)
+  "Scroll the PDF down ARG screens."
+  (interactive "p")
+  (if (bound-and-true-p pdf-view-roll-minor-mode)
+      (pdf-roll-scroll-screen-forward (or arg 1))
+    (pdf-view-scroll-up-or-next-page)))
+
+(defun grant/pdf-scroll-screen-up (&optional arg)
+  "Scroll the PDF up ARG screens."
+  (interactive "p")
+  (if (bound-and-true-p pdf-view-roll-minor-mode)
+      (pdf-roll-scroll-screen-backward (or arg 1))
+    (pdf-view-scroll-down-or-previous-page)))
+
+(defun grant/pdf-hscroll-left (&optional arg)
+  "Scroll the PDF left ARG times `grant/pdf-hscroll-columns'."
+  (interactive "p")
+  (image-forward-hscroll (- (* (or arg 1) grant/pdf-hscroll-columns))))
+
+(defun grant/pdf-hscroll-right (&optional arg)
+  "Scroll the PDF right ARG times `grant/pdf-hscroll-columns'."
+  (interactive "p")
+  (image-forward-hscroll (* (or arg 1) grant/pdf-hscroll-columns)))
+
+(with-eval-after-load 'pdf-view
+  (define-key pdf-view-mode-map (kbd "SPC") #'grant/pdf-scroll-screen-down)
+  (define-key pdf-view-mode-map (kbd "S-SPC") #'grant/pdf-scroll-screen-up)
+  (define-key pdf-view-mode-map (kbd "DEL") #'grant/pdf-scroll-screen-up)
+  (define-key pdf-view-mode-map (kbd "C-n") #'grant/pdf-scroll-down)
+  (define-key pdf-view-mode-map (kbd "C-p") #'grant/pdf-scroll-up)
+  (define-key pdf-view-mode-map (kbd "<down>") #'grant/pdf-scroll-down)
+  (define-key pdf-view-mode-map (kbd "<up>") #'grant/pdf-scroll-up)
+  (define-key pdf-view-mode-map (kbd "C-b") #'grant/pdf-hscroll-left)
+  (define-key pdf-view-mode-map (kbd "C-f") #'grant/pdf-hscroll-right)
+  (define-key pdf-view-mode-map (kbd "<left>") #'grant/pdf-hscroll-left)
+  (define-key pdf-view-mode-map (kbd "<right>") #'grant/pdf-hscroll-right))
+
 ;; PDF presentation mode on top of pdf-tools: full screen, page fit, no
 ;; clutter.  In a PDF buffer press P or M-x grant-pdf-present-mode; q quits,
 ;; m inverts.
@@ -146,80 +206,6 @@
 (with-eval-after-load 'pdf-history
   (define-key pdf-history-minor-mode-map (kbd "l")
     #'pdf-annot-list-annotations))
-
-;;; Doc View PDF presentation (shared by macOS and WSL)
-(with-eval-after-load 'doc-view
-  (add-hook 'doc-view-mode-hook #'doc-view-fit-width-to-window)
-
-  (defvar-local grant-docview-present--saved nil
-    "State saved before entering `grant-docview-present-mode'.")
-  (defvar-local grant-docview-present--page nil
-    "Page shown when presentation mode last refit.")
-
-  (defvar grant-docview-present-mode-map
-    (let ((map (make-sparse-keymap)))
-      (set-keymap-parent map doc-view-mode-map)
-      (define-key map (kbd "q") #'grant-docview-present-mode)
-      (define-key map (kbd "n") #'doc-view-next-page)
-      (define-key map (kbd "SPC") #'doc-view-next-page)
-      (define-key map (kbd "p") #'doc-view-previous-page)
-      (define-key map (kbd "DEL") #'doc-view-previous-page)
-      map)
-    "Keymap for `grant-docview-present-mode'.")
-
-  (defun grant-docview-present--refit ()
-    "Refit the page after a page change while presenting."
-    (when (and grant-docview-present-mode
-               (derived-mode-p 'doc-view-mode)
-               grant-docview-present--page
-               (/= (doc-view-current-page) grant-docview-present--page))
-      (setq grant-docview-present--page (doc-view-current-page))
-      (doc-view-fit-page-to-window)))
-
-  (define-minor-mode grant-docview-present-mode
-    "Present the current PDF full-screen with Doc View."
-    :lighter " Present"
-    :keymap grant-docview-present-mode-map
-    (if grant-docview-present-mode
-        (progn
-          (unless (derived-mode-p 'doc-view-mode)
-            (setq grant-docview-present-mode nil)
-            (user-error "Only available in Doc View buffers"))
-          (setq grant-docview-present--saved
-                (list :fullscreen (frame-parameter nil 'fullscreen)
-                      :mode-line mode-line-format
-                      :header-line header-line-format
-                      :cursor cursor-type
-                      :tab-bar (bound-and-true-p tab-bar-mode)
-                      :line-numbers (bound-and-true-p display-line-numbers-mode)))
-          (unless (frame-parameter nil 'fullscreen)
-            (toggle-frame-fullscreen))
-          (when (bound-and-true-p tab-bar-mode)
-            (tab-bar-mode -1))
-          (setq-local mode-line-format nil
-                      header-line-format nil
-                      cursor-type nil)
-          (display-line-numbers-mode -1)
-          (doc-view-fit-page-to-window)
-          (setq grant-docview-present--page (doc-view-current-page))
-          (add-hook 'post-command-hook #'grant-docview-present--refit nil t)
-          (message "Presentation: n/SPC next, p/DEL previous, q quit"))
-      (remove-hook 'post-command-hook #'grant-docview-present--refit t)
-      (when-let* ((state grant-docview-present--saved))
-        (unless (eq (frame-parameter nil 'fullscreen)
-                    (plist-get state :fullscreen))
-          (toggle-frame-fullscreen))
-        (when (plist-get state :tab-bar)
-          (tab-bar-mode 1))
-        (setq-local mode-line-format (plist-get state :mode-line)
-                    header-line-format (plist-get state :header-line)
-                    cursor-type (plist-get state :cursor))
-        (when (plist-get state :line-numbers)
-          (display-line-numbers-mode 1)))
-      (setq grant-docview-present--saved nil
-            grant-docview-present--page nil)))
-
-  (define-key doc-view-mode-map (kbd "P") #'grant-docview-present-mode))
 
 (provide 'init-tex)
 ;;; init-tex.el ends here

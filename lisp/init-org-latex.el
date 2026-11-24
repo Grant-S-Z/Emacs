@@ -74,8 +74,18 @@ linkcolor=black
 ")
   (setq org-latex-prefer-user-labels t)
   (setq org-beamer-theme (if *is-wsl* "THU" "metropolis"))
-  ;; Open PDF links in Emacs (pdf-tools).
-  (add-to-list 'org-file-apps '("\\.pdf\\'" . emacs))
+  ;; Open PDF links in Emacs, reverting an existing pdf-view buffer.
+  (defun grant/open-pdf-in-emacs (file _link)
+    "Open FILE in Emacs, reverting it when already visited."
+    (let ((buffer (find-buffer-visiting file)))
+      (if buffer
+          (with-current-buffer buffer
+            (when (derived-mode-p 'pdf-view-mode)
+              (revert-buffer nil t t))
+            (pop-to-buffer buffer))
+        (pop-to-buffer (find-file-noselect file)))))
+  (add-to-list 'org-file-apps
+               '("\\.pdf\\'" . grant/open-pdf-in-emacs))
   (setq org-latex-pdf-process
 	'("latexmk --lualatex -shell-escape -interaction=nonstopmode -output-directory=%o %f"))
 

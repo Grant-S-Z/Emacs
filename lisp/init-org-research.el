@@ -71,8 +71,10 @@
 (defun grant/org-fc-deck-buffer-p ()
   "Non-nil when the current buffer visits the vocabulary deck."
   (and buffer-file-name
-       (string-prefix-p (expand-file-name "~/org/English/")
-                        (expand-file-name buffer-file-name))))
+       ;; Compare case-insensitively: the deck lives in ~/org/english, but
+       ;; macOS and the WSL checkout disagree about the directory's case.
+       (string-prefix-p (downcase (expand-file-name "~/org/english/"))
+                        (downcase (expand-file-name buffer-file-name)))))
 
 (defun grant/org-fc-deck-disable-valign ()
   "Turn off `valign-mode' in the vocabulary deck."

@@ -22,12 +22,15 @@
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 
-;; Postpone GC while loading init files; restore a generous threshold
-;; after startup.  Repeated garbage collection during init is a common
-;; cause of slow startup.
+;; Postpone GC while loading init files; after startup use a 32 MB
+;; threshold and collect once the heap has grown by 10%.  Leaving the
+;; percentage at its default 1.0 lets a large heap grow by ~100% before
+;; the next collection.
 (setq gc-cons-threshold most-positive-fixnum)
-(add-hook 'emacs-startup-hook
-          (lambda () (setq gc-cons-threshold (* 32 1024 1024))))
+(add-hook 'after-init-hook
+          (lambda ()
+            (setq gc-cons-threshold (* 32 1024 1024)
+                  gc-cons-percentage 0.1)))
 
 ;; Init files use `use-package' macros whose expansion depends on init-elpa;
 ;; native-comp's async process does not load init-elpa, so keep it away from

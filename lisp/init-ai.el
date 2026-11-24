@@ -2,7 +2,6 @@
 ;;; Commentary:
 ;; agent-shell / agent-shell-math-renderer
 ;;; Code:
-
 ;; Agentero is an external CLI called by the ACP agent, not an ACP server.
 (let ((bin (expand-file-name "~/.local/bin")))
   (add-to-list 'exec-path bin)
@@ -40,7 +39,13 @@
   :config
   ;; (setq agent-shell-preferred-agent-config 'pi)
   ;; (setq agent-shell-preferred-agent-config 'omp)
-  (setq agent-shell-preferred-agent-config 'kimi)
+  (setq agent-shell-preferred-agent-config 'deepseek)
+  ;; An alist of (OPTION . VALUE), applied in order at session start.  The
+  ;; DeepSeek model value is the ACP route pair the agent advertises, not the
+  ;; bare model id; `M-x agent-shell-config-options' lists the valid values.
+  (setq agent-shell-deepseek-default-config-options
+        '(("model" . "[\"deepseek-official\",\"deepseek-flash\"]")
+          ("reasoning_effort" . "max")))
   ;; xclip exists on macOS but needs X11; drop it so text yanks fall through
   ;; to the normal `yank' instead of starting XQuartz.
   (when *is-mac*
@@ -53,6 +58,10 @@
         (if *is-mac*
             '("/opt/homebrew/bin/kimi" "acp")
           '("~/.kimi-code/bin/kimi" "acp")))
+  ;; Same PATH caveat for the DeepSeek Harness launcher installed by npm.
+  (when *is-mac*
+    (setq agent-shell-deepseek-acp-command
+          '("/opt/homebrew/bin/dsh" "--profile" "acp")))
   (setq agent-shell-kimi-default-session-mode-id "auto")
   ;; Replay the whole history when restoring a session via session/load.
   ;; The default 'minimal shows only the session title; last / first-last / full
@@ -192,9 +201,18 @@ current shell's working directory and asks for confirmation."
             #'agent-shell-math-renderer-on-appearance-change)
   (setq agent-shell-math-renderer-rescale-inline 0.9)
   (setq agent-shell-math-renderer-rescale-display 0.9)
-  ;; Allow Chinese in formulas.
-  (setq latex-to-svg-backend-appended-preamble
-        "\\usepackage[UTF8,fontset=fandol]{ctex}")
+  ;; Chinese in formulas, plus packages that LLM replies commonly use.
+  ;; `physics' is deliberately absent: it redefines siunitx's \qty.
+  (setq latex-to-svg-backend-preamble-packages
+        (concat "\\usepackage[UTF8,fontset=fandol]{ctex}\n"
+                "\\usepackage{bm}\n"
+                "\\usepackage{mathtools}\n"
+                "\\usepackage{cancel}\n"
+                "\\usepackage{siunitx}\n"
+                "\\usepackage[version=4]{mhchem}\n"
+                "\\usepackage{esint}\n"
+                "\\usepackage{slashed}\n"
+                "\\usepackage{mathrsfs}"))
   )
 
 (provide 'init-ai)
