@@ -19,6 +19,7 @@
 (require 'init-org-research)
 (require 'init-org-publish)
 (require 'init-fun)
+(require 'init-etaf)
 (require 'init-kbd)
 
 (provide 'init)

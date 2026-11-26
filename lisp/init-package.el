@@ -128,30 +128,6 @@
   (setq gt-default-translator (gt-translator :engines (gt-youdao-dict-engine)))
   (setq gt-taker-pick 'paragraph))
 
-;;; Music
-;; Play music and media with mpv.
-(use-package empv
-  :custom
-  (empv-action-handler 'completing-read)
-  (empv-audio-dir '("~/music/free/"))
-  :config
-  (with-eval-after-load 'embark
-    (empv-embark-initialize-extra-actions)))
-
-;; MaiMemo vocabulary service (token in ~/.config/memo-api.json).
-(use-package maimemo
-  :ensure nil                            ; not on MELPA, loaded from site-lisp
-  :load-path "~/.emacs.d/site-lisp/maimemo"
-  :commands (maimemo-add-word
-             maimemo-add-word-to-notepad
-             maimemo-study-progress
-             maimemo-today-items)
-  :bind (("C-c m a" . maimemo-add-word)            ; add to study plan (C-u: review early)
-         ("C-c m n" . maimemo-add-word-to-notepad) ; add to cloud notepad
-         ("C-c m p" . maimemo-study-progress)      ; today's progress
-         ("C-c m t" . maimemo-today-items))        ; today's word list
-  )
-
 
 (provide 'init-package)
 ;;; init-package.el ends here

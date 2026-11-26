@@ -31,6 +31,7 @@ pomm
 /devdocs
 /places/var/dsh-acp
 /agent
+/agent-shell
 /eca
 /xenops
 /persist
